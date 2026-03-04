@@ -1,0 +1,130 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --surface: 204 32% 96%;
+  --surface-foreground: 220 31% 16%;
+  --surface-muted: 204 28% 90%;
+  --surface-border: 213 22% 78%;
+  --surface-accent: 27 95% 54%;
+}
+
+.dark {
+  --surface: 220 35% 10%;
+  --surface-foreground: 210 24% 93%;
+  --surface-muted: 220 27% 16%;
+  --surface-border: 219 16% 30%;
+  --surface-accent: 31 95% 60%;
+}
+
+* {
+  @apply border-surface-border;
+}
+
+body {
+  @apply text-surface-foreground antialiased;
+  background:
+    radial-gradient(circle at 0% 0%, rgba(255, 140, 64, 0.22), transparent 34%),
+    radial-gradient(circle at 100% 20%, rgba(0, 118, 255, 0.18), transparent 38%),
+    linear-gradient(165deg, rgba(255, 255, 255, 0.5), rgba(235, 242, 255, 0.4)),
+    hsl(var(--surface));
+  font-family: var(--font-sans), 'Segoe UI', sans-serif;
+}
+
+.dark body {
+  background:
+    radial-gradient(circle at 5% 0%, rgba(255, 136, 45, 0.2), transparent 38%),
+    radial-gradient(circle at 95% 25%, rgba(56, 132, 255, 0.2), transparent 40%),
+    linear-gradient(165deg, rgba(20, 25, 39, 0.95), rgba(11, 18, 32, 0.96)),
+    hsl(var(--surface));
+}
+
+pre,
+code {
+  font-family: var(--font-mono), ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono',
+    'Courier New', monospace;
+}
+
+.markdown-preview {
+  @apply text-[15px] leading-7;
+}
+
+.markdown-preview h1 {
+  @apply mt-6 mb-2 text-3xl font-bold tracking-tight;
+}
+
+.markdown-preview h2 {
+  @apply mt-5 mb-2 text-2xl font-semibold tracking-tight;
+}
+
+.markdown-preview h3 {
+  @apply mt-5 mb-2 text-xl font-semibold;
+}
+
+.markdown-preview h4 {
+  @apply mt-4 mb-2 text-lg font-semibold;
+}
+
+.markdown-preview h5 {
+  @apply mt-4 mb-2 text-base font-semibold;
+}
+
+.markdown-preview h6 {
+  @apply mt-4 mb-2 text-sm font-semibold uppercase tracking-wide;
+}
+
+.markdown-preview p {
+  @apply my-3 leading-7;
+}
+
+.markdown-preview ul {
+  @apply my-3 list-disc space-y-1 pl-6;
+}
+
+.markdown-preview ol {
+  @apply my-3 list-decimal space-y-1 pl-6;
+}
+
+.markdown-preview li {
+  @apply pl-1;
+}
+
+.markdown-preview blockquote {
+  @apply my-3 border-l-4 border-surface-accent/70 bg-surface-muted/70 py-2 pl-3 italic;
+}
+
+.markdown-preview a {
+  @apply font-medium text-sky-700 underline underline-offset-4 dark:text-sky-300;
+}
+
+.markdown-preview pre {
+  @apply my-4 overflow-x-auto rounded-lg bg-black/85 p-3 text-zinc-100;
+}
+
+.markdown-preview table {
+  @apply my-4 w-full border-collapse overflow-hidden rounded-lg;
+}
+
+.markdown-preview th,
+.markdown-preview td {
+  @apply border border-surface-border px-3 py-2 text-left;
+}
+
+.hljs-keyword,
+.hljs-selector-tag,
+.hljs-literal,
+.hljs-title {
+  color: #f59e0b;
+}
+
+.hljs-string,
+.hljs-attr,
+.hljs-template-tag {
+  color: #34d399;
+}
+
+.hljs-number,
+.hljs-symbol {
+  color: #22d3ee;
+}
