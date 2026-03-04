@@ -7,6 +7,11 @@ import { ThemeProvider } from '@/components/layout/theme-provider';
 export const metadata: Metadata = {
   title: 'Canivete Suico Dev',
   description: 'Canivete suico para devs com ferramentas de produtividade.',
+  icons: {
+    icon: '/developer.png',
+    shortcut: '/developer.png',
+    apple: '/developer.png',
+  },
 };
 
 export default function RootLayout({
