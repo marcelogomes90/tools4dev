@@ -15,7 +15,7 @@ export function Sidebar({ isOpen }: SidebarProps) {
   return (
     <aside
       className={cn(
-        'sticky top-0 hidden h-screen shrink-0 overflow-hidden border-r border-surface-border/80 bg-surface-muted px-3 py-4 transition-all duration-300 lg:block',
+        'sticky top-0 hidden h-screen shrink-0 overflow-x-hidden overflow-y-auto border-r border-surface-border/80 bg-surface-muted px-3 py-4 transition-all duration-300 lg:block',
         isOpen ? 'w-72 opacity-100' : 'w-0 border-r-0 px-0 py-0 opacity-0',
       )}
       aria-hidden={!isOpen}
