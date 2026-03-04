@@ -22,12 +22,17 @@ export const jwtVerifySchema = z.object({
 export const shortenSchema = z.object({
   url: z
     .string()
+    .trim()
     .url('URL invalida.')
-    .refine((value) => value.startsWith('http://') || value.startsWith('https://'), {
-      message: 'Apenas URLs http/https sao permitidas.',
-    }),
+    .refine(
+      (value) => value.startsWith('http://') || value.startsWith('https://'),
+      {
+        message: 'Apenas URLs http/https sao permitidas.',
+      },
+    ),
   slug: z
     .string()
+    .trim()
     .min(3)
     .max(40)
     .regex(/^[a-zA-Z0-9_-]+$/)
@@ -49,5 +54,9 @@ export const imageCompressSchema = z.object({
 export const pdfCompressSchema = z.object({
   fileName: z.string().min(1),
   mimeType: z.literal('application/pdf'),
-  size: z.number().int().positive().max(20 * 1024 * 1024),
+  size: z
+    .number()
+    .int()
+    .positive()
+    .max(20 * 1024 * 1024),
 });

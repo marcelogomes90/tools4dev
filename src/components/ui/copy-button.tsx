@@ -10,7 +10,11 @@ interface CopyButtonProps {
   className?: string;
 }
 
-export function CopyButton({ value, label = 'Copiar', className }: CopyButtonProps) {
+export function CopyButton({
+  value,
+  label = 'Copiar',
+  className,
+}: CopyButtonProps) {
   const [copied, setCopied] = useState(false);
 
   async function onCopy() {
@@ -29,7 +33,11 @@ export function CopyButton({ value, label = 'Copiar', className }: CopyButtonPro
       disabled={!value}
       className={className}
     >
-      {copied ? <ClipboardCheck className="mr-2 h-4 w-4" /> : <Clipboard className="mr-2 h-4 w-4" />}
+      {copied ? (
+        <ClipboardCheck className="mr-2 h-4 w-4" />
+      ) : (
+        <Clipboard className="mr-2 h-4 w-4" />
+      )}
       {copied ? 'Copiado' : label}
     </Button>
   );

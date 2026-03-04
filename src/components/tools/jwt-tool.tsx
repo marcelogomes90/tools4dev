@@ -30,7 +30,9 @@ export function JwtTool() {
   const [decoderError, setDecoderError] = useState('');
 
   const [headerJson, setHeaderJson] = useState('{"alg":"HS256","typ":"JWT"}');
-  const [payloadJson, setPayloadJson] = useState('{"sub":"123","role":"admin"}');
+  const [payloadJson, setPayloadJson] = useState(
+    '{"sub":"123","role":"admin"}',
+  );
   const [secret, setSecret] = useState('my-secret');
   const [showSecret, setShowSecret] = useState(false);
   const [algorithm, setAlgorithm] = useState<'HS256' | 'HS512'>('HS256');
@@ -82,7 +84,9 @@ export function JwtTool() {
       setDecoderError('');
     } catch (err) {
       setDecodedOutput('');
-      setDecoderError(err instanceof Error ? err.message : 'Falha ao decodificar token.');
+      setDecoderError(
+        err instanceof Error ? err.message : 'Falha ao decodificar token.',
+      );
     }
   }
 
@@ -100,7 +104,9 @@ export function JwtTool() {
         body: JSON.stringify({ header, payload, secret, algorithm, expiresIn }),
       });
 
-      const data = (await response.json()) as { ok: true; token: string } | { ok: false; message: string };
+      const data = (await response.json()) as
+        | { ok: true; token: string }
+        | { ok: false; message: string };
 
       if (!response.ok || !data.ok) {
         throw new Error(data.ok ? 'Falha ao assinar token.' : data.message);
@@ -110,7 +116,9 @@ export function JwtTool() {
       setToken(data.token);
       setDecoderError('');
     } catch (err) {
-      setEncoderError(err instanceof Error ? err.message : 'Erro ao assinar token.');
+      setEncoderError(
+        err instanceof Error ? err.message : 'Erro ao assinar token.',
+      );
     } finally {
       setLoadingSign(false);
     }
@@ -126,10 +134,16 @@ export function JwtTool() {
       const response = await fetch('/api/jwt/verify', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ token: token.trim(), key: verifyKey, algorithms: [algorithm] }),
+        body: JSON.stringify({
+          token: token.trim(),
+          key: verifyKey,
+          algorithms: [algorithm],
+        }),
       });
 
-      const data = (await response.json()) as { ok: true; decoded: unknown } | { ok: false; message: string };
+      const data = (await response.json()) as
+        | { ok: true; decoded: unknown }
+        | { ok: false; message: string };
 
       if (!response.ok || !data.ok) {
         throw new Error(data.ok ? 'Token invalido.' : data.message);
@@ -138,21 +152,29 @@ export function JwtTool() {
       setVerifyOutput(pretty(data.decoded));
     } catch (err) {
       setVerifyOutput('');
-      setDecoderError(err instanceof Error ? err.message : 'Falha ao validar token.');
+      setDecoderError(
+        err instanceof Error ? err.message : 'Falha ao validar token.',
+      );
     } finally {
       setLoadingVerify(false);
     }
   }
 
   return (
-    <ToolLayout title={meta.name} description={meta.description} examples={meta.examples}>
+    <ToolLayout
+      title={meta.name}
+      description={meta.description}
+      examples={meta.examples}
+    >
       <div className="space-y-4">
         <div className="inline-flex rounded-xl border border-surface-border bg-surface-muted p-1">
           <button
             type="button"
             onClick={() => setMode('decoder')}
             className={`rounded-lg px-3 py-1.5 text-sm font-medium transition ${
-              mode === 'decoder' ? 'bg-surface text-surface-foreground' : 'text-slate-600 dark:text-slate-300'
+              mode === 'decoder'
+                ? 'bg-surface text-surface-foreground'
+                : 'text-slate-600 dark:text-slate-300'
             }`}
           >
             Decoder
@@ -161,7 +183,9 @@ export function JwtTool() {
             type="button"
             onClick={() => setMode('encoder')}
             className={`rounded-lg px-3 py-1.5 text-sm font-medium transition ${
-              mode === 'encoder' ? 'bg-surface text-surface-foreground' : 'text-slate-600 dark:text-slate-300'
+              mode === 'encoder'
+                ? 'bg-surface text-surface-foreground'
+                : 'text-slate-600 dark:text-slate-300'
             }`}
           >
             Encoder
@@ -214,7 +238,9 @@ export function JwtTool() {
                   <Select
                     id="jwt-alg-enc"
                     value={algorithm}
-                    onChange={(event) => setAlgorithm(event.target.value as 'HS256' | 'HS512')}
+                    onChange={(event) =>
+                      setAlgorithm(event.target.value as 'HS256' | 'HS512')
+                    }
                   >
                     <option value="HS256">HS256</option>
                     <option value="HS512">HS512</option>
@@ -222,7 +248,11 @@ export function JwtTool() {
                 </div>
                 <div>
                   <Label htmlFor="jwt-exp">Expires In</Label>
-                  <Input id="jwt-exp" value={expiresIn} onChange={(event) => setExpiresIn(event.target.value)} />
+                  <Input
+                    id="jwt-exp"
+                    value={expiresIn}
+                    onChange={(event) => setExpiresIn(event.target.value)}
+                  />
                 </div>
               </div>
               <div className="flex flex-wrap gap-2">
@@ -236,7 +266,9 @@ export function JwtTool() {
                   Limpar
                 </Button>
               </div>
-              {encoderError && <p className="text-sm text-rose-600">{encoderError}</p>}
+              {encoderError && (
+                <p className="text-sm text-rose-600">{encoderError}</p>
+              )}
             </InputPanel>
 
             <OutputPanel title="Token assinado">
@@ -263,7 +295,9 @@ export function JwtTool() {
                 />
               </div>
               <div>
-                <Label htmlFor="jwt-verify-key">Secret/Public key para verify</Label>
+                <Label htmlFor="jwt-verify-key">
+                  Secret/Public key para verify
+                </Label>
                 <div className="flex items-stretch gap-2">
                   <Input
                     id="jwt-verify-key"
@@ -287,7 +321,9 @@ export function JwtTool() {
                   <Select
                     id="jwt-alg-dec"
                     value={algorithm}
-                    onChange={(event) => setAlgorithm(event.target.value as 'HS256' | 'HS512')}
+                    onChange={(event) =>
+                      setAlgorithm(event.target.value as 'HS256' | 'HS512')
+                    }
                   >
                     <option value="HS256">HS256</option>
                     <option value="HS512">HS512</option>
@@ -296,14 +332,20 @@ export function JwtTool() {
               </div>
               <div className="flex flex-wrap gap-2">
                 <Button onClick={decodeLocal}>Decode (sem verify)</Button>
-                <Button variant="outline" onClick={verifyServer} disabled={loadingVerify}>
+                <Button
+                  variant="outline"
+                  onClick={verifyServer}
+                  disabled={loadingVerify}
+                >
                   {loadingVerify ? 'Validando...' : 'Verify assinatura'}
                 </Button>
                 <Button variant="ghost" onClick={clearDecoder}>
                   Limpar
                 </Button>
               </div>
-              {decoderError && <p className="text-sm text-rose-600">{decoderError}</p>}
+              {decoderError && (
+                <p className="text-sm text-rose-600">{decoderError}</p>
+              )}
             </InputPanel>
 
             <OutputPanel title="Resultados">

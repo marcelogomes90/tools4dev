@@ -19,11 +19,11 @@ marked.setOptions({
 });
 
 export function MarkdownViewerTool() {
-  const [markdown, setMarkdown] = useState('# Hello Dev\n\n```ts\nconst msg = "Swiss knife";\nconsole.log(msg);\n```');
+  const [markdown, setMarkdown] = useState(
+    '# Hello Dev\n\n```ts\nconst msg = "Swiss knife";\nconsole.log(msg);\n```',
+  );
   const [html, setHtml] = useState('');
   const previewRef = useRef<HTMLDivElement>(null);
-
-  if (!meta) return null;
 
   useEffect(() => {
     let active = true;
@@ -58,8 +58,14 @@ export function MarkdownViewerTool() {
     );
   }
 
+  if (!meta) return null;
+
   return (
-    <ToolLayout title={meta.name} description={meta.description} examples={meta.examples}>
+    <ToolLayout
+      title={meta.name}
+      description={meta.description}
+      examples={meta.examples}
+    >
       <div className="grid gap-4 lg:grid-cols-2">
         <InputPanel>
           <Textarea

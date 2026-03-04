@@ -22,7 +22,8 @@ export function checkRateLimit(
   cleanup(now);
 
   const max = options?.max ?? Number(process.env.RATE_LIMIT_MAX ?? 120);
-  const windowMs = options?.windowMs ?? Number(process.env.RATE_LIMIT_WINDOW_MS ?? 60_000);
+  const windowMs =
+    options?.windowMs ?? Number(process.env.RATE_LIMIT_WINDOW_MS ?? 60_000);
   const current = store.get(key);
 
   if (!current || current.resetAt <= now) {

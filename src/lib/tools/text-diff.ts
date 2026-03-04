@@ -24,7 +24,10 @@ export function buildPatch(oldText: string, newText: string) {
   return createPatch('text.diff', oldText, newText);
 }
 
-export function buildSideBySideDiff(oldText: string, newText: string): SideBySideLine[] {
+export function buildSideBySideDiff(
+  oldText: string,
+  newText: string,
+): SideBySideLine[] {
   const parts = diffLines(oldText, newText);
   const rows: SideBySideLine[] = [];
   let index = 0;

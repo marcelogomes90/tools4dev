@@ -18,9 +18,10 @@ export function TextDiffTool() {
   const [left, setLeft] = useState('linha 1\nlinha antiga\nlinha 3');
   const [right, setRight] = useState('linha 1\nlinha nova\nlinha 3\nlinha 4');
 
-  if (!meta) return null;
-
-  const sideBySide = useMemo(() => buildSideBySideDiff(left, right), [left, right]);
+  const sideBySide = useMemo(
+    () => buildSideBySideDiff(left, right),
+    [left, right],
+  );
   const patch = useMemo(() => buildPatch(left, right), [left, right]);
 
   function clear() {
@@ -29,18 +30,32 @@ export function TextDiffTool() {
   }
 
   function sample() {
-    setLeft('const total = price * amount;\nconsole.log(total);\nreturn total;');
-    setRight('const total = price * qty;\nif (total > 0) {\n  console.log(total);\n}\nreturn total;');
+    setLeft(
+      'const total = price * amount;\nconsole.log(total);\nreturn total;',
+    );
+    setRight(
+      'const total = price * qty;\nif (total > 0) {\n  console.log(total);\n}\nreturn total;',
+    );
   }
 
+  if (!meta) return null;
+
   return (
-    <ToolLayout title={meta.name} description={meta.description} examples={meta.examples}>
+    <ToolLayout
+      title={meta.name}
+      description={meta.description}
+      examples={meta.examples}
+    >
       <div className="space-y-4">
         <InputPanel>
           <div className="grid gap-3 lg:grid-cols-2">
             <div>
               <p className="mb-1 text-sm font-medium">Texto A</p>
-              <Textarea className="min-h-[180px] font-mono" value={left} onChange={(event) => setLeft(event.target.value)} />
+              <Textarea
+                className="min-h-[180px] font-mono"
+                value={left}
+                onChange={(event) => setLeft(event.target.value)}
+              />
             </div>
             <div>
               <p className="mb-1 text-sm font-medium">Texto B</p>
@@ -64,14 +79,17 @@ export function TextDiffTool() {
         <OutputPanel>
           <div className="grid gap-3 lg:grid-cols-2">
             <div className="overflow-hidden rounded-lg border border-surface-border bg-surface-muted/60">
-              <p className="border-b border-surface-border bg-surface px-3 py-2 text-xs font-semibold uppercase">Texto A</p>
+              <p className="border-b border-surface-border bg-surface px-3 py-2 text-xs font-semibold uppercase">
+                Texto A
+              </p>
               <div className="max-h-96 overflow-auto font-mono text-xs leading-6">
                 {sideBySide.map((line) => (
                   <div
                     key={`${line.key}-left`}
                     className={cn(
                       'min-h-6 whitespace-pre-wrap px-3',
-                      line.leftType === 'removed' && 'bg-rose-200/80 text-rose-900 dark:bg-rose-900/50 dark:text-rose-100',
+                      line.leftType === 'removed' &&
+                        'bg-rose-200/80 text-rose-900 dark:bg-rose-900/50 dark:text-rose-100',
                     )}
                   >
                     {line.left || ' '}
@@ -81,7 +99,9 @@ export function TextDiffTool() {
             </div>
 
             <div className="overflow-hidden rounded-lg border border-surface-border bg-surface-muted/60">
-              <p className="border-b border-surface-border bg-surface px-3 py-2 text-xs font-semibold uppercase">Texto B</p>
+              <p className="border-b border-surface-border bg-surface px-3 py-2 text-xs font-semibold uppercase">
+                Texto B
+              </p>
               <div className="max-h-96 overflow-auto font-mono text-xs leading-6">
                 {sideBySide.map((line) => (
                   <div
@@ -100,7 +120,11 @@ export function TextDiffTool() {
           </div>
           <div className="flex gap-2">
             <CopyButton value={patch} label="Copiar diff" />
-            <Button variant="outline" size="sm" onClick={() => downloadText(patch, 'diff.patch')}>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => downloadText(patch, 'diff.patch')}
+            >
               Baixar diff
             </Button>
           </div>

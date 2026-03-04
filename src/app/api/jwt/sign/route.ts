@@ -15,14 +15,26 @@ export async function POST(request: NextRequest) {
   const parsed = jwtSignSchema.safeParse(body);
 
   if (!parsed.success) {
-    return NextResponse.json({ ok: false, message: 'Payload invalido.', errors: parsed.error.flatten() }, { status: 400 });
+    return NextResponse.json(
+      {
+        ok: false,
+        message: 'Payload invalido.',
+        errors: parsed.error.flatten(),
+      },
+      { status: 400 },
+    );
   }
 
   try {
     const { payload, secret, algorithm, header, expiresIn } = parsed.data;
+    const jwtHeader: jwt.JwtHeader = {
+      alg: algorithm,
+      ...(header as Partial<jwt.JwtHeader>),
+    };
+
     const signOptions: jwt.SignOptions = {
       algorithm,
-      header,
+      header: jwtHeader,
     };
 
     if (expiresIn) {
@@ -36,7 +48,8 @@ export async function POST(request: NextRequest) {
     return NextResponse.json(
       {
         ok: false,
-        message: 'Nao foi possivel assinar o token. Verifique payload/header e configuracoes.',
+        message:
+          'Nao foi possivel assinar o token. Verifique payload/header e configuracoes.',
       },
       { status: 400 },
     );

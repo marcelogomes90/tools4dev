@@ -13,10 +13,14 @@ export function badRequest(message: string, details?: unknown) {
   return NextResponse.json({ ok: false, message, details }, { status: 400 });
 }
 
-export function tooManyRequests(message = 'Rate limit excedido. Tente novamente em instantes.') {
+export function tooManyRequests(
+  message = 'Rate limit excedido. Tente novamente em instantes.',
+) {
   return NextResponse.json({ ok: false, message }, { status: 429 });
 }
 
-export function internalError(message = 'Erro interno ao processar requisicao.') {
+export function internalError(
+  message = 'Erro interno ao processar requisicao.',
+) {
   return NextResponse.json({ ok: false, message }, { status: 500 });
 }

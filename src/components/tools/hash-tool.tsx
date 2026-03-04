@@ -66,7 +66,11 @@ export function HashTool() {
   }
 
   return (
-    <ToolLayout title={meta.name} description={meta.description} examples={meta.examples}>
+    <ToolLayout
+      title={meta.name}
+      description={meta.description}
+      examples={meta.examples}
+    >
       <div className="grid gap-4 lg:grid-cols-2">
         <InputPanel>
           <div>
@@ -83,7 +87,9 @@ export function HashTool() {
             <Select
               id="hash-encoding"
               value={encoding}
-              onChange={(event) => setEncoding(event.target.value as 'hex' | 'base64')}
+              onChange={(event) =>
+                setEncoding(event.target.value as 'hex' | 'base64')
+              }
             >
               <option value="hex">Hex</option>
               <option value="base64">Base64</option>
@@ -107,7 +113,10 @@ export function HashTool() {
           {result ? (
             <div className="space-y-3 text-sm">
               {Object.entries(result).map(([algorithm, value]) => (
-                <div key={algorithm} className="rounded-lg border border-surface-border bg-surface-muted p-3">
+                <div
+                  key={algorithm}
+                  className="rounded-lg border border-surface-border bg-surface-muted p-3"
+                >
                   <p className="font-semibold uppercase">{algorithm}</p>
                   <p className="mt-1 break-all font-mono text-xs">{value}</p>
                   <CopyButton value={value} className="mt-2" />
@@ -115,7 +124,9 @@ export function HashTool() {
               ))}
             </div>
           ) : (
-            <p className="text-sm text-slate-600 dark:text-slate-400">Nenhum hash gerado.</p>
+            <p className="text-sm text-slate-600 dark:text-slate-400">
+              Nenhum hash gerado.
+            </p>
           )}
         </OutputPanel>
       </div>

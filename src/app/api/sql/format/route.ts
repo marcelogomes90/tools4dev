@@ -15,7 +15,14 @@ export async function POST(request: NextRequest) {
   const parsed = sqlFormatterSchema.safeParse(body);
 
   if (!parsed.success) {
-    return NextResponse.json({ ok: false, message: 'Payload invalido.', errors: parsed.error.flatten() }, { status: 400 });
+    return NextResponse.json(
+      {
+        ok: false,
+        message: 'Payload invalido.',
+        errors: parsed.error.flatten(),
+      },
+      { status: 400 },
+    );
   }
 
   try {
@@ -28,6 +35,9 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({ ok: true, formatted });
   } catch {
-    return NextResponse.json({ ok: false, message: 'Erro ao formatar SQL. Revise query e dialect.' }, { status: 400 });
+    return NextResponse.json(
+      { ok: false, message: 'Erro ao formatar SQL. Revise query e dialect.' },
+      { status: 400 },
+    );
   }
 }

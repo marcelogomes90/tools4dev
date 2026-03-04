@@ -29,12 +29,20 @@ export function UuidTool() {
   }
 
   return (
-    <ToolLayout title={meta.name} description={meta.description} examples={meta.examples}>
+    <ToolLayout
+      title={meta.name}
+      description={meta.description}
+      examples={meta.examples}
+    >
       <div className="grid gap-4 lg:grid-cols-2">
         <InputPanel>
           <div>
             <Label htmlFor="uuid-type">Formato</Label>
-            <Select id="uuid-type" value={type} onChange={(event) => setType(event.target.value as 'v4' | 'ulid')}>
+            <Select
+              id="uuid-type"
+              value={type}
+              onChange={(event) => setType(event.target.value as 'v4' | 'ulid')}
+            >
               <option value="v4">UUID v4</option>
               <option value="ulid">ULID</option>
             </Select>
@@ -51,8 +59,13 @@ export function UuidTool() {
             />
           </div>
           <div className="flex flex-wrap gap-2">
-            <Button onClick={() => setResult(generateIds(type, amount))}>Gerar</Button>
-            <Button variant="outline" onClick={() => setResult(generateIds('v4', 25))}>
+            <Button onClick={() => setResult(generateIds(type, amount))}>
+              Gerar
+            </Button>
+            <Button
+              variant="outline"
+              onClick={() => setResult(generateIds('v4', 25))}
+            >
               Gerar exemplo
             </Button>
             <Button variant="ghost" onClick={clear}>

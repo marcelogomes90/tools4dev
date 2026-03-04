@@ -17,13 +17,22 @@ export async function POST(request: NextRequest) {
   const parsed = hashSchema.safeParse(body);
 
   if (!parsed.success) {
-    return NextResponse.json({ ok: false, message: 'Payload invalido.', errors: parsed.error.flatten() }, { status: 400 });
+    return NextResponse.json(
+      {
+        ok: false,
+        message: 'Payload invalido.',
+        errors: parsed.error.flatten(),
+      },
+      { status: 400 },
+    );
   }
 
   const { text, encoding } = parsed.data;
 
   const result = algorithms.reduce<Record<string, string>>((acc, algorithm) => {
-    acc[algorithm] = createHash(algorithm).update(text, 'utf8').digest(encoding);
+    acc[algorithm] = createHash(algorithm)
+      .update(text, 'utf8')
+      .digest(encoding);
     return acc;
   }, {});
 

@@ -25,6 +25,7 @@ export function LinkShortenerTool() {
   const [url, setUrl] = useState('');
   const [slug, setSlug] = useState('');
   const [result, setResult] = useState<ShortenResponse | null>(null);
+  const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
   if (!meta) return null;
@@ -32,27 +33,39 @@ export function LinkShortenerTool() {
   async function shorten() {
     setLoading(true);
     setResult(null);
+    setError('');
 
-    const payload = {
-      url,
-      slug: slug || undefined,
-    };
+    try {
+      const payload = {
+        url: url.trim(),
+        slug: slug.trim() || undefined,
+      };
 
-    const response = await fetch('/api/shorten', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(payload),
-    });
+      const response = await fetch('/api/shorten', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      });
 
-    const data = (await response.json()) as ShortenResponse;
-    setResult(data);
-    setLoading(false);
+      const data = (await response.json()) as ShortenResponse;
+      if (!response.ok || !data.ok) {
+        setError(data.message ?? 'Falha ao encurtar URL.');
+        return;
+      }
+
+      setResult(data);
+    } catch {
+      setError('Falha de rede ao chamar o encurtador.');
+    } finally {
+      setLoading(false);
+    }
   }
 
   function clear() {
     setUrl('');
     setSlug('');
     setResult(null);
+    setError('');
   }
 
   function sample() {
@@ -61,7 +74,11 @@ export function LinkShortenerTool() {
   }
 
   return (
-    <ToolLayout title={meta.name} description={meta.description} examples={meta.examples}>
+    <ToolLayout
+      title={meta.name}
+      description={meta.description}
+      examples={meta.examples}
+    >
       <div className="grid gap-4 lg:grid-cols-2">
         <InputPanel>
           <div>
@@ -74,11 +91,19 @@ export function LinkShortenerTool() {
             />
           </div>
           <div>
-            <Label htmlFor="shorten-slug">Slug custom no Bitly (opcional)</Label>
-            <Input id="shorten-slug" placeholder="meu-link" value={slug} onChange={(event) => setSlug(event.target.value)} />
+            <Label htmlFor="shorten-slug">
+              Slug custom no Bitly (opcional)
+            </Label>
+            <Input
+              id="shorten-slug"
+              placeholder="meu-link"
+              value={slug}
+              onChange={(event) => setSlug(event.target.value)}
+            />
           </div>
           <p className="text-xs text-slate-600 dark:text-slate-400">
-            Esta ferramenta usa somente Bitly. Configure `BITLY_TOKEN` no ambiente para habilitar.
+            Esta ferramenta usa somente Bitly. Configure `BITLY_TOKEN` no
+            ambiente para habilitar.
           </p>
           <div className="flex flex-wrap gap-2">
             <Button onClick={shorten} disabled={loading || !url}>
@@ -109,7 +134,7 @@ export function LinkShortenerTool() {
             </div>
           ) : (
             <div className="space-y-2 text-sm text-slate-700 dark:text-slate-300">
-              <p>{result?.message ?? 'Nenhum link curto gerado.'}</p>
+              <p>{error || result?.message || 'Nenhum link curto gerado.'}</p>
             </div>
           )}
         </OutputPanel>

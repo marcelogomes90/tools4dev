@@ -1,7 +1,7 @@
 'use client';
 
 import { ImagePlus } from 'lucide-react';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { getToolBySlug } from '@/lib/tool-registry';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -23,6 +23,12 @@ export function ImageCompressorTool() {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
+  useEffect(() => {
+    return () => {
+      if (resultUrl) URL.revokeObjectURL(resultUrl);
+    };
+  }, [resultUrl]);
+
   if (!meta) return null;
 
   async function compress() {
@@ -31,35 +37,47 @@ export function ImageCompressorTool() {
     setError('');
     setStats('');
 
-    const formData = new FormData();
-    formData.append('file', file);
-    formData.append('format', format);
-    formData.append('quality', String(quality));
+    try {
+      const formData = new FormData();
+      formData.append('file', file);
+      formData.append('format', format);
+      formData.append('quality', String(quality));
 
-    const response = await fetch('/api/image/compress', {
-      method: 'POST',
-      body: formData,
-    });
+      const response = await fetch('/api/image/compress', {
+        method: 'POST',
+        body: formData,
+      });
 
-    if (!response.ok) {
-      const data = (await response.json().catch(() => null)) as { message?: string } | null;
-      setError(data?.message ?? 'Falha ao comprimir imagem.');
+      if (!response.ok) {
+        const data = (await response.json().catch(() => null)) as {
+          message?: string;
+        } | null;
+        setError(data?.message ?? 'Falha ao comprimir imagem.');
+        return;
+      }
+
+      const blob = await response.blob();
+      const url = URL.createObjectURL(blob);
+      if (resultUrl) URL.revokeObjectURL(resultUrl);
+
+      const reduction = Math.max(
+        0,
+        ((file.size - blob.size) / file.size) * 100,
+      );
+      setResultUrl(url);
+      setStats(
+        `Original: ${(file.size / 1024).toFixed(1)}KB | Comprimido: ${(blob.size / 1024).toFixed(1)}KB | Reducao: ${reduction.toFixed(1)}%`,
+      );
+    } catch {
+      setError('Falha de rede ao comprimir imagem.');
+    } finally {
       setLoading(false);
-      return;
     }
-
-    const blob = await response.blob();
-    const url = URL.createObjectURL(blob);
-    const reduction = Math.max(0, ((file.size - blob.size) / file.size) * 100);
-    setResultUrl(url);
-    setStats(
-      `Original: ${(file.size / 1024).toFixed(1)}KB | Comprimido: ${(blob.size / 1024).toFixed(1)}KB | Reducao: ${reduction.toFixed(1)}%`,
-    );
-    setLoading(false);
   }
 
   function clear() {
     setFile(null);
+    if (resultUrl) URL.revokeObjectURL(resultUrl);
     setResultUrl('');
     setStats('');
     setError('');
@@ -71,11 +89,17 @@ export function ImageCompressorTool() {
   }
 
   return (
-    <ToolLayout title={meta.name} description={meta.description} examples={meta.examples}>
+    <ToolLayout
+      title={meta.name}
+      description={meta.description}
+      examples={meta.examples}
+    >
       <div className="grid gap-4 lg:grid-cols-2">
         <InputPanel>
           <div>
-            <Label htmlFor={FILE_INPUT_ID}>Arquivo (png/jpeg/webp/gif, max 10MB)</Label>
+            <Label htmlFor={FILE_INPUT_ID}>
+              Arquivo (png/jpeg/webp/gif, max 10MB)
+            </Label>
             <input
               id={FILE_INPUT_ID}
               type="file"
@@ -88,7 +112,9 @@ export function ImageCompressorTool() {
               className="mt-1 flex min-h-28 cursor-pointer flex-col items-center justify-center rounded-2xl border-2 border-dashed border-surface-border bg-surface/75 px-4 text-center transition hover:border-surface-accent/70 hover:bg-surface-muted/70"
             >
               <ImagePlus className="mb-2 h-5 w-5" />
-              <span className="text-sm font-medium">Clique para selecionar imagem</span>
+              <span className="text-sm font-medium">
+                Clique para selecionar imagem
+              </span>
               <span className="mt-1 text-xs text-slate-600 dark:text-slate-400">
                 {file ? file.name : 'Sem arquivo selecionado'}
               </span>
@@ -99,7 +125,11 @@ export function ImageCompressorTool() {
               <Label>Formato de saida</Label>
               <Select
                 value={format}
-                onChange={(event) => setFormat(event.target.value as 'png' | 'jpeg' | 'webp' | 'gif')}
+                onChange={(event) =>
+                  setFormat(
+                    event.target.value as 'png' | 'jpeg' | 'webp' | 'gif',
+                  )
+                }
               >
                 <option value="png">PNG</option>
                 <option value="jpeg">JPEG</option>
@@ -114,7 +144,14 @@ export function ImageCompressorTool() {
                 min={30}
                 max={95}
                 value={quality}
-                onChange={(event) => setQuality(Number(event.target.value || 80))}
+                onChange={(event) => {
+                  const parsed = Number(event.target.value);
+                  if (Number.isNaN(parsed)) {
+                    setQuality(80);
+                    return;
+                  }
+                  setQuality(Math.max(30, Math.min(95, parsed)));
+                }}
               />
             </div>
           </div>
@@ -152,7 +189,9 @@ export function ImageCompressorTool() {
               </div>
             </div>
           ) : (
-            <p className="text-sm text-slate-600 dark:text-slate-400">Nenhum arquivo processado.</p>
+            <p className="text-sm text-slate-600 dark:text-slate-400">
+              Nenhum arquivo processado.
+            </p>
           )}
         </OutputPanel>
       </div>

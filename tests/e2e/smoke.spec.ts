@@ -2,7 +2,10 @@ import { expect, test } from '@playwright/test';
 
 test('home opens and lists project title', async ({ page }) => {
   await page.goto('/');
-  await expect(page.getByText('Canivete Suico Dev')).toBeVisible();
+  await expect(page).toHaveURL(/\/$/);
+  await expect(
+    page.getByRole('heading', { name: 'Toolkit fullstack para o dia a dia' }),
+  ).toBeVisible();
 });
 
 test('json formatter works', async ({ page }) => {

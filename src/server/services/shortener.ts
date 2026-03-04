@@ -18,8 +18,44 @@ function extractSlugFromLink(link: string) {
   return parts[parts.length - 1] ?? '';
 }
 
+const BITLY_TIMEOUT_MS = 12_000;
+
+function isAbortLikeError(error: unknown) {
+  return (
+    error instanceof Error &&
+    (error.name === 'AbortError' || error.message.includes('aborted'))
+  );
+}
+
+async function requestBitly(
+  endpoint: string,
+  payload: Record<string, unknown>,
+  token: string,
+) {
+  try {
+    return await fetch(endpoint, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify(payload),
+      cache: 'no-store',
+      signal: AbortSignal.timeout(BITLY_TIMEOUT_MS),
+    });
+  } catch (error) {
+    if (isAbortLikeError(error)) {
+      throw new Error('Timeout ao chamar Bitly. Tente novamente.');
+    }
+
+    throw new Error('Falha de rede ao chamar Bitly.');
+  }
+}
+
 async function parseBitlyError(response: Response) {
-  const payload = (await response.json().catch(() => null)) as BitlyError | null;
+  const payload = (await response
+    .json()
+    .catch(() => null)) as BitlyError | null;
 
   if (payload?.description) return payload.description;
   if (payload?.message) return payload.message;
@@ -36,14 +72,11 @@ async function parseBitlyError(response: Response) {
 }
 
 async function createDefaultBitlyLink(url: string, token: string) {
-  const response = await fetch('https://api-ssl.bitly.com/v4/shorten', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      Authorization: `Bearer ${token}`,
-    },
-    body: JSON.stringify({ long_url: url }),
-  });
+  const response = await requestBitly(
+    'https://api-ssl.bitly.com/v4/shorten',
+    { long_url: url },
+    token,
+  );
 
   if (!response.ok) {
     throw new Error(await parseBitlyError(response));
@@ -53,18 +86,15 @@ async function createDefaultBitlyLink(url: string, token: string) {
 }
 
 async function createCustomBitlyLink(url: string, slug: string, token: string) {
-  const response = await fetch('https://api-ssl.bitly.com/v4/bitlinks', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      Authorization: `Bearer ${token}`,
-    },
-    body: JSON.stringify({
+  const response = await requestBitly(
+    'https://api-ssl.bitly.com/v4/bitlinks',
+    {
       long_url: url,
       domain: 'bit.ly',
       keyword: slug,
-    }),
-  });
+    },
+    token,
+  );
 
   if (!response.ok) {
     throw new Error(await parseBitlyError(response));
@@ -74,10 +104,12 @@ async function createCustomBitlyLink(url: string, slug: string, token: string) {
 }
 
 export async function createShortLink(input: BitlyCreateInput) {
-  const token = process.env.BITLY_TOKEN;
+  const token = process.env.BITLY_TOKEN?.trim();
 
   if (!token) {
-    throw new Error('BITLY_TOKEN nao configurado. Defina a variavel de ambiente para usar o encurtador.');
+    throw new Error(
+      'BITLY_TOKEN nao configurado. Defina a variavel de ambiente para usar o encurtador.',
+    );
   }
 
   const bitlyData = input.slug

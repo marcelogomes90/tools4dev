@@ -5,7 +5,11 @@ import { randomUUID } from 'node:crypto';
 import { spawn } from 'node:child_process';
 import { PDFDocument } from 'pdf-lib';
 
-function runGhostscript(inputPath: string, outputPath: string, timeoutMs = 30000) {
+function runGhostscript(
+  inputPath: string,
+  outputPath: string,
+  timeoutMs = 30000,
+) {
   return new Promise<boolean>((resolve) => {
     const child = spawn('gs', [
       '-sDEVICE=pdfwrite',
@@ -37,7 +41,10 @@ function runGhostscript(inputPath: string, outputPath: string, timeoutMs = 30000
 
 async function fallbackPdfLib(buffer: Buffer) {
   const doc = await PDFDocument.load(buffer, { ignoreEncryption: true });
-  const bytes = await doc.save({ useObjectStreams: true, addDefaultPage: false });
+  const bytes = await doc.save({
+    useObjectStreams: true,
+    addDefaultPage: false,
+  });
   return Buffer.from(bytes);
 }
 

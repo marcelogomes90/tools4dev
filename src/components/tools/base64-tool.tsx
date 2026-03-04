@@ -47,12 +47,18 @@ export function Base64Tool() {
       setOutput(decodeBase64(input, urlSafe));
       setError('');
     } catch {
-      setError('Falha ao decodificar base64. Verifique o conteudo e modo URL-safe.');
+      setError(
+        'Falha ao decodificar base64. Verifique o conteudo e modo URL-safe.',
+      );
     }
   }
 
   return (
-    <ToolLayout title={meta.name} description={meta.description} examples={meta.examples}>
+    <ToolLayout
+      title={meta.name}
+      description={meta.description}
+      examples={meta.examples}
+    >
       <div className="grid gap-4 lg:grid-cols-2">
         <InputPanel>
           <Textarea
@@ -61,7 +67,11 @@ export function Base64Tool() {
             placeholder="Digite texto ou base64"
           />
           <label className="flex items-center gap-2 text-sm">
-            <input type="checkbox" checked={urlSafe} onChange={(event) => setUrlSafe(event.target.checked)} />
+            <input
+              type="checkbox"
+              checked={urlSafe}
+              onChange={(event) => setUrlSafe(event.target.checked)}
+            />
             Modo URL-safe
           </label>
           <div className="flex flex-wrap gap-2">

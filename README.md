@@ -1,35 +1,62 @@
 # dev-swiss-knife
 
-Monolito em Next.js (App Router) com 16 ferramentas utilitarias para devs, arquitetura modular, validacao com Zod, protecao basica contra abuso e testes unitarios/e2e.
+Monolito em Next.js (App Router) com 16 ferramentas para produtividade de desenvolvimento.
+
+O projeto foi estruturado para ser:
+
+- modular
+- testavel
+- seguro por padrao
+- pronto para deploy
+
+## Destaques
+
+- 16 ferramentas em uma unica aplicacao
+- App Router + TypeScript
+- validacao com Zod em todas as rotas API
+- rate limit simples por IP (in-memory)
+- Node runtime nas rotas que usam libs Node
+- tema light/dark com toggle
+- testes unitarios (Vitest) e smoke e2e (Playwright)
+- shortener em modo **Bitly-only**
 
 ## Stack
 
-- Next.js (App Router) + TypeScript
+- Next.js 16 (App Router)
+- React + TypeScript
 - TailwindCSS
 - Zod
-- Vitest (unit)
-- Playwright (e2e smoke)
-- Node runtime nas rotas que exigem libs Node (`sharp`, `sql-formatter`, JWT sign/verify e PDF)
+- jsonwebtoken
+- sharp
+- sql-formatter
+- pdf-lib (+ Ghostscript opcional no host)
+- Vitest
+- Playwright
+- ESLint + Prettier
 
 ## Estrutura
 
 ```txt
 src/
-  app/            # Routes, pages e route handlers
-  components/     # UI reutilizavel e componentes de ferramentas
-  lib/            # Funcoes puras por ferramenta
-  server/         # Servicos, validadores e rate-limit
+  app/            # Rotas de pagina e route handlers (/api)
+  components/     # UI reutilizavel e componentes das ferramentas
+  lib/            # Funcoes puras por dominio
+  server/         # Servicos e utilitarios server-only
   types/          # Tipos compartilhados
+
+tests/
+  unit/           # Vitest
+  e2e/            # Playwright smoke
 ```
 
 ## Ferramentas implementadas
 
 1. Gerador de CPF
 2. Gerador de CNPJ
-3. Hash Generator (md5/sha1/sha256/sha512)
-4. UUID/ULID Generator
+3. Hash generator (md5/sha1/sha256/sha512)
+4. UUID/ULID generator
 5. Lorem Ipsum
-6. JWT Encoder/Decoder (decode local, sign/verify server)
+6. JWT encoder/decoder (decode local + sign/verify server)
 7. Base64 encode/decode
 8. Encurtador de links (Bitly only)
 9. Formatador de JSON
@@ -41,51 +68,61 @@ src/
 15. Compressao de imagens
 16. Compressao de PDFs
 
-## Como rodar
+## Requisitos
+
+- Node.js 20+
+- Yarn 1.22+
+- para compressao de PDF de melhor qualidade: `ghostscript` (`gs`) no host
+
+## Como rodar (Yarn)
 
 ```bash
-npm install
-npm run dev
+yarn install
+yarn dev
 ```
 
 App em `http://localhost:3000`.
 
-## Build e start
+## Build e producao
 
 ```bash
-npm run build
-npm run start
+yarn build
+yarn start
 ```
 
-## Testes
-
-```bash
-npm run test
-npm run test:e2e
-```
+> O script de build usa `next build --webpack` para maior estabilidade no ambiente atual.
 
 ## Ambiente
 
-Copie `.env.example` para `.env.local` e ajuste se necessario.
+Copie `.env.example` para `.env.local`:
+
+```bash
+cp .env.example .env.local
+```
 
 Variaveis:
 
-- `BITLY_TOKEN`: obrigatorio para encurtador de links
-- `NEXT_PUBLIC_APP_URL`: base publica da aplicacao
-- `RATE_LIMIT_WINDOW_MS`: janela do rate limit global (padrao 60000)
-- `RATE_LIMIT_MAX`: maximo de requests por janela (padrao 120)
+- `BITLY_TOKEN` (obrigatoria para o encurtador)
+- `NEXT_PUBLIC_APP_URL` (url publica da aplicacao)
+- `RATE_LIMIT_WINDOW_MS` (padrao: `60000`)
+- `RATE_LIMIT_MAX` (padrao: `120`)
 
-## Encurtador de links (Bitly)
+### Bitly token (resumo rapido)
 
-A aplicacao esta em modo Bitly-only para encurtamento.
+1. Crie/login na conta Bitly.
+2. Gere um token de API na configuracao da conta.
+3. Defina em `.env.local`:
 
-- Endpoint: `POST /api/shorten`
-- Payload: `{ "url": "https://...", "slug": "opcional" }`
-- Requisitos:
-  - `BITLY_TOKEN` valido
-  - URL com protocolo `http/https`
+```bash
+BITLY_TOKEN=seu_token_aqui
+```
 
-Obs: o endpoint local `GET /s/:slug` foi desabilitado e retorna `410`, pois o redirecionamento e feito pelo proprio Bitly.
+4. Reinicie `yarn dev`.
+
+Documentacao oficial (Bitly):
+
+- https://dev.bitly.com/docs/getting-started/authentication/
+- https://support.bitly.com/hc/en-us/articles/360001927171-How-do-I-generate-an-OAuth-access-token-for-the-Bitly-API
 
 ## Endpoints principais
 
@@ -96,30 +133,48 @@ Obs: o endpoint local `GET /s/:slug` foi desabilitado e retorna `410`, pois o re
 - `POST /api/sql/format`
 - `POST /api/image/compress`
 - `POST /api/pdf/compress`
+- `GET /s/:slug` (desabilitado em modo Bitly-only, retorna `410`)
 
-## Seguranca e limites
+## Testes
 
-- Validacao de entrada com Zod nas rotas API
-- Rate limit em memoria por IP
-- Limites de upload:
-  - imagem: 10MB, tipos `png/jpeg/webp/gif`
-  - pdf: 20MB, timeout e fallback
-- URL shortener aceita apenas `http/https`
-- Secrets de JWT nao sao persistidos
-- Headers basicos de seguranca em `next.config.ts`
-
-## Compressao de PDF: limitacoes
-
-A rota tenta primeiro Ghostscript (`gs`) para melhor compressao. Se a dependencia de sistema nao estiver disponivel, usa fallback com `pdf-lib`.
-
-Quando nenhum metodo for suficiente, a API retorna erro explicito indicando dependencia de sistema.
+```bash
+yarn test          # unit
+yarn test:e2e      # smoke e2e
+yarn typecheck
+yarn lint
+```
 
 ## Scripts
 
-- `npm run dev`
-- `npm run build`
-- `npm run start`
-- `npm run lint`
-- `npm run format`
-- `npm run test`
-- `npm run test:e2e`
+- `yarn dev`
+- `yarn build`
+- `yarn start`
+- `yarn lint`
+- `yarn lint:fix`
+- `yarn typecheck`
+- `yarn format`
+- `yarn format:check`
+- `yarn test`
+- `yarn test:watch`
+- `yarn test:e2e`
+- `yarn test:e2e:ui`
+
+## Seguranca e limites
+
+- validacao Zod em rotas API
+- rate limit in-memory por IP
+- headers de seguranca em `next.config.ts`
+- JWT secrets nao sao persistidos
+- shortener aceita apenas URL `http/https`
+- uploads com limite:
+  - imagem: 10MB (`png/jpeg/webp/gif`)
+  - PDF: 20MB
+
+## Documentacao completa
+
+- [Arquitetura](docs/ARCHITECTURE.md)
+- [API](docs/API.md)
+- [Bitly](docs/BITLY.md)
+- [Seguranca](docs/SECURITY.md)
+- [Testes](docs/TESTING.md)
+- [Deploy](docs/DEPLOY.md)

@@ -17,7 +17,9 @@ function escapeHtml(value: string) {
 
 export function runRegex(pattern: string, flags: string, text: string) {
   if (text.length > REGEX_MAX_TEXT_LENGTH) {
-    throw new Error(`Texto muito longo. Limite atual: ${REGEX_MAX_TEXT_LENGTH} caracteres.`);
+    throw new Error(
+      `Texto muito longo. Limite atual: ${REGEX_MAX_TEXT_LENGTH} caracteres.`,
+    );
   }
 
   let regex: RegExp;

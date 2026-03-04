@@ -39,7 +39,11 @@ export function JsonFormatterTool() {
   function sample() {
     const example = '{"z":3,"a":{"x":1,"w":2},"arr":[{"b":2,"a":1}]}';
     setInput(example);
-    const result = formatJson(example, { indent: 2, sortKeys: true, minify: false });
+    const result = formatJson(example, {
+      indent: 2,
+      sortKeys: true,
+      minify: false,
+    });
     if (result.ok) setOutput(result.output);
     setSortKeys(true);
     setMinify(false);
@@ -57,7 +61,11 @@ export function JsonFormatterTool() {
   }
 
   return (
-    <ToolLayout title={meta.name} description={meta.description} examples={meta.examples}>
+    <ToolLayout
+      title={meta.name}
+      description={meta.description}
+      examples={meta.examples}
+    >
       <div className="grid gap-4 lg:grid-cols-2">
         <InputPanel>
           <Textarea
@@ -68,19 +76,34 @@ export function JsonFormatterTool() {
           />
           <div className="grid gap-3 sm:grid-cols-2">
             <div>
-              <label className="mb-1 block text-sm font-medium">Indentacao</label>
-              <Select value={String(indent)} onChange={(event) => setIndent(Number(event.target.value) as 2 | 4)}>
+              <label className="mb-1 block text-sm font-medium">
+                Indentacao
+              </label>
+              <Select
+                value={String(indent)}
+                onChange={(event) =>
+                  setIndent(Number(event.target.value) as 2 | 4)
+                }
+              >
                 <option value="2">2 espacos</option>
                 <option value="4">4 espacos</option>
               </Select>
             </div>
             <div className="flex items-end gap-4 pb-2 text-sm">
               <label className="flex items-center gap-2">
-                <input type="checkbox" checked={sortKeys} onChange={(event) => setSortKeys(event.target.checked)} />
+                <input
+                  type="checkbox"
+                  checked={sortKeys}
+                  onChange={(event) => setSortKeys(event.target.checked)}
+                />
                 Ordenar chaves
               </label>
               <label className="flex items-center gap-2">
-                <input type="checkbox" checked={minify} onChange={(event) => setMinify(event.target.checked)} />
+                <input
+                  type="checkbox"
+                  checked={minify}
+                  onChange={(event) => setMinify(event.target.checked)}
+                />
                 Minify
               </label>
             </div>
@@ -110,7 +133,13 @@ export function JsonFormatterTool() {
               variant="outline"
               size="sm"
               disabled={!output}
-              onClick={() => downloadText(output, 'formatted.json', 'application/json;charset=utf-8')}
+              onClick={() =>
+                downloadText(
+                  output,
+                  'formatted.json',
+                  'application/json;charset=utf-8',
+                )
+              }
             >
               Baixar
             </Button>

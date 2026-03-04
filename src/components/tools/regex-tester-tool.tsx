@@ -18,8 +18,6 @@ export function RegexTesterTool() {
   const [flags, setFlags] = useState('');
   const [text, setText] = useState('');
 
-  if (!meta) return null;
-
   const { result, error } = useMemo(() => {
     try {
       const matches = runRegex(pattern, flags, text);
@@ -32,7 +30,10 @@ export function RegexTesterTool() {
     }
   }, [pattern, flags, text]);
 
-  const highlighted = useMemo(() => highlightMatches(text, result), [text, result]);
+  const highlighted = useMemo(
+    () => highlightMatches(text, result),
+    [text, result],
+  );
 
   function sample() {
     setPattern('(dev|tool)\\s+(\\w+)');
@@ -46,18 +47,32 @@ export function RegexTesterTool() {
     setText('');
   }
 
+  if (!meta) return null;
+
   return (
-    <ToolLayout title={meta.name} description={meta.description} examples={meta.examples}>
+    <ToolLayout
+      title={meta.name}
+      description={meta.description}
+      examples={meta.examples}
+    >
       <div className="grid gap-4 lg:grid-cols-2">
         <InputPanel>
           <div className="grid gap-3 sm:grid-cols-3">
             <div className="sm:col-span-2">
               <Label htmlFor="regex-pattern">Regex</Label>
-              <Input id="regex-pattern" value={pattern} onChange={(event) => setPattern(event.target.value)} />
+              <Input
+                id="regex-pattern"
+                value={pattern}
+                onChange={(event) => setPattern(event.target.value)}
+              />
             </div>
             <div>
               <Label htmlFor="regex-flags">Flags</Label>
-              <Input id="regex-flags" value={flags} onChange={(event) => setFlags(event.target.value)} />
+              <Input
+                id="regex-flags"
+                value={flags}
+                onChange={(event) => setFlags(event.target.value)}
+              />
             </div>
           </div>
           <div>
@@ -90,7 +105,10 @@ export function RegexTesterTool() {
             {result.length === 0
               ? 'Sem matches.'
               : result.map((item, idx) => (
-                  <div key={`${item.index}-${idx}`} className="mb-2 rounded border border-surface-border p-2">
+                  <div
+                    key={`${item.index}-${idx}`}
+                    className="mb-2 rounded border border-surface-border p-2"
+                  >
                     <p>
                       <strong>Match:</strong> {item.match}
                     </p>
@@ -98,7 +116,10 @@ export function RegexTesterTool() {
                       <strong>Indice:</strong> {item.index}
                     </p>
                     <p>
-                      <strong>Grupos:</strong> {item.groups.length ? item.groups.join(', ') : 'sem grupos'}
+                      <strong>Grupos:</strong>{' '}
+                      {item.groups.length
+                        ? item.groups.join(', ')
+                        : 'sem grupos'}
                     </p>
                   </div>
                 ))}

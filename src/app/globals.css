@@ -3,19 +3,19 @@
 @tailwind utilities;
 
 :root {
-  --surface: 204 32% 96%;
-  --surface-foreground: 220 31% 16%;
-  --surface-muted: 204 28% 90%;
-  --surface-border: 213 22% 78%;
-  --surface-accent: 27 95% 54%;
+  --surface: 210 30% 98%;
+  --surface-foreground: 223 30% 14%;
+  --surface-muted: 212 28% 84%;
+  --surface-border: 214 22% 68%;
+  --surface-accent: 194 90% 45%;
 }
 
 .dark {
-  --surface: 220 35% 10%;
-  --surface-foreground: 210 24% 93%;
-  --surface-muted: 220 27% 16%;
-  --surface-border: 219 16% 30%;
-  --surface-accent: 31 95% 60%;
+  --surface: 223 20% 18%;
+  --surface-foreground: 210 24% 92%;
+  --surface-muted: 224 22% 8%;
+  --surface-border: 223 14% 38%;
+  --surface-accent: 190 92% 52%;
 }
 
 * {
@@ -25,25 +25,56 @@
 body {
   @apply text-surface-foreground antialiased;
   background:
-    radial-gradient(circle at 0% 0%, rgba(255, 140, 64, 0.22), transparent 34%),
-    radial-gradient(circle at 100% 20%, rgba(0, 118, 255, 0.18), transparent 38%),
-    linear-gradient(165deg, rgba(255, 255, 255, 0.5), rgba(235, 242, 255, 0.4)),
-    hsl(var(--surface));
-  font-family: var(--font-sans), 'Segoe UI', sans-serif;
+    radial-gradient(
+      circle at 1px 1px,
+      rgba(41, 70, 102, 0.07) 1px,
+      transparent 1.2px
+    ),
+    linear-gradient(
+      180deg,
+      rgba(255, 255, 255, 0.76),
+      rgba(255, 255, 255, 0.82)
+    ),
+    radial-gradient(
+      circle at 8% -10%,
+      rgba(56, 189, 248, 0.18),
+      transparent 45%
+    ),
+    hsl(var(--surface-muted));
+  background-size:
+    20px 20px,
+    auto,
+    auto,
+    auto;
+  font-family: 'Manrope', 'Segoe UI', 'Inter', system-ui, sans-serif;
 }
 
 .dark body {
   background:
-    radial-gradient(circle at 5% 0%, rgba(255, 136, 45, 0.2), transparent 38%),
-    radial-gradient(circle at 95% 25%, rgba(56, 132, 255, 0.2), transparent 40%),
-    linear-gradient(165deg, rgba(20, 25, 39, 0.95), rgba(11, 18, 32, 0.96)),
-    hsl(var(--surface));
+    radial-gradient(
+      circle at 1px 1px,
+      rgba(171, 214, 255, 0.08) 1px,
+      transparent 1.2px
+    ),
+    linear-gradient(180deg, rgba(10, 14, 22, 0.68), rgba(10, 14, 22, 0.68)),
+    radial-gradient(
+      circle at 8% -20%,
+      rgba(56, 189, 248, 0.13),
+      transparent 46%
+    ),
+    hsl(var(--surface-muted));
+  background-size:
+    20px 20px,
+    auto,
+    auto,
+    auto;
 }
 
 pre,
 code {
-  font-family: var(--font-mono), ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono',
-    'Courier New', monospace;
+  font-family:
+    'IBM Plex Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas,
+    'Liberation Mono', 'Courier New', monospace;
 }
 
 .markdown-preview {
@@ -51,27 +82,27 @@ code {
 }
 
 .markdown-preview h1 {
-  @apply mt-6 mb-2 text-3xl font-bold tracking-tight;
+  @apply mb-2 mt-6 text-3xl font-bold tracking-tight;
 }
 
 .markdown-preview h2 {
-  @apply mt-5 mb-2 text-2xl font-semibold tracking-tight;
+  @apply mb-2 mt-5 text-2xl font-semibold tracking-tight;
 }
 
 .markdown-preview h3 {
-  @apply mt-5 mb-2 text-xl font-semibold;
+  @apply mb-2 mt-5 text-xl font-semibold;
 }
 
 .markdown-preview h4 {
-  @apply mt-4 mb-2 text-lg font-semibold;
+  @apply mb-2 mt-4 text-lg font-semibold;
 }
 
 .markdown-preview h5 {
-  @apply mt-4 mb-2 text-base font-semibold;
+  @apply mb-2 mt-4 text-base font-semibold;
 }
 
 .markdown-preview h6 {
-  @apply mt-4 mb-2 text-sm font-semibold uppercase tracking-wide;
+  @apply mb-2 mt-4 text-sm font-semibold uppercase tracking-wide;
 }
 
 .markdown-preview p {

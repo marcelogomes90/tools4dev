@@ -39,7 +39,11 @@ export function CnpjTool() {
   }
 
   return (
-    <ToolLayout title={meta.name} description={meta.description} examples={meta.examples}>
+    <ToolLayout
+      title={meta.name}
+      description={meta.description}
+      examples={meta.examples}
+    >
       <div className="grid gap-4 lg:grid-cols-2">
         <InputPanel>
           <div>
@@ -54,7 +58,11 @@ export function CnpjTool() {
             />
           </div>
           <label className="flex items-center gap-2 text-sm">
-            <input type="checkbox" checked={masked} onChange={(event) => setMasked(event.target.checked)} />
+            <input
+              type="checkbox"
+              checked={masked}
+              onChange={(event) => setMasked(event.target.checked)}
+            />
             Gerar com mascara
           </label>
           <div>
@@ -66,13 +74,19 @@ export function CnpjTool() {
               onChange={(event) => setInputToValidate(event.target.value)}
             />
             {validation !== null && (
-              <p className={`mt-1 text-xs ${validation ? 'text-emerald-600' : 'text-rose-600'}`}>
+              <p
+                className={`mt-1 text-xs ${validation ? 'text-emerald-600' : 'text-rose-600'}`}
+              >
                 {validation ? 'CNPJ valido.' : 'CNPJ invalido.'}
               </p>
             )}
           </div>
           <div className="flex flex-wrap gap-2">
-            <Button onClick={() => setResult(generateCnpjBatch(quantity, masked))}>Gerar</Button>
+            <Button
+              onClick={() => setResult(generateCnpjBatch(quantity, masked))}
+            >
+              Gerar
+            </Button>
             <Button variant="outline" onClick={generateExample}>
               Gerar exemplo
             </Button>

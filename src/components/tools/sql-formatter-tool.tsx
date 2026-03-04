@@ -17,7 +17,9 @@ const meta = getToolBySlug('sql-formatter');
 
 export function SqlFormatterTool() {
   const [sql, setSql] = useState('');
-  const [language, setLanguage] = useState<'postgresql' | 'mysql' | 'sqlite'>('postgresql');
+  const [language, setLanguage] = useState<'postgresql' | 'mysql' | 'sqlite'>(
+    'postgresql',
+  );
   const [uppercase, setUppercase] = useState(true);
   const [indent, setIndent] = useState(2);
   const [formatted, setFormatted] = useState('');
@@ -30,25 +32,30 @@ export function SqlFormatterTool() {
     setLoading(true);
     setError('');
 
-    const response = await fetch('/api/sql/format', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ sql, language, uppercase, indent }),
-    });
+    try {
+      const response = await fetch('/api/sql/format', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ sql, language, uppercase, indent }),
+      });
 
-    const data = (await response.json()) as
-      | { ok: true; formatted: string }
-      | { ok: false; message: string };
+      const data = (await response.json()) as
+        | { ok: true; formatted: string }
+        | { ok: false; message: string };
 
-    if (!response.ok || !data.ok) {
-      setError(data.ok ? 'Erro ao formatar SQL.' : data.message);
+      if (!response.ok || !data.ok) {
+        setError(data.ok ? 'Erro ao formatar SQL.' : data.message);
+        setFormatted('');
+        return;
+      }
+
+      setFormatted(data.formatted);
+    } catch {
+      setError('Falha de rede ao formatar SQL.');
       setFormatted('');
+    } finally {
       setLoading(false);
-      return;
     }
-
-    setFormatted(data.formatted);
-    setLoading(false);
   }
 
   function sample() {
@@ -67,7 +74,11 @@ export function SqlFormatterTool() {
   }
 
   return (
-    <ToolLayout title={meta.name} description={meta.description} examples={meta.examples}>
+    <ToolLayout
+      title={meta.name}
+      description={meta.description}
+      examples={meta.examples}
+    >
       <div className="grid gap-4 lg:grid-cols-2">
         <InputPanel>
           <Textarea
@@ -81,7 +92,11 @@ export function SqlFormatterTool() {
               <Label>Dialect</Label>
               <Select
                 value={language}
-                onChange={(event) => setLanguage(event.target.value as 'postgresql' | 'mysql' | 'sqlite')}
+                onChange={(event) =>
+                  setLanguage(
+                    event.target.value as 'postgresql' | 'mysql' | 'sqlite',
+                  )
+                }
               >
                 <option value="postgresql">PostgreSQL</option>
                 <option value="mysql">MySQL</option>

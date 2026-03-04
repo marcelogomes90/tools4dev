@@ -27,7 +27,7 @@ const ptWords = [
   'escala',
   'qualidade',
   'arquitetura',
-  'performatico',
+  'performante',
   'modular',
   'seguro',
   'confiavel',
@@ -87,6 +87,8 @@ export function generateLorem(
   }
 
   return Array.from({ length: total }, () =>
-    Array.from({ length: 4 }, () => sentence(words, 10 + Math.floor(Math.random() * 6))).join(' '),
+    Array.from({ length: 4 }, () =>
+      sentence(words, 10 + Math.floor(Math.random() * 6)),
+    ).join(' '),
   ).join('\n\n');
 }

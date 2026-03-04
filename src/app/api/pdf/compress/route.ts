@@ -9,13 +9,19 @@ export const runtime = 'nodejs';
 export async function POST(request: NextRequest) {
   const ip = getClientIp(request);
   const rate = checkRateLimit(`pdf:${ip}`, { max: 8, windowMs: 60_000 });
-  if (!rate.allowed) return tooManyRequests('Muitas requisicoes de PDF. Tente novamente em instantes.');
+  if (!rate.allowed)
+    return tooManyRequests(
+      'Muitas requisicoes de PDF. Tente novamente em instantes.',
+    );
 
   const formData = await request.formData();
   const file = formData.get('file');
 
   if (!(file instanceof File)) {
-    return NextResponse.json({ ok: false, message: 'Arquivo PDF nao enviado.' }, { status: 400 });
+    return NextResponse.json(
+      { ok: false, message: 'Arquivo PDF nao enviado.' },
+      { status: 400 },
+    );
   }
 
   const metadata = pdfCompressSchema.safeParse({
@@ -25,17 +31,23 @@ export async function POST(request: NextRequest) {
   });
 
   if (!metadata.success) {
-    return NextResponse.json({ ok: false, message: 'Arquivo invalido. Envie PDF de ate 20MB.' }, { status: 400 });
+    return NextResponse.json(
+      { ok: false, message: 'Arquivo invalido. Envie PDF de ate 20MB.' },
+      { status: 400 },
+    );
   }
 
   const input = Buffer.from(await file.arrayBuffer());
   const compressed = await compressPdf(input);
 
   if (!compressed.ok) {
-    return NextResponse.json({ ok: false, message: compressed.message }, { status: 400 });
+    return NextResponse.json(
+      { ok: false, message: compressed.message },
+      { status: 400 },
+    );
   }
 
-  return new NextResponse(compressed.buffer, {
+  return new NextResponse(new Uint8Array(compressed.buffer), {
     status: 200,
     headers: {
       'Content-Type': 'application/pdf',

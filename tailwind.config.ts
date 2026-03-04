@@ -15,7 +15,7 @@ const config: Config = {
         },
       },
       boxShadow: {
-        card: '0 2px 14px hsl(var(--surface-border) / 0.22)',
+        card: '0 10px 30px hsl(var(--surface-border) / 0.14)',
       },
     },
   },

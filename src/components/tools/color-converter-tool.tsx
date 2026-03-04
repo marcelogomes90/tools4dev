@@ -1,7 +1,15 @@
 'use client';
 
 import { useMemo, useState } from 'react';
-import { hexToRgb, hslToRgb, hsvToRgb, isHexColor, rgbToHex, rgbToHsl, rgbToHsv } from '@/lib/tools/color';
+import {
+  hexToRgb,
+  hslToRgb,
+  hsvToRgb,
+  isHexColor,
+  rgbToHex,
+  rgbToHsl,
+  rgbToHsv,
+} from '@/lib/tools/color';
 import { getToolBySlug } from '@/lib/tool-registry';
 import { Button } from '@/components/ui/button';
 import { CopyButton } from '@/components/ui/copy-button';
@@ -28,7 +36,10 @@ function parseNumbers(value: string, expected: number) {
     .filter(Boolean)
     .map((part) => Number(part.replace('%', '')));
 
-  if (numbers.length !== expected || numbers.some((item) => Number.isNaN(item))) {
+  if (
+    numbers.length !== expected ||
+    numbers.some((item) => Number.isNaN(item))
+  ) {
     throw new Error('Formato invalido. Use valores separados por virgula.');
   }
 
@@ -36,10 +47,14 @@ function parseNumbers(value: string, expected: number) {
 }
 
 export function ColorConverterTool() {
-  const [inputType, setInputType] = useState<InputType>('hex');
-  const [inputValue, setInputValue] = useState('#ff9900');
-
-  if (!meta) return null;
+  const [formState, setFormState] = useState<{
+    inputType: InputType;
+    inputValue: string;
+  }>({
+    inputType: 'hex',
+    inputValue: '#ff9900',
+  });
+  const { inputType, inputValue } = formState;
 
   const { computed, error } = useMemo(() => {
     if (!inputValue.trim()) {
@@ -53,7 +68,9 @@ export function ColorConverterTool() {
         if (inputType === 'rgb') {
           const [r, g, b] = parseNumbers(inputValue, 3);
           if ([r, g, b].some((value) => value < 0 || value > 255)) {
-            throw new Error('RGB invalido. Cada canal deve ficar entre 0 e 255.');
+            throw new Error(
+              'RGB invalido. Cada canal deve ficar entre 0 e 255.',
+            );
           }
           return { r, g, b };
         }
@@ -61,7 +78,9 @@ export function ColorConverterTool() {
         if (inputType === 'hsl') {
           const [h, s, l] = parseNumbers(inputValue, 3);
           if (h < 0 || h > 360 || s < 0 || s > 100 || l < 0 || l > 100) {
-            throw new Error('HSL invalido. Use H(0..360), S(0..100), L(0..100).');
+            throw new Error(
+              'HSL invalido. Use H(0..360), S(0..100), L(0..100).',
+            );
           }
           return hslToRgb({ h, s, l });
         }
@@ -95,25 +114,37 @@ export function ColorConverterTool() {
   }, [inputType, inputValue]);
 
   function sample() {
-    if (inputType === 'hex') setInputValue('#34d399');
-    if (inputType === 'rgb') setInputValue('52, 211, 153');
-    if (inputType === 'hsl') setInputValue('158, 64, 52');
-    if (inputType === 'hsv') setInputValue('158, 75, 83');
+    if (inputType === 'hex')
+      setFormState((state) => ({ ...state, inputValue: '#34d399' }));
+    if (inputType === 'rgb')
+      setFormState((state) => ({ ...state, inputValue: '52, 211, 153' }));
+    if (inputType === 'hsl')
+      setFormState((state) => ({ ...state, inputValue: '158, 64, 52' }));
+    if (inputType === 'hsv')
+      setFormState((state) => ({ ...state, inputValue: '158, 75, 83' }));
   }
 
   function updateFromPicker(value: string) {
     if (isHexColor(value)) {
-      setInputValue(value);
+      setFormState((state) => ({ ...state, inputValue: value }));
     }
   }
 
   function changeInputType(type: InputType) {
-    setInputType(type);
-    setInputValue('');
+    setFormState({
+      inputType: type,
+      inputValue: '',
+    });
   }
 
+  if (!meta) return null;
+
   return (
-    <ToolLayout title={meta.name} description={meta.description} examples={meta.examples}>
+    <ToolLayout
+      title={meta.name}
+      description={meta.description}
+      examples={meta.examples}
+    >
       <div className="grid gap-4 lg:grid-cols-2">
         <InputPanel>
           <div>
@@ -121,7 +152,9 @@ export function ColorConverterTool() {
             <Select
               id="input-type"
               value={inputType}
-              onChange={(event) => changeInputType(event.target.value as InputType)}
+              onChange={(event) =>
+                changeInputType(event.target.value as InputType)
+              }
             >
               <option value="hex">HEX</option>
               <option value="rgb">RGB</option>
@@ -134,7 +167,12 @@ export function ColorConverterTool() {
             <Input
               id="color-input"
               value={inputValue}
-              onChange={(event) => setInputValue(event.target.value)}
+              onChange={(event) =>
+                setFormState((state) => ({
+                  ...state,
+                  inputValue: event.target.value,
+                }))
+              }
               placeholder={
                 inputType === 'hex'
                   ? '#RRGGBB'
@@ -167,7 +205,10 @@ export function ColorConverterTool() {
         <OutputPanel>
           {computed ? (
             <div className="space-y-3 text-sm">
-              <div className="h-20 rounded-lg border border-surface-border" style={{ backgroundColor: computed.hex }} />
+              <div
+                className="h-20 rounded-lg border border-surface-border"
+                style={{ backgroundColor: computed.hex }}
+              />
               <p>
                 <strong>HEX:</strong> {computed.hex}
               </p>
@@ -188,7 +229,9 @@ export function ColorConverterTool() {
               </div>
             </div>
           ) : (
-            <p className="text-sm text-slate-600 dark:text-slate-400">Sem resultado valido.</p>
+            <p className="text-sm text-slate-600 dark:text-slate-400">
+              Sem resultado valido.
+            </p>
           )}
         </OutputPanel>
       </div>

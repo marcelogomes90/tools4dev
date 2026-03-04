@@ -1,7 +1,7 @@
 'use client';
 
 import { FileUp } from 'lucide-react';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { getToolBySlug } from '@/lib/tool-registry';
 import { Button } from '@/components/ui/button';
 import { InputPanel } from '@/components/ui/input-panel';
@@ -19,6 +19,12 @@ export function PdfCompressorTool() {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
+  useEffect(() => {
+    return () => {
+      if (resultUrl) URL.revokeObjectURL(resultUrl);
+    };
+  }, [resultUrl]);
+
   if (!meta) return null;
 
   async function compress() {
@@ -31,38 +37,50 @@ export function PdfCompressorTool() {
     const formData = new FormData();
     formData.append('file', file);
 
-    const response = await fetch('/api/pdf/compress', {
-      method: 'POST',
-      body: formData,
-    });
+    try {
+      const response = await fetch('/api/pdf/compress', {
+        method: 'POST',
+        body: formData,
+      });
 
-    if (!response.ok) {
-      const data = (await response.json().catch(() => null)) as { message?: string } | null;
-      setError(data?.message ?? 'Falha ao comprimir PDF.');
+      if (!response.ok) {
+        const data = (await response.json().catch(() => null)) as {
+          message?: string;
+        } | null;
+        setError(data?.message ?? 'Falha ao comprimir PDF.');
+        return;
+      }
+
+      const blob = await response.blob();
+      const url = URL.createObjectURL(blob);
+      const method = response.headers.get('X-Compression-Method') ?? 'unknown';
+      if (resultUrl) URL.revokeObjectURL(resultUrl);
+
+      setResultUrl(url);
+      setStats(
+        `Metodo: ${method} | Original: ${(file.size / 1024).toFixed(1)}KB | Comprimido: ${(blob.size / 1024).toFixed(1)}KB`,
+      );
+    } catch {
+      setError('Falha de rede ao comprimir PDF.');
+    } finally {
       setLoading(false);
-      return;
     }
-
-    const blob = await response.blob();
-    const url = URL.createObjectURL(blob);
-    const method = response.headers.get('X-Compression-Method') ?? 'unknown';
-
-    setResultUrl(url);
-    setStats(
-      `Metodo: ${method} | Original: ${(file.size / 1024).toFixed(1)}KB | Comprimido: ${(blob.size / 1024).toFixed(1)}KB`,
-    );
-    setLoading(false);
   }
 
   function clear() {
     setFile(null);
+    if (resultUrl) URL.revokeObjectURL(resultUrl);
     setResultUrl('');
     setStats('');
     setError('');
   }
 
   return (
-    <ToolLayout title={meta.name} description={meta.description} examples={meta.examples}>
+    <ToolLayout
+      title={meta.name}
+      description={meta.description}
+      examples={meta.examples}
+    >
       <div className="grid gap-4 lg:grid-cols-2">
         <InputPanel>
           <div>
@@ -79,7 +97,9 @@ export function PdfCompressorTool() {
               className="mt-1 flex min-h-28 cursor-pointer flex-col items-center justify-center rounded-2xl border-2 border-dashed border-surface-border bg-surface/75 px-4 text-center transition hover:border-surface-accent/70 hover:bg-surface-muted/70"
             >
               <FileUp className="mb-2 h-5 w-5" />
-              <span className="text-sm font-medium">Clique para selecionar PDF</span>
+              <span className="text-sm font-medium">
+                Clique para selecionar PDF
+              </span>
               <span className="mt-1 text-xs text-slate-600 dark:text-slate-400">
                 {file ? file.name : 'Sem arquivo selecionado'}
               </span>
@@ -95,7 +115,8 @@ export function PdfCompressorTool() {
           </div>
           {error && <p className="text-sm text-rose-600">{error}</p>}
           <p className="text-xs text-slate-600 dark:text-slate-400">
-            Se ghostscript nao existir no ambiente, a rota tenta fallback com pdf-lib e pode retornar aviso de dependencia.
+            Se ghostscript nao existir no ambiente, a rota tenta fallback com
+            pdf-lib e pode retornar aviso de dependencia.
           </p>
         </InputPanel>
 
@@ -114,7 +135,9 @@ export function PdfCompressorTool() {
               </div>
             </div>
           ) : (
-            <p className="text-sm text-slate-600 dark:text-slate-400">Nenhum PDF processado.</p>
+            <p className="text-sm text-slate-600 dark:text-slate-400">
+              Nenhum PDF processado.
+            </p>
           )}
         </OutputPanel>
       </div>

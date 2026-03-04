@@ -6,7 +6,9 @@ const firstWeights = [5, 4, 3, 2, 9, 8, 7, 6, 5, 4, 3, 2];
 const secondWeights = [6, ...firstWeights];
 
 function calcDigit(base: string, weights: number[]) {
-  const sum = base.split('').reduce((acc, digit, idx) => acc + Number(digit) * weights[idx], 0);
+  const sum = base
+    .split('')
+    .reduce((acc, digit, idx) => acc + Number(digit) * weights[idx], 0);
   const remainder = sum % 11;
   return remainder < 2 ? 0 : 11 - remainder;
 }
@@ -28,7 +30,10 @@ export function isValidCnpj(input: string) {
 
 export function formatCnpj(cnpj: string) {
   const digits = onlyDigits(cnpj).slice(0, 14);
-  return digits.replace(/(\d{2})(\d{3})(\d{3})(\d{4})(\d{2})/, '$1.$2.$3/$4-$5');
+  return digits.replace(
+    /(\d{2})(\d{3})(\d{3})(\d{4})(\d{2})/,
+    '$1.$2.$3/$4-$5',
+  );
 }
 
 export function generateCnpj(masked = true) {

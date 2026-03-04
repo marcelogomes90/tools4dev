@@ -38,7 +38,9 @@ export function hexToRgb(hex: string): RGB {
 }
 
 export function rgbToHex(rgb: RGB) {
-  const parts = [rgb.r, rgb.g, rgb.b].map((value) => clamp(Math.round(value), 0, 255));
+  const parts = [rgb.r, rgb.g, rgb.b].map((value) =>
+    clamp(Math.round(value), 0, 255),
+  );
   return `#${parts.map((v) => v.toString(16).padStart(2, '0')).join('')}`.toUpperCase();
 }
 

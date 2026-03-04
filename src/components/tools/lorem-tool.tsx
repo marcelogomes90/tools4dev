@@ -16,7 +16,9 @@ import { ToolLayout } from '@/components/ui/tool-layout';
 const meta = getToolBySlug('lorem-ipsum');
 
 export function LoremTool() {
-  const [mode, setMode] = useState<'words' | 'sentences' | 'paragraphs'>('paragraphs');
+  const [mode, setMode] = useState<'words' | 'sentences' | 'paragraphs'>(
+    'paragraphs',
+  );
   const [quantity, setQuantity] = useState(3);
   const [language, setLanguage] = useState<'classic' | 'pt' | 'en'>('classic');
   const [result, setResult] = useState('');
@@ -42,7 +44,11 @@ export function LoremTool() {
   }
 
   return (
-    <ToolLayout title={meta.name} description={meta.description} examples={meta.examples}>
+    <ToolLayout
+      title={meta.name}
+      description={meta.description}
+      examples={meta.examples}
+    >
       <div className="grid gap-4 lg:grid-cols-2">
         <InputPanel>
           <div>
@@ -50,7 +56,11 @@ export function LoremTool() {
             <Select
               id="lorem-mode"
               value={mode}
-              onChange={(event) => setMode(event.target.value as 'words' | 'sentences' | 'paragraphs')}
+              onChange={(event) =>
+                setMode(
+                  event.target.value as 'words' | 'sentences' | 'paragraphs',
+                )
+              }
             >
               <option value="words">Palavras</option>
               <option value="sentences">Frases</option>
@@ -73,7 +83,9 @@ export function LoremTool() {
             <Select
               id="lorem-lang"
               value={language}
-              onChange={(event) => setLanguage(event.target.value as 'classic' | 'pt' | 'en')}
+              onChange={(event) =>
+                setLanguage(event.target.value as 'classic' | 'pt' | 'en')
+              }
             >
               <option value="classic">Lorem classico</option>
               <option value="pt">Portugues</option>

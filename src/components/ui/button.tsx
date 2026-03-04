@@ -9,17 +9,24 @@ interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   size?: Size;
 }
 
-export function Button({ className, variant = 'default', size = 'md', ...props }: ButtonProps) {
+export function Button({
+  className,
+  variant = 'default',
+  size = 'md',
+  ...props
+}: ButtonProps) {
   return (
     <button
       className={cn(
-        'inline-flex items-center justify-center rounded-xl border font-medium transition duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-surface-accent disabled:cursor-not-allowed disabled:opacity-50',
+        'inline-flex items-center justify-center rounded-2xl border font-medium transition duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-surface-accent disabled:cursor-not-allowed disabled:opacity-50',
         variant === 'default' &&
-          'border-transparent bg-surface-accent px-3 text-black shadow-[0_8px_20px_hsl(var(--surface-accent)/0.28)] hover:translate-y-[-1px] hover:opacity-95',
+          'border-transparent bg-surface-accent px-3 text-white shadow-sm hover:brightness-95',
         variant === 'outline' &&
-          'border-surface-border bg-surface text-surface-foreground hover:bg-surface-muted hover:border-surface-accent/60',
-        variant === 'ghost' && 'border-transparent hover:bg-surface-muted',
-        variant === 'danger' && 'border-transparent bg-rose-600 text-white hover:bg-rose-700',
+          'border-surface-border bg-surface text-surface-foreground hover:border-surface-accent/50 hover:bg-surface-muted',
+        variant === 'ghost' &&
+          'border-transparent bg-transparent hover:bg-surface-muted',
+        variant === 'danger' &&
+          'border-transparent bg-rose-600 text-white hover:bg-rose-700',
         size === 'md' && 'h-10 px-4 text-sm',
         size === 'sm' && 'h-8 px-3 text-xs',
         className,
