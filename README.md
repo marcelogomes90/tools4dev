@@ -127,6 +127,7 @@ Variáveis:
 - `POSTGRES_URL_NON_POOLING` (fallback auto-detectado)
 - `DATABASE_URL` (fallback do shortener quando `SHORTENER_DATABASE_URL` não está definida)
 - `POSTGRES_USER` + `POSTGRES_HOST` + `POSTGRES_DATABASE` + `POSTGRES_PASSWORD` (+ `POSTGRES_PORT` opcional) para montar URL automaticamente
+- `SHORTENER_DATABASE_SSL_NO_VERIFY` (opcional e temporário: desabilita validação TLS do certificado do shortener)
 - `SHORTENER_STORAGE_FILE` (opcional: fallback JSON local sem Postgres)
 
 ## Endpoints principais

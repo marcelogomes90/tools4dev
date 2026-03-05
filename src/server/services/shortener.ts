@@ -1,7 +1,7 @@
 import { mkdirSync, readFileSync, renameSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { dirname, join } from 'node:path';
-import { Pool } from 'pg';
+import { Pool, type PoolConfig } from 'pg';
 
 interface ShortLinkCreateInput {
   url: string;
@@ -46,6 +46,7 @@ const VERCEL_POSTGRES_HOST_ENV = 'POSTGRES_HOST';
 const VERCEL_POSTGRES_DATABASE_ENV = 'POSTGRES_DATABASE';
 const VERCEL_POSTGRES_PASSWORD_ENV = 'POSTGRES_PASSWORD';
 const VERCEL_POSTGRES_PORT_ENV = 'POSTGRES_PORT';
+const DATABASE_SSL_NO_VERIFY_ENV = 'SHORTENER_DATABASE_SSL_NO_VERIFY';
 const DATABASE_TABLE_ENV = 'SHORTENER_DATABASE_TABLE';
 const DATABASE_TABLE_DEFAULT = 'short_links';
 
@@ -94,6 +95,37 @@ function buildDatabaseUrlFromParts() {
   const encodedDatabase = encodeURIComponent(database);
 
   return `postgresql://${encodedUser}:${encodedPassword}@${hostWithPort}/${encodedDatabase}?sslmode=require`;
+}
+
+function parseBooleanEnv(name: string): boolean | null {
+  const raw = process.env[name]?.trim().toLowerCase();
+  if (!raw) return null;
+
+  if (['1', 'true', 'yes', 'on'].includes(raw)) return true;
+  if (['0', 'false', 'no', 'off'].includes(raw)) return false;
+  return null;
+}
+
+function resolveSslConfig(connectionString: string): PoolConfig['ssl'] | undefined {
+  const noVerify = parseBooleanEnv(DATABASE_SSL_NO_VERIFY_ENV);
+  if (noVerify === true) {
+    return { rejectUnauthorized: false };
+  }
+
+  if (noVerify === false) {
+    return undefined;
+  }
+
+  try {
+    const sslMode = new URL(connectionString).searchParams.get('sslmode')?.toLowerCase();
+    if (sslMode === 'no-verify') {
+      return { rejectUnauthorized: false };
+    }
+  } catch {
+    // No-op: invalid URL format should be handled by pg during connection.
+  }
+
+  return undefined;
 }
 
 function getDatabaseTable() {
@@ -146,7 +178,10 @@ async function getPostgresStore(): Promise<PostgresStore | null> {
     return existing;
   }
 
-  const pool = new Pool({ connectionString });
+  const ssl = resolveSslConfig(connectionString);
+  const pool = ssl
+    ? new Pool({ connectionString, ssl })
+    : new Pool({ connectionString });
   const schemaReady = ensureSchema(pool, tableName);
   const store: PostgresStore = {
     connectionString,

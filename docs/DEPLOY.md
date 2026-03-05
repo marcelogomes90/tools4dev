@@ -21,6 +21,7 @@
 - `POSTGRES_URL_NON_POOLING` (fallback auto-detectado)
 - `DATABASE_URL` (fallback do shortener se `SHORTENER_DATABASE_URL` não existir)
 - `POSTGRES_USER` + `POSTGRES_HOST` + `POSTGRES_DATABASE` + `POSTGRES_PASSWORD` (+ `POSTGRES_PORT` opcional) para montagem automática da URL
+- `SHORTENER_DATABASE_SSL_NO_VERIFY` (opcional e temporário, para ambiente com erro de certificado TLS)
 - `SHORTENER_STORAGE_FILE` (opcional, fallback JSON local sem Postgres)
 
 ## Build e start

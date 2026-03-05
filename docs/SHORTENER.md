@@ -64,5 +64,6 @@ Ação:
 - configure uma URL de DB (`SHORTENER_DATABASE_URL`, `SUPABASE_DB_URL`, `POSTGRES_URL`, `POSTGRES_PRISMA_URL`, `POSTGRES_URL_NON_POOLING` ou `DATABASE_URL`)
 - se não houver URL, o serviço também tenta montar por `POSTGRES_USER/HOST/DATABASE/PASSWORD` (+ `POSTGRES_PORT`)
 - opcional: `SHORTENER_DATABASE_TABLE` para customizar a tabela (`schema.tabela` suportado)
+- em caso de erro TLS (`self-signed certificate...`), use `SHORTENER_DATABASE_SSL_NO_VERIFY=true` apenas temporariamente
 - sem URL de DB, o serviço usa fallback JSON local (`SHORTENER_STORAGE_FILE`)
 - em produção com múltiplas instâncias, use Postgres compartilhado entre todas as instâncias

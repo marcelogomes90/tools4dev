@@ -28,6 +28,16 @@ Se só `POSTGRES_USER`, `POSTGRES_HOST` e `POSTGRES_DATABASE` estiverem preenchi
 
 Com esses 4 valores (+ `POSTGRES_PORT` opcional), o serviço monta a URL automaticamente.
 
+### Erro de certificado TLS
+
+Se aparecer `self-signed certificate in certificate chain`:
+
+1. use preferencialmente `POSTGRES_URL`/`POSTGRES_PRISMA_URL` da integração (já vem com TLS correto);
+2. confirme que a URL de conexão contém `sslmode=require`;
+3. se o erro persistir, defina `SHORTENER_DATABASE_SSL_NO_VERIFY=true` apenas como mitigação temporária.
+
+Use esse fallback apenas quando necessário e remova depois de corrigir a cadeia TLS.
+
 ## String de conexão Supabase
 
 No painel Supabase:
