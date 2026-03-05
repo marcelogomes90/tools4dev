@@ -119,7 +119,15 @@ Variáveis:
 - `NEXT_PUBLIC_APP_URL` (URL pública da aplicação)
 - `RATE_LIMIT_WINDOW_MS` (padrão: `60000`)
 - `RATE_LIMIT_MAX` (padrão: `120`)
-- `SHORTENER_STORAGE_FILE` (opcional: caminho do arquivo de persistência do shortener)
+- `SHORTENER_DATABASE_URL` (opcional: URL dedicada do Postgres para o shortener)
+- `SUPABASE_DB_URL` (opcional: atalho para URL do Postgres do Supabase)
+- `SHORTENER_DATABASE_TABLE` (opcional: tabela do shortener, padrão `short_links`, aceita `schema.tabela`)
+- `POSTGRES_URL` (auto-detectado do Vercel/Supabase Integration)
+- `POSTGRES_PRISMA_URL` (fallback auto-detectado)
+- `POSTGRES_URL_NON_POOLING` (fallback auto-detectado)
+- `DATABASE_URL` (fallback do shortener quando `SHORTENER_DATABASE_URL` não está definida)
+- `POSTGRES_USER` + `POSTGRES_HOST` + `POSTGRES_DATABASE` + `POSTGRES_PASSWORD` (+ `POSTGRES_PORT` opcional) para montar URL automaticamente
+- `SHORTENER_STORAGE_FILE` (opcional: fallback JSON local sem Postgres)
 
 ## Endpoints principais
 
@@ -164,7 +172,7 @@ yarn lint
 - headers de segurança em `next.config.ts`
 - JWT secrets não são persistidos
 - shortener aceita apenas URL `http/https`
-- shortener persiste mapeamentos em arquivo local (fallback em memória)
+- shortener usa Postgres quando encontra uma URL de DB (`SHORTENER_DATABASE_URL`, `SUPABASE_DB_URL`, `POSTGRES_URL`, `POSTGRES_PRISMA_URL`, `POSTGRES_URL_NON_POOLING` ou `DATABASE_URL`)
 - uploads com limite:
   - imagem: 10MB (`png/jpeg/webp/gif`)
   - PDF: 20MB
@@ -176,5 +184,6 @@ yarn lint
 - [API](docs/API.md)
 - [Shortener local](docs/SHORTENER.md)
 - [Segurança](docs/SECURITY.md)
+- [Supabase](docs/SUPABASE.md)
 - [Testes](docs/TESTING.md)
 - [Deploy](docs/DEPLOY.md)

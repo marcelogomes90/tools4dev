@@ -8,7 +8,7 @@ O encurtador desta aplicação opera em modo local:
 - aceita slug custom opcional
 - gera slug automático com 5 caracteres quando não informado
 - redireciona via `GET /s/:slug`
-- persistência em arquivo local (com fallback em memória)
+- persistência em Postgres (fallback JSON local sem DB)
 
 ## Payload suportado
 
@@ -28,9 +28,11 @@ O encurtador desta aplicação opera em modo local:
   "ok": true,
   "slug": "minha-url",
   "shortUrl": "http://localhost:3000/s/minha-url",
-  "provider": "local"
+  "provider": "postgres"
 }
 ```
+
+`provider` pode retornar `postgres` ou `local` (fallback JSON sem DB).
 
 ## Erros comuns
 
@@ -38,7 +40,7 @@ O encurtador desta aplicação opera em modo local:
 
 Causa:
 
-- slug custom já cadastrado no processo atual
+- slug custom já cadastrado no banco do shortener
 
 Ação:
 
@@ -59,6 +61,8 @@ Ação:
 
 - validação de URL e slug ocorre no servidor
 - não há chamadas para APIs de terceiros
-- por padrão, o arquivo é salvo em `${TMPDIR}/tools4dev-shortlinks.json`
-- opcional: configure `SHORTENER_STORAGE_FILE` para definir outro caminho
-- para produção com múltiplas instâncias, use persistência compartilhada (ex.: Redis/DB)
+- configure uma URL de DB (`SHORTENER_DATABASE_URL`, `SUPABASE_DB_URL`, `POSTGRES_URL`, `POSTGRES_PRISMA_URL`, `POSTGRES_URL_NON_POOLING` ou `DATABASE_URL`)
+- se não houver URL, o serviço também tenta montar por `POSTGRES_USER/HOST/DATABASE/PASSWORD` (+ `POSTGRES_PORT`)
+- opcional: `SHORTENER_DATABASE_TABLE` para customizar a tabela (`schema.tabela` suportado)
+- sem URL de DB, o serviço usa fallback JSON local (`SHORTENER_STORAGE_FILE`)
+- em produção com múltiplas instâncias, use Postgres compartilhado entre todas as instâncias

@@ -13,7 +13,15 @@
 - `NEXT_PUBLIC_APP_URL` (recomendada, para URLs curtas absolutas)
 - `RATE_LIMIT_WINDOW_MS` (opcional)
 - `RATE_LIMIT_MAX` (opcional)
-- `SHORTENER_STORAGE_FILE` (opcional, caminho do storage do shortener)
+- `SHORTENER_DATABASE_URL` (opcional, URL dedicada Postgres para shortener)
+- `SUPABASE_DB_URL` (opcional, atalho para URL Postgres do Supabase)
+- `SHORTENER_DATABASE_TABLE` (opcional, tabela do shortener; aceita `schema.tabela`)
+- `POSTGRES_URL` (auto-detectado do Vercel/Supabase Integration)
+- `POSTGRES_PRISMA_URL` (fallback auto-detectado)
+- `POSTGRES_URL_NON_POOLING` (fallback auto-detectado)
+- `DATABASE_URL` (fallback do shortener se `SHORTENER_DATABASE_URL` não existir)
+- `POSTGRES_USER` + `POSTGRES_HOST` + `POSTGRES_DATABASE` + `POSTGRES_PASSWORD` (+ `POSTGRES_PORT` opcional) para montagem automática da URL
+- `SHORTENER_STORAGE_FILE` (opcional, fallback JSON local sem Postgres)
 
 ## Build e start
 

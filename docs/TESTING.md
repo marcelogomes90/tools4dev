@@ -26,7 +26,7 @@
   - transformações e contagem de texto
 - `tests/unit/name-shortener.test.ts`
   - geração de nomes por lote com limites
-  - shortener local (slug custom, auto, conflito, resolução e hits)
+  - shortener (slug custom, auto, conflito, resolução, hits e persistência)
 - `tests/unit/css-units.test.ts`
   - conversão entre px/rem/em/%/vw/vh
   - precisão de formatação de resultado

@@ -44,8 +44,8 @@ describe('shortener service', () => {
     rmSync(tempDir, { recursive: true, force: true });
   });
 
-  it('creates short link with normalized custom slug', () => {
-    const result = createShortLink(
+  it('creates short link with normalized custom slug', async () => {
+    const result = await createShortLink(
       { url: 'https://example.com', slug: ' Meu-Slug ' },
       'https://dev.example.com/',
     );
@@ -55,44 +55,47 @@ describe('shortener service', () => {
     expect(result.provider).toBe('local');
   });
 
-  it('creates random slug with 5 chars when none is provided', () => {
-    const result = createShortLink({ url: 'https://example.com/a' }, 'https://dev.example.com');
+  it('creates random slug with 5 chars when none is provided', async () => {
+    const result = await createShortLink({ url: 'https://example.com/a' }, 'https://dev.example.com');
 
     expect(result.slug).toMatch(/^[a-z0-9]{5}$/);
     expect(result.shortUrl.endsWith(`/s/${result.slug}`)).toBe(true);
   });
 
-  it('rejects duplicate slugs', () => {
-    createShortLink({ url: 'https://example.com/1', slug: 'dup' }, 'https://dev.example.com');
+  it('rejects duplicate slugs', async () => {
+    await createShortLink({ url: 'https://example.com/1', slug: 'dup' }, 'https://dev.example.com');
 
-    expect(() =>
+    await expect(
       createShortLink({ url: 'https://example.com/2', slug: 'dup' }, 'https://dev.example.com'),
-    ).toThrow('Slug já está em uso. Escolha outro.');
+    ).rejects.toThrow('Slug já está em uso. Escolha outro.');
   });
 
-  it('resolves slug case-insensitively and increments hit counter', () => {
-    createShortLink({ url: 'https://example.com/target', slug: 'mySlug' }, 'https://dev.example.com');
+  it('resolves slug case-insensitively and increments hit counter', async () => {
+    await createShortLink(
+      { url: 'https://example.com/target', slug: 'mySlug' },
+      'https://dev.example.com',
+    );
 
-    const first = resolveShortLink('myslug');
-    const second = resolveShortLink('MYSLUG');
+    const first = await resolveShortLink('myslug');
+    const second = await resolveShortLink('MYSLUG');
 
     expect(first?.url).toBe('https://example.com/target');
     expect(second?.hits).toBe(2);
   });
 
-  it('returns null for unknown slugs', () => {
-    expect(resolveShortLink('inexistente')).toBeNull();
+  it('returns null for unknown slugs', async () => {
+    await expect(resolveShortLink('inexistente')).resolves.toBeNull();
   });
 
-  it('persists links in storage file and resolves after memory reset', () => {
-    const created = createShortLink(
+  it('persists links in storage file and resolves after memory reset', async () => {
+    const created = await createShortLink(
       { url: 'https://example.com/persisted', slug: 'persistido' },
       'https://dev.example.com',
     );
 
     globalThis.__tools4devShortLinks = undefined;
 
-    const resolved = resolveShortLink(created.slug);
+    const resolved = await resolveShortLink(created.slug);
     expect(resolved?.url).toBe('https://example.com/persisted');
     expect(resolved?.hits).toBe(1);
   });

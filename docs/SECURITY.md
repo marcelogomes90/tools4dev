@@ -41,12 +41,12 @@
 ## Shortener local
 
 - não depende de provider externo
-- mapeamento persistido em arquivo local (fallback em memória)
+- mapeamento persistido em Postgres quando configurado (fallback JSON local)
 
 ## Riscos conhecidos (aceitos)
 
 - rate limit em memória não é distribuído entre múltiplas instâncias
-- shortener local pode perder dados quando o host limpa `TMPDIR`
+- shortener em fallback JSON pode perder dados quando o host não preserva disco local
 - sem WAF/proxy dedicado por padrão
 - CSP usa `unsafe-inline` por compatibilidade com Next
 

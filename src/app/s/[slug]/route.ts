@@ -9,7 +9,7 @@ interface ShortRedirectParams {
 
 export async function GET(_request: NextRequest, { params }: ShortRedirectParams) {
   const { slug } = await params;
-  const found = resolveShortLink(slug);
+  const found = await resolveShortLink(slug);
 
   if (!found) {
     return NextResponse.json(

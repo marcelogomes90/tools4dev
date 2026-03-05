@@ -82,6 +82,6 @@ As rotas abaixo usam `export const runtime = 'nodejs'`:
 
 A estrutura permite evolução para:
 
-- persistência opcional para o shortener local
+- storage compartilhado para o shortener (ex.: Postgres/Redis)
 - novos processadores de arquivo
 - novos grupos de ferramentas sem mexer no shell

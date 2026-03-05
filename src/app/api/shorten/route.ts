@@ -6,15 +6,34 @@ import { shortenSchema } from '@/server/validators/api';
 
 export const runtime = 'nodejs';
 
-function resolveBaseUrl(request: NextRequest) {
-  const envUrl = process.env.NEXT_PUBLIC_APP_URL?.trim();
-  if (envUrl) return envUrl;
+function isLoopbackHost(url: string) {
+  try {
+    const hostname = new URL(url).hostname;
+    return hostname === 'localhost' || hostname === '127.0.0.1' || hostname === '::1';
+  } catch {
+    return false;
+  }
+}
 
+function resolveBaseUrl(request: NextRequest) {
   const host = request.headers.get('x-forwarded-host') ?? request.headers.get('host');
   const proto = request.headers.get('x-forwarded-proto') ?? 'http';
+  const requestOrigin = host ? `${proto}://${host}` : request.nextUrl.origin;
 
-  if (host) return `${proto}://${host}`;
-  return request.nextUrl.origin;
+  const envUrl = process.env.NEXT_PUBLIC_APP_URL?.trim();
+  if (envUrl) {
+    if (
+      process.env.NODE_ENV === 'production' &&
+      isLoopbackHost(envUrl) &&
+      !isLoopbackHost(requestOrigin)
+    ) {
+      return requestOrigin;
+    }
+
+    return envUrl;
+  }
+
+  return requestOrigin;
 }
 
 export async function POST(request: NextRequest) {
@@ -37,11 +56,11 @@ export async function POST(request: NextRequest) {
   }
 
   try {
-    const result = createShortLink(parsed.data, resolveBaseUrl(request));
+    const result = await createShortLink(parsed.data, resolveBaseUrl(request));
     return NextResponse.json({ ok: true, ...result }, { status: 201 });
   } catch (error) {
     const message = error instanceof Error ? error.message : 'Falha ao gerar link curto.';
-    const status = message.includes('Slug já está em uso') ? 409 : 400;
+    const status = message.includes('Slug já está em uso') ? 409 : 500;
 
     return NextResponse.json(
       {
