@@ -36,9 +36,9 @@ export function RegexTesterTool() {
   );
 
   function sample() {
-    setPattern('(dev|tool)\\s+(\\w+)');
+    setPattern('(dev4tools|tool)\\s+(\\w+)');
     setFlags('gi');
-    setText('dev swiss and tool regex in this tool sandbox');
+    setText('dev4tools and tool regex in this tool sandbox');
   }
 
   function clear() {

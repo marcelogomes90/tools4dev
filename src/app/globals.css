@@ -3,21 +3,21 @@
 @tailwind utilities;
 
 :root {
-  --surface: 210 30% 98%;
-  --surface-foreground: 223 30% 14%;
-  --surface-muted: 212 28% 84%;
-  --surface-border: 214 22% 68%;
-  --surface-accent: 194 90% 45%;
+  --surface: 210 46% 98%;
+  --surface-foreground: 218 32% 16%;
+  --surface-muted: 205 45% 93%;
+  --surface-border: 212 34% 82%;
+  --surface-accent: 196 88% 42%;
   --surface-input: 0 0% 100%;
 }
 
 .dark {
-  --surface: 223 20% 18%;
-  --surface-foreground: 210 24% 92%;
-  --surface-muted: 224 22% 8%;
-  --surface-border: 223 14% 38%;
-  --surface-accent: 190 92% 52%;
-  --surface-input: 224 18% 13%;
+  --surface: 222 34% 11%;
+  --surface-foreground: 210 36% 94%;
+  --surface-muted: 219 28% 16%;
+  --surface-border: 217 19% 31%;
+  --surface-accent: 192 92% 57%;
+  --surface-input: 220 27% 14%;
 }
 
 * {
@@ -25,51 +25,61 @@
 }
 
 body {
-  @apply text-surface-foreground antialiased;
+  @apply text-surface-foreground antialiased selection:bg-surface-accent/25 selection:text-surface-foreground;
   background:
-    radial-gradient(
-      circle at 1px 1px,
-      rgba(41, 70, 102, 0.07) 1px,
-      transparent 1.2px
-    ),
-    linear-gradient(
-      180deg,
-      rgba(255, 255, 255, 0.76),
-      rgba(255, 255, 255, 0.82)
-    ),
-    radial-gradient(
-      circle at 8% -10%,
-      rgba(56, 189, 248, 0.18),
-      transparent 45%
-    ),
+    radial-gradient(circle at 2% -20%, rgba(14, 165, 233, 0.2), transparent 44%),
+    radial-gradient(circle at 94% 4%, rgba(56, 189, 248, 0.14), transparent 30%),
+    radial-gradient(circle at 12% 100%, rgba(37, 99, 235, 0.08), transparent 34%),
+    radial-gradient(rgba(100, 116, 139, 0.24) 0.85px, transparent 0.95px),
+    radial-gradient(rgba(255, 255, 255, 0.3) 0.85px, transparent 0.95px),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.86), rgba(255, 255, 255, 0.72)),
     hsl(var(--surface-muted));
   background-size:
-    20px 20px,
     auto,
+    auto,
+    auto,
+    15px 15px,
+    15px 15px,
     auto,
     auto;
+  background-position:
+    center,
+    center,
+    center,
+    0 0,
+    7.5px 7.5px,
+    center,
+    center;
+  background-attachment: fixed;
   font-family: 'Manrope', 'Segoe UI', 'Inter', system-ui, sans-serif;
 }
 
 .dark body {
   background:
-    radial-gradient(
-      circle at 1px 1px,
-      rgba(171, 214, 255, 0.08) 1px,
-      transparent 1.2px
-    ),
-    linear-gradient(180deg, rgba(10, 14, 22, 0.68), rgba(10, 14, 22, 0.68)),
-    radial-gradient(
-      circle at 8% -20%,
-      rgba(56, 189, 248, 0.13),
-      transparent 46%
-    ),
+    radial-gradient(circle at -8% -24%, rgba(6, 182, 212, 0.24), transparent 48%),
+    radial-gradient(circle at 96% -10%, rgba(56, 189, 248, 0.16), transparent 36%),
+    radial-gradient(circle at 10% 110%, rgba(37, 99, 235, 0.11), transparent 40%),
+    radial-gradient(rgba(148, 163, 184, 0.2) 0.85px, transparent 0.95px),
+    radial-gradient(rgba(8, 47, 73, 0.46) 0.85px, transparent 0.95px),
+    linear-gradient(180deg, rgba(6, 10, 18, 0.82), rgba(7, 12, 21, 0.76)),
     hsl(var(--surface-muted));
   background-size:
-    20px 20px,
     auto,
+    auto,
+    auto,
+    15px 15px,
+    15px 15px,
     auto,
     auto;
+  background-position:
+    center,
+    center,
+    center,
+    0 0,
+    7.5px 7.5px,
+    center,
+    center;
+  background-attachment: fixed;
 }
 
 pre,
@@ -128,11 +138,11 @@ code {
 }
 
 .markdown-preview a {
-  @apply font-medium text-sky-700 underline underline-offset-4 dark:text-sky-300;
+  @apply font-medium text-sky-700 underline decoration-surface-accent/45 underline-offset-4 dark:text-sky-300;
 }
 
 .markdown-preview pre {
-  @apply my-4 overflow-x-auto rounded-lg bg-black/85 p-3 text-zinc-100;
+  @apply my-4 overflow-x-auto rounded-xl bg-slate-950/90 p-4 text-zinc-100;
 }
 
 .markdown-preview table {
@@ -160,4 +170,19 @@ code {
 .hljs-number,
 .hljs-symbol {
   color: #22d3ee;
+}
+
+@keyframes fade-in-up {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.fade-in-up {
+  animation: fade-in-up 0.3s ease-out;
 }

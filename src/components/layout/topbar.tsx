@@ -97,12 +97,12 @@ export function Topbar({
   }
 
   return (
-    <header className="sticky top-0 z-40 border-b border-surface-border/80 bg-surface/95">
-      <div className="mx-auto flex max-w-[1400px] items-center gap-3 px-4 py-3">
+    <header className="sticky top-0 z-40 border-b border-surface-border/70 bg-surface/75 backdrop-blur-xl supports-[backdrop-filter]:bg-surface/65">
+      <div className="mx-auto flex max-w-[1400px] items-center gap-3 px-4 py-3 sm:px-6 lg:px-8">
         <button
           type="button"
           onClick={onToggleMobileMenu}
-          className="inline-flex h-10 w-10 items-center justify-center rounded-xl border border-surface-border bg-surface-muted text-slate-700 transition hover:bg-surface dark:text-slate-200 lg:hidden"
+          className="inline-flex h-10 w-10 items-center justify-center rounded-xl border border-surface-border/80 bg-surface/75 text-slate-700 shadow-sm transition hover:bg-surface-muted/75 dark:text-slate-200 lg:hidden"
           aria-label={
             isMobileMenuOpen
               ? 'Fechar menu de ferramentas'
@@ -118,7 +118,7 @@ export function Topbar({
         <button
           type="button"
           onClick={onToggleDesktopSidebar}
-          className="hidden h-10 w-10 items-center justify-center rounded-xl border border-surface-border bg-surface-muted text-slate-700 transition hover:bg-surface dark:text-slate-200 lg:inline-flex"
+          className="hidden h-10 w-10 items-center justify-center rounded-xl border border-surface-border/80 bg-surface/75 text-slate-700 shadow-sm transition hover:bg-surface-muted/75 dark:text-slate-200 lg:inline-flex"
           aria-label={
             isDesktopSidebarOpen ? 'Ocultar sidebar' : 'Mostrar sidebar'
           }
@@ -132,12 +132,12 @@ export function Topbar({
         <Link
           href="/"
           aria-label="Ir para Home"
-          className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-surface-border bg-surface-muted text-slate-700 transition hover:bg-surface dark:text-slate-200"
+          className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-surface-border/80 bg-surface/75 text-slate-700 shadow-sm transition hover:bg-surface-muted/75 dark:text-slate-200"
         >
           <House className="h-4 w-4" />
         </Link>
         <form onSubmit={onSubmit} className="relative min-w-0 flex-1">
-          <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-500 dark:text-slate-400" />
+          <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-500 dark:text-slate-300" />
           <input
             value={query}
             onChange={(event) => setQuery(event.target.value)}
@@ -146,10 +146,10 @@ export function Topbar({
             placeholder="Buscar ferramenta por nome, slug ou keyword"
             aria-label="Buscar ferramentas"
             autoComplete="off"
-            className="h-10 w-full rounded-xl border border-surface-border bg-surface-muted pl-9 pr-3 text-sm text-surface-foreground outline-none ring-surface-accent transition focus:border-surface-accent/60 focus:ring-2"
+            className="h-10 w-full rounded-2xl border border-surface-border/80 bg-surface/80 pl-9 pr-3 text-sm text-surface-foreground shadow-sm outline-none ring-surface-accent/40 transition focus:border-surface-accent/60 focus:ring-2"
           />
           {isSearchFocused && suggestions.length > 0 && (
-            <div className="absolute top-full z-50 mt-2 w-full rounded-xl border border-surface-border bg-surface shadow-lg">
+            <div className="absolute top-full z-50 mt-2 w-full rounded-2xl border border-surface-border/80 bg-surface/95 shadow-card backdrop-blur">
               <ul className="max-h-72 overflow-y-auto p-1">
                 {suggestions.map((tool) => (
                   <li key={tool.slug}>
@@ -159,7 +159,7 @@ export function Topbar({
                         event.preventDefault();
                         goToTool(tool.path);
                       }}
-                      className="w-full rounded-lg px-3 py-2 text-left transition hover:bg-surface-muted"
+                      className="w-full rounded-xl px-3 py-2 text-left transition hover:bg-surface-muted/70"
                     >
                       <div className="text-sm font-medium text-surface-foreground">
                         {tool.name}

@@ -24,7 +24,7 @@ export function Sidebar({
     <>
       <div
         className={cn(
-          'fixed inset-0 z-40 bg-slate-950/45 transition-opacity lg:hidden',
+          'fixed inset-0 z-40 bg-slate-950/35 backdrop-blur-[2px] transition-opacity lg:hidden',
           isMobileOpen ? 'opacity-100' : 'pointer-events-none opacity-0',
         )}
         onClick={onCloseMobile}
@@ -32,7 +32,7 @@ export function Sidebar({
       />
       <aside
         className={cn(
-          'fixed inset-y-0 left-0 z-50 w-72 shrink-0 overflow-x-hidden overflow-y-auto border-r border-surface-border/80 bg-surface-muted px-3 py-4 transition-transform duration-300 lg:sticky lg:top-0 lg:z-auto lg:h-screen lg:transition-all',
+          'fixed inset-y-0 left-0 z-50 w-72 shrink-0 overflow-x-hidden overflow-y-auto border-r border-surface-border/60 bg-surface/85 px-3 py-4 shadow-card backdrop-blur-xl transition-transform duration-300 lg:sticky lg:top-0 lg:z-auto lg:h-screen lg:shadow-none lg:transition-all',
           isMobileOpen ? 'translate-x-0' : '-translate-x-full',
           isDesktopOpen
             ? 'lg:w-72 lg:opacity-100'
@@ -40,10 +40,10 @@ export function Sidebar({
           'lg:translate-x-0',
         )}
       >
-        <nav className="space-y-5 pt-2">
+        <nav className="space-y-6 pt-2">
           {categories.map((category) => (
             <div key={category}>
-              <h3 className="mb-2 text-[11px] font-semibold uppercase tracking-[0.15em] text-slate-600 dark:text-slate-400">
+              <h3 className="mb-2 px-2 text-[10px] font-semibold uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400">
                 {category}
               </h3>
               <ul className="space-y-1">
@@ -57,9 +57,9 @@ export function Sidebar({
                           href={tool.path}
                           onClick={onNavigate}
                           className={cn(
-                            'block rounded-xl px-3 py-2 text-sm transition hover:bg-surface hover:text-surface-foreground',
+                            'block rounded-xl px-3 py-2.5 text-sm text-slate-700 transition hover:bg-surface-muted/85 hover:text-surface-foreground dark:text-slate-200',
                             active &&
-                              'bg-surface font-semibold text-surface-foreground shadow-sm',
+                              'bg-surface font-semibold text-surface-foreground shadow-sm ring-1 ring-surface-border/70',
                           )}
                         >
                           {tool.name}

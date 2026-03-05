@@ -13,7 +13,7 @@ export function AppShell({ children }: AppShellProps) {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   return (
-    <div className="min-h-screen lg:flex">
+    <div className="relative min-h-screen lg:flex">
       <Sidebar
         isDesktopOpen={isDesktopSidebarOpen}
         isMobileOpen={isMobileMenuOpen}
@@ -29,7 +29,9 @@ export function AppShell({ children }: AppShellProps) {
           }
           onToggleMobileMenu={() => setIsMobileMenuOpen((value) => !value)}
         />
-        <main className="mx-auto max-w-[1400px] px-4 py-6">{children}</main>
+        <main className="fade-in-up mx-auto max-w-[1400px] px-4 pb-8 pt-7 sm:px-6 lg:px-8">
+          {children}
+        </main>
       </div>
     </div>
   );

@@ -3,7 +3,7 @@ import { generateNames } from '@/lib/tools/name';
 import { createShortLink, resolveShortLink } from '@/server/services/shortener';
 
 declare global {
-  var __devSwissShortLinks: Map<
+  var __dev4toolsShortLinks: Map<
     string,
     { slug: string; url: string; createdAt: string; hits: number }
   > | undefined;
@@ -26,7 +26,7 @@ describe('name generator', () => {
 
 describe('shortener service', () => {
   beforeEach(() => {
-    globalThis.__devSwissShortLinks = new Map();
+    globalThis.__dev4toolsShortLinks = new Map();
   });
 
   it('creates short link with normalized custom slug', () => {

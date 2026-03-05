@@ -15,7 +15,7 @@ export function ToolLayout({
 }: ToolLayoutProps) {
   return (
     <section className="space-y-6">
-      <header className="space-y-2 rounded-2xl border border-surface-border bg-surface p-5 shadow-card">
+      <header className="space-y-2 rounded-2xl border border-surface-border/75 bg-surface/85 p-6 shadow-card">
         <h1 className="text-2xl font-bold tracking-tight md:text-3xl">
           {title}
         </h1>

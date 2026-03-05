@@ -2,7 +2,7 @@
 
 ## Visão geral
 
-`dev-swiss-knife` é um monolito Next.js com App Router.
+`dev4tools` é um monolito Next.js com App Router.
 
 Princípios:
 

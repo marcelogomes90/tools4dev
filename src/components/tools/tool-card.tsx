@@ -9,9 +9,9 @@ export function ToolCard({ tool }: ToolCardProps) {
   return (
     <Link
       href={tool.path}
-      className="group rounded-2xl border border-surface-border/70 bg-surface/80 p-5 shadow-card transition hover:-translate-y-1 hover:border-surface-accent/80"
+      className="group rounded-2xl border border-surface-border/70 bg-surface/85 p-5 shadow-card transition hover:-translate-y-1 hover:border-surface-accent/70 hover:bg-surface"
     >
-      <p className="text-[11px] uppercase tracking-[0.13em] text-slate-600 dark:text-slate-400">
+      <p className="text-[11px] uppercase tracking-[0.16em] text-slate-600 dark:text-slate-400">
         {tool.category}
       </p>
       <h2 className="mt-2 text-lg font-semibold group-hover:text-surface-accent">

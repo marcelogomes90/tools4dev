@@ -3,7 +3,7 @@ import { decodeBase64, encodeBase64 } from '@/lib/tools/base64';
 
 describe('base64 utf8', () => {
   it('encodes and decodes utf8 text', () => {
-    const value = 'Olá, dev swiss knife';
+    const value = 'Olá, dev4tools';
     const encoded = encodeBase64(value);
     const decoded = decodeBase64(encoded);
 

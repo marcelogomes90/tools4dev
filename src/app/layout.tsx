@@ -5,8 +5,8 @@ import { AppShell } from '@/components/layout/app-shell';
 import { ThemeProvider } from '@/components/layout/theme-provider';
 
 export const metadata: Metadata = {
-  title: 'Canivete Suico Dev',
-  description: 'Canivete suico para devs com ferramentas de produtividade.',
+  title: 'dev4tools',
+  description: 'Suite de ferramentas para produtividade no desenvolvimento.',
   icons: {
     icon: '/developer.png',
     shortcut: '/developer.png',

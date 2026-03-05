@@ -11,15 +11,15 @@ interface ShortLinkRecord {
 }
 
 declare global {
-  var __devSwissShortLinks: Map<string, ShortLinkRecord> | undefined;
+  var __dev4toolsShortLinks: Map<string, ShortLinkRecord> | undefined;
 }
 
 function getStore() {
-  if (!globalThis.__devSwissShortLinks) {
-    globalThis.__devSwissShortLinks = new Map<string, ShortLinkRecord>();
+  if (!globalThis.__dev4toolsShortLinks) {
+    globalThis.__dev4toolsShortLinks = new Map<string, ShortLinkRecord>();
   }
 
-  return globalThis.__devSwissShortLinks;
+  return globalThis.__dev4toolsShortLinks;
 }
 
 function normalizeSlug(value: string) {
