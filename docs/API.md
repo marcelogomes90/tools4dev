@@ -105,6 +105,7 @@ Encurtador local com slug opcional.
 
 - URL apenas `http/https`
 - `slug` opcional (`3..40`, `a-zA-Z0-9_-`)
+- sem `slug`, o servidor gera automaticamente um slug alfanumérico de 5 caracteres
 - slugs são únicos no processo atual
 
 ### Response 201

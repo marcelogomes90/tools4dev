@@ -76,6 +76,7 @@ As rotas abaixo usam `export const runtime = 'nodejs'`:
 
 - unit tests para regras puras
 - smoke e2e para disponibilidade da app e ferramenta principal
+- cobertura específica para shortener local e utilitários de data/texto
 
 ## Escalabilidade
 

@@ -6,6 +6,7 @@ O encurtador desta aplicação opera em modo local:
 
 - cria links curtos no servidor da aplicação
 - aceita slug custom opcional
+- gera slug automático com 5 caracteres quando não informado
 - redireciona via `GET /s/:slug`
 - persistência em memória do processo (não persistente)
 

@@ -18,11 +18,15 @@
   - erro para formato inválido
 - `tests/unit/password.test.ts`
   - geração com regras de segurança
-  - geração em lote
+  - cenários de erro e limites (`length`, `amount`, grupos)
 - `tests/unit/date-list-text.test.ts`
-  - operações de data
+  - operações de data (inclusive leap year)
+  - validação de erros de data
   - ordenação/desduplicação de lista
-  - transformações de texto
+  - transformações e contagem de texto
+- `tests/unit/name-shortener.test.ts`
+  - geração de nomes por lote com limites
+  - shortener local (slug custom, auto, conflito, resolução e hits)
 
 ## E2E smoke atual
 
@@ -46,7 +50,7 @@ yarn lint
 
 ## Próximos testes recomendados
 
-1. cobertura de rotas API (`/api/shorten`, `/api/image/compress`, `/api/pdf/compress`)
-2. testes de erro para JWT sign/verify
+1. cobertura de rotas API de upload (`/api/image/compress`, `/api/pdf/compress`)
+2. testes e2e para shortener local (`/api/shorten` + `/s/:slug`)
 3. smoke para regex/diff/markdown
-4. teste de limites (payload grande e uploads grandes)
+4. teste de limites com payload grande e uploads grandes

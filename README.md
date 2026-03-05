@@ -30,6 +30,8 @@ O projeto foi estruturado para ser:
 - sharp
 - sql-formatter
 - pdf-lib (+ Ghostscript opcional no host)
+- @faker-js/faker
+- qrcode
 - Vitest
 - Playwright
 - ESLint + Prettier
@@ -81,7 +83,7 @@ tests/
 
 ## Requisitos
 
-- Node.js 20+
+- Node.js 22+ (veja `.nvmrc`)
 - Yarn 1.22+
 - para compressão de PDF de melhor qualidade: `ghostscript` (`gs`) no host
 
