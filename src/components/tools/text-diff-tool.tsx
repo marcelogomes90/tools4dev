@@ -82,19 +82,25 @@ export function TextDiffTool() {
               <p className="border-b border-surface-border bg-surface px-3 py-2 text-xs font-semibold uppercase">
                 Texto A
               </p>
-              <div className="max-h-96 overflow-auto font-mono text-xs leading-6">
-                {sideBySide.map((line) => (
-                  <div
-                    key={`${line.key}-left`}
-                    className={cn(
-                      'min-h-6 whitespace-pre-wrap px-3',
-                      line.leftType === 'removed' &&
-                        'bg-rose-200/80 text-rose-900 dark:bg-rose-900/50 dark:text-rose-100',
-                    )}
-                  >
-                    {line.left || ' '}
+              <div className="max-h-96 min-h-[12rem] overflow-auto font-mono text-xs leading-6">
+                {sideBySide.length === 0 ? (
+                  <div className="flex h-[12rem] items-center justify-center px-3 text-center text-slate-500 dark:text-slate-400">
+                    Sem conteúdo para comparar
                   </div>
-                ))}
+                ) : (
+                  sideBySide.map((line) => (
+                    <div
+                      key={`${line.key}-left`}
+                      className={cn(
+                        'min-h-6 whitespace-pre-wrap px-3',
+                        line.leftType === 'removed' &&
+                          'bg-rose-200/80 text-rose-900 dark:bg-rose-900/50 dark:text-rose-100',
+                      )}
+                    >
+                      {line.left || ' '}
+                    </div>
+                  ))
+                )}
               </div>
             </div>
 
@@ -102,19 +108,25 @@ export function TextDiffTool() {
               <p className="border-b border-surface-border bg-surface px-3 py-2 text-xs font-semibold uppercase">
                 Texto B
               </p>
-              <div className="max-h-96 overflow-auto font-mono text-xs leading-6">
-                {sideBySide.map((line) => (
-                  <div
-                    key={`${line.key}-right`}
-                    className={cn(
-                      'min-h-6 whitespace-pre-wrap px-3',
-                      line.rightType === 'added' &&
-                        'bg-emerald-200/80 text-emerald-900 dark:bg-emerald-900/50 dark:text-emerald-100',
-                    )}
-                  >
-                    {line.right || ' '}
+              <div className="max-h-96 min-h-[12rem] overflow-auto font-mono text-xs leading-6">
+                {sideBySide.length === 0 ? (
+                  <div className="flex h-[12rem] items-center justify-center px-3 text-center text-slate-500 dark:text-slate-400">
+                    Sem conteúdo para comparar
                   </div>
-                ))}
+                ) : (
+                  sideBySide.map((line) => (
+                    <div
+                      key={`${line.key}-right`}
+                      className={cn(
+                        'min-h-6 whitespace-pre-wrap px-3',
+                        line.rightType === 'added' &&
+                          'bg-emerald-200/80 text-emerald-900 dark:bg-emerald-900/50 dark:text-emerald-100',
+                      )}
+                    >
+                      {line.right || ' '}
+                    </div>
+                  ))
+                )}
               </div>
             </div>
           </div>
