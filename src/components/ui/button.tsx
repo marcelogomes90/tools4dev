@@ -18,7 +18,7 @@ export function Button({
   return (
     <button
       className={cn(
-        'inline-flex items-center justify-center rounded-2xl border font-medium transition duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-surface-accent disabled:cursor-not-allowed disabled:opacity-50',
+        'inline-flex items-center justify-center rounded-xl border font-medium transition duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-surface-accent disabled:cursor-not-allowed disabled:opacity-50',
         variant === 'default' &&
           'border-transparent bg-surface-accent px-3 text-white shadow-sm hover:brightness-95',
         variant === 'outline' &&

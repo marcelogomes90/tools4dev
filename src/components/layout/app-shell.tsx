@@ -9,15 +9,25 @@ interface AppShellProps {
 }
 
 export function AppShell({ children }: AppShellProps) {
-  const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+  const [isDesktopSidebarOpen, setIsDesktopSidebarOpen] = useState(true);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   return (
     <div className="min-h-screen lg:flex">
-      <Sidebar isOpen={isSidebarOpen} />
+      <Sidebar
+        isDesktopOpen={isDesktopSidebarOpen}
+        isMobileOpen={isMobileMenuOpen}
+        onCloseMobile={() => setIsMobileMenuOpen(false)}
+        onNavigate={() => setIsMobileMenuOpen(false)}
+      />
       <div className="min-w-0 flex-1">
         <Topbar
-          isSidebarOpen={isSidebarOpen}
-          onToggleSidebar={() => setIsSidebarOpen((value) => !value)}
+          isDesktopSidebarOpen={isDesktopSidebarOpen}
+          isMobileMenuOpen={isMobileMenuOpen}
+          onToggleDesktopSidebar={() =>
+            setIsDesktopSidebarOpen((value) => !value)
+          }
+          onToggleMobileMenu={() => setIsMobileMenuOpen((value) => !value)}
         />
         <main className="mx-auto max-w-[1400px] px-4 py-6">{children}</main>
       </div>

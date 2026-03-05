@@ -4,7 +4,7 @@ import { categories } from '@/lib/tool-registry';
 export default function HomePage() {
   return (
     <section className="flex min-h-[calc(100vh-140px)] items-center justify-center px-2">
-      <div className="w-full max-w-3xl rounded-[2rem] border border-surface-border bg-surface p-10 text-center shadow-card">
+      <div className="w-full max-w-3xl rounded-2xl border border-surface-border bg-surface p-10 text-center shadow-card">
         <p className="mb-3 text-xs uppercase tracking-[0.2em] text-slate-600 dark:text-slate-400">
           Canivete Suico Dev
         </p>
@@ -29,7 +29,7 @@ export default function HomePage() {
         <div className="mt-7">
           <Link
             href="/tools/json-formatter"
-            className="inline-flex h-10 items-center justify-center rounded-2xl bg-surface-accent px-5 text-sm font-semibold text-white transition hover:brightness-95"
+            className="inline-flex h-10 items-center justify-center rounded-xl bg-surface-accent px-5 text-sm font-semibold text-white transition hover:brightness-95"
           >
             Abrir uma ferramenta
           </Link>

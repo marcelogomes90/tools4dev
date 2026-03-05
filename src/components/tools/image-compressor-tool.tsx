@@ -109,7 +109,7 @@ export function ImageCompressorTool() {
             />
             <label
               htmlFor={FILE_INPUT_ID}
-              className="mt-1 flex min-h-28 cursor-pointer flex-col items-center justify-center rounded-2xl border-2 border-dashed border-surface-border bg-surface/75 px-4 text-center transition hover:border-surface-accent/70 hover:bg-surface-muted/70"
+              className="mt-1 flex min-h-28 cursor-pointer flex-col items-center justify-center rounded-xl border-2 border-dashed border-surface-border bg-surface/75 px-4 text-center transition hover:border-surface-accent/70 hover:bg-surface-muted/70"
             >
               <ImagePlus className="mb-2 h-5 w-5" />
               <span className="text-sm font-medium">
