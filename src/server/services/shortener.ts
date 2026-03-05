@@ -29,9 +29,24 @@ interface PostgresRow {
   hits: number | string;
 }
 
+interface SupabaseHttpStore {
+  baseUrl: string;
+  schema: string;
+  serviceRoleKey: string;
+  table: string;
+}
+
+interface SupabaseRow {
+  created_at: string;
+  hits: number | string;
+  slug: string;
+  url: string;
+}
+
 declare global {
   var __tools4devShortLinks: Map<string, ShortLinkRecord> | undefined;
   var __tools4devShortLinksPostgres: PostgresStore | undefined;
+  var __tools4devShortLinksSupabaseHttp: SupabaseHttpStore | undefined;
 }
 
 const STORE_FILE_ENV = 'SHORTENER_STORAGE_FILE';
@@ -49,6 +64,10 @@ const VERCEL_POSTGRES_PORT_ENV = 'POSTGRES_PORT';
 const DATABASE_SSL_NO_VERIFY_ENV = 'SHORTENER_DATABASE_SSL_NO_VERIFY';
 const DATABASE_TABLE_ENV = 'SHORTENER_DATABASE_TABLE';
 const DATABASE_TABLE_DEFAULT = 'short_links';
+const SUPABASE_URL_ENV = 'SUPABASE_URL';
+const SUPABASE_PUBLIC_URL_ENV = 'NEXT_PUBLIC_SUPABASE_URL';
+const SUPABASE_SERVICE_ROLE_KEY_ENV = 'SUPABASE_SERVICE_ROLE_KEY';
+const SUPABASE_HTTP_MODE_ENV = 'SHORTENER_USE_SUPABASE_HTTP';
 
 function getStoreFilePath() {
   const configured = process.env[STORE_FILE_ENV]?.trim();
@@ -128,13 +147,59 @@ function resolveSslConfig(connectionString: string): PoolConfig['ssl'] | undefin
   return undefined;
 }
 
+function shouldUseSupabaseHttp() {
+  return parseBooleanEnv(SUPABASE_HTTP_MODE_ENV) === true;
+}
+
+function getSupabaseUrl() {
+  const serverUrl = process.env[SUPABASE_URL_ENV]?.trim();
+  if (serverUrl) return serverUrl;
+
+  const publicUrl = process.env[SUPABASE_PUBLIC_URL_ENV]?.trim();
+  return publicUrl || '';
+}
+
 function getDatabaseTable() {
   const configured = process.env[DATABASE_TABLE_ENV]?.trim();
   return configured || DATABASE_TABLE_DEFAULT;
 }
 
+function isSafeIdentifier(value: string) {
+  return /^[a-zA-Z_][a-zA-Z0-9_]*$/.test(value);
+}
+
+function parseTableReference(value: string) {
+  const parts = value.split('.').map((part) => part.trim()).filter(Boolean);
+
+  if (parts.length === 1) {
+    const [table] = parts;
+    if (!table || !isSafeIdentifier(table)) {
+      throw new Error('SHORTENER_DATABASE_TABLE inválido.');
+    }
+
+    return {
+      schema: null as string | null,
+      table,
+    };
+  }
+
+  if (parts.length === 2) {
+    const [schema, table] = parts;
+    if (!schema || !table || !isSafeIdentifier(schema) || !isSafeIdentifier(table)) {
+      throw new Error('SHORTENER_DATABASE_TABLE inválido.');
+    }
+
+    return {
+      schema,
+      table,
+    };
+  }
+
+  throw new Error('SHORTENER_DATABASE_TABLE inválido.');
+}
+
 function quoteIdentifier(value: string) {
-  if (!/^[a-zA-Z_][a-zA-Z0-9_]*$/.test(value)) {
+  if (!isSafeIdentifier(value)) {
     throw new Error('SHORTENER_DATABASE_TABLE inválido.');
   }
 
@@ -142,12 +207,69 @@ function quoteIdentifier(value: string) {
 }
 
 function quoteTableName(value: string) {
-  const parts = value.split('.').map((part) => part.trim()).filter(Boolean);
-  if (parts.length === 0 || parts.length > 2) {
-    throw new Error('SHORTENER_DATABASE_TABLE inválido.');
+  const reference = parseTableReference(value);
+  if (!reference.schema) return quoteIdentifier(reference.table);
+  return `${quoteIdentifier(reference.schema)}.${quoteIdentifier(reference.table)}`;
+}
+
+function isSupabaseRow(value: unknown): value is SupabaseRow {
+  if (!value || typeof value !== 'object') return false;
+
+  const maybe = value as Record<string, unknown>;
+  return (
+    typeof maybe.slug === 'string' &&
+    typeof maybe.url === 'string' &&
+    typeof maybe.created_at === 'string' &&
+    (typeof maybe.hits === 'number' || typeof maybe.hits === 'string')
+  );
+}
+
+function createSupabaseHeaders(
+  store: SupabaseHttpStore,
+  options?: { includeContentType?: boolean },
+) {
+  const headers: Record<string, string> = {
+    Accept: 'application/json',
+    apikey: store.serviceRoleKey,
+    Authorization: `Bearer ${store.serviceRoleKey}`,
+    'Accept-Profile': store.schema,
+  };
+
+  if (options?.includeContentType) {
+    headers['Content-Type'] = 'application/json';
+    headers['Content-Profile'] = store.schema;
   }
 
-  return parts.map((part) => quoteIdentifier(part)).join('.');
+  return headers;
+}
+
+async function readSupabaseError(response: Response) {
+  const raw = await response.text().catch(() => '');
+
+  if (raw) {
+    try {
+      const parsed = JSON.parse(raw) as { error?: string; message?: string };
+      const message = parsed.message || parsed.error;
+      if (message) return `Supabase HTTP ${response.status}: ${message}`;
+    } catch {
+      return `Supabase HTTP ${response.status}: ${raw}`;
+    }
+  }
+
+  return `Supabase HTTP ${response.status}: erro ao acessar API`;
+}
+
+function toShortLinkRecord(row: SupabaseRow, hitsOverride?: number): ShortLinkRecord {
+  const hits = Number.isFinite(Number(row.hits))
+    ? Math.max(0, Math.trunc(Number(row.hits)))
+    : 0;
+
+  return {
+    slug: normalizeSlug(row.slug),
+    url: row.url,
+    createdAt: row.created_at,
+    hits: hitsOverride ?? hits,
+  };
 }
 
 async function ensureSchema(pool: Pool, tableName: string) {
@@ -191,6 +313,43 @@ async function getPostgresStore(): Promise<PostgresStore | null> {
   };
 
   globalThis.__tools4devShortLinksPostgres = store;
+  return store;
+}
+
+function getSupabaseHttpStore(): SupabaseHttpStore | null {
+  if (!shouldUseSupabaseHttp()) return null;
+
+  const baseUrl = getSupabaseUrl();
+  const serviceRoleKey = process.env[SUPABASE_SERVICE_ROLE_KEY_ENV]?.trim() || '';
+  if (!baseUrl || !serviceRoleKey) {
+    throw new Error(
+      'Modo Supabase HTTP requer SUPABASE_URL (ou NEXT_PUBLIC_SUPABASE_URL) e SUPABASE_SERVICE_ROLE_KEY.',
+    );
+  }
+
+  const normalizedBaseUrl = baseUrl.replace(/\/$/, '');
+  const reference = parseTableReference(getDatabaseTable());
+  const schema = reference.schema ?? 'public';
+  const table = reference.table;
+  const existing = globalThis.__tools4devShortLinksSupabaseHttp;
+
+  if (
+    existing &&
+    existing.baseUrl === normalizedBaseUrl &&
+    existing.serviceRoleKey === serviceRoleKey &&
+    existing.schema === schema &&
+    existing.table === table
+  ) {
+    return existing;
+  }
+
+  const store: SupabaseHttpStore = {
+    baseUrl: normalizedBaseUrl,
+    schema,
+    serviceRoleKey,
+    table,
+  };
+  globalThis.__tools4devShortLinksSupabaseHttp = store;
   return store;
 }
 
@@ -366,8 +525,118 @@ async function resolvePostgresRecord(
   return fromPostgresRow(row);
 }
 
+async function insertSupabaseRecord(
+  store: SupabaseHttpStore,
+  slug: string,
+  url: string,
+): Promise<boolean> {
+  const endpoint = new URL(`${store.baseUrl}/rest/v1/${store.table}`);
+  endpoint.searchParams.set('on_conflict', 'slug');
+
+  const response = await fetch(endpoint.toString(), {
+    method: 'POST',
+    headers: {
+      ...createSupabaseHeaders(store, { includeContentType: true }),
+      Prefer: 'resolution=ignore-duplicates,return=representation',
+    },
+    body: JSON.stringify([{ slug, url }]),
+    cache: 'no-store',
+  });
+
+  if (!response.ok) {
+    throw new Error(await readSupabaseError(response));
+  }
+
+  const rows = (await response.json()) as unknown;
+  return Array.isArray(rows) && rows.length > 0;
+}
+
+async function resolveSupabaseRecord(
+  store: SupabaseHttpStore,
+  slug: string,
+): Promise<ShortLinkRecord | null> {
+  const selectUrl = new URL(`${store.baseUrl}/rest/v1/${store.table}`);
+  selectUrl.searchParams.set('select', 'slug,url,created_at,hits');
+  selectUrl.searchParams.set('slug', `eq.${slug}`);
+  selectUrl.searchParams.set('limit', '1');
+
+  const selectResponse = await fetch(selectUrl.toString(), {
+    method: 'GET',
+    headers: createSupabaseHeaders(store),
+    cache: 'no-store',
+  });
+
+  if (!selectResponse.ok) {
+    throw new Error(await readSupabaseError(selectResponse));
+  }
+
+  const rows = (await selectResponse.json()) as unknown;
+  if (!Array.isArray(rows) || rows.length === 0 || !isSupabaseRow(rows[0])) {
+    return null;
+  }
+
+  const current = toShortLinkRecord(rows[0]);
+  const nextHits = current.hits + 1;
+
+  const updateUrl = new URL(`${store.baseUrl}/rest/v1/${store.table}`);
+  updateUrl.searchParams.set('slug', `eq.${slug}`);
+
+  const updateResponse = await fetch(updateUrl.toString(), {
+    method: 'PATCH',
+    headers: {
+      ...createSupabaseHeaders(store, { includeContentType: true }),
+      Prefer: 'return=minimal',
+    },
+    body: JSON.stringify({ hits: nextHits }),
+    cache: 'no-store',
+  });
+
+  if (!updateResponse.ok) {
+    throw new Error(await readSupabaseError(updateResponse));
+  }
+
+  return {
+    ...current,
+    hits: nextHits,
+  };
+}
+
 export async function createShortLink(input: ShortLinkCreateInput, baseUrl: string) {
   const requestedSlug = input.slug ? normalizeSlug(input.slug) : '';
+  const supabaseStore = getSupabaseHttpStore();
+
+  if (supabaseStore) {
+    if (requestedSlug) {
+      const inserted = await insertSupabaseRecord(supabaseStore, requestedSlug, input.url);
+      if (!inserted) {
+        throw new Error('Slug já está em uso. Escolha outro.');
+      }
+
+      return {
+        slug: requestedSlug,
+        shortUrl: withBaseUrl(baseUrl, requestedSlug),
+        expiresAt: null,
+        provider: 'supabase-http' as const,
+      };
+    }
+
+    for (let tries = 0; tries < 10; tries += 1) {
+      const candidate = randomSlug(5);
+      const inserted = await insertSupabaseRecord(supabaseStore, candidate, input.url);
+
+      if (!inserted) continue;
+
+      return {
+        slug: candidate,
+        shortUrl: withBaseUrl(baseUrl, candidate),
+        expiresAt: null,
+        provider: 'supabase-http' as const,
+      };
+    }
+
+    throw new Error('Falha ao gerar slug único. Tente novamente.');
+  }
+
   const postgresStore = await getPostgresStore();
 
   if (postgresStore) {
@@ -427,6 +696,12 @@ export async function createShortLink(input: ShortLinkCreateInput, baseUrl: stri
 
 export async function resolveShortLink(slug: string) {
   const normalizedSlug = normalizeSlug(slug);
+  const supabaseStore = getSupabaseHttpStore();
+
+  if (supabaseStore) {
+    return resolveSupabaseRecord(supabaseStore, normalizedSlug);
+  }
+
   const postgresStore = await getPostgresStore();
 
   if (postgresStore) {

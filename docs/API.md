@@ -120,7 +120,7 @@ Encurtador local com slug opcional.
 }
 ```
 
-`provider` pode retornar `postgres` (quando DB está configurado) ou `local` (fallback JSON).
+`provider` pode retornar `supabase-http`, `postgres` ou `local` (fallback JSON).
 
 ### Response 409
 

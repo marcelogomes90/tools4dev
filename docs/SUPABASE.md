@@ -2,56 +2,45 @@
 
 ## Objetivo
 
-Configurar o encurtador para usar o Postgres do Supabase e funcionar entre máquinas/instâncias.
+Configurar o encurtador para funcionar em produção mesmo quando o host Postgres direto do Supabase é IPv6-only.
 
-## Variáveis de ambiente
+## Modos suportados
 
-Defina no deploy:
+### 1) HTTP (recomendado para Vercel + IPv4)
 
-- `NEXT_PUBLIC_APP_URL=https://seu-dominio.com`
-- `POSTGRES_URL=postgresql://...` (gerada automaticamente na integração Supabase + Vercel)
+Usa PostgREST (`/rest/v1`) via HTTPS.
 
-Opcional:
+Variáveis:
 
-- `SUPABASE_DB_URL=postgresql://...`
-- `SHORTENER_DATABASE_URL=postgresql://...` (tem prioridade sobre `SUPABASE_DB_URL`)
-- `SHORTENER_DATABASE_TABLE=public.short_links`
+- `SHORTENER_USE_SUPABASE_HTTP=true`
+- `SUPABASE_URL=https://<project-ref>.supabase.co`
+- `SUPABASE_SERVICE_ROLE_KEY=<service-role-key>`
+- opcional: `SHORTENER_DATABASE_TABLE=public.short_links`
 
-Se `SHORTENER_DATABASE_URL`, `SUPABASE_DB_URL` e `POSTGRES_URL` não estiverem definidas, o serviço tenta `DATABASE_URL`.  
-Sem nenhuma URL de banco, cai no fallback JSON local.
+Vantagem:
 
-### Cenário comum no Vercel
+- evita conexão TCP direta no banco (sem problema de IPv6/IPv4 do host `db.*`).
 
-Se só `POSTGRES_USER`, `POSTGRES_HOST` e `POSTGRES_DATABASE` estiverem preenchidas, o shortener ainda precisa de:
+### 2) Postgres direto
 
-- `POSTGRES_PASSWORD`
+Usa `pg` com connection string.
 
-Com esses 4 valores (+ `POSTGRES_PORT` opcional), o serviço monta a URL automaticamente.
+Variáveis (uma URL já basta):
 
-### Erro de certificado TLS
+- `SHORTENER_DATABASE_URL`
+- `SUPABASE_DB_URL`
+- `POSTGRES_URL`
+- `POSTGRES_PRISMA_URL`
+- `POSTGRES_URL_NON_POOLING`
+- `DATABASE_URL`
 
-Se aparecer `self-signed certificate in certificate chain`:
+Ou montagem por partes:
 
-1. use preferencialmente `POSTGRES_URL`/`POSTGRES_PRISMA_URL` da integração (já vem com TLS correto);
-2. confirme que a URL de conexão contém `sslmode=require`;
-3. se o erro persistir, defina `SHORTENER_DATABASE_SSL_NO_VERIFY=true` apenas como mitigação temporária.
-
-Use esse fallback apenas quando necessário e remova depois de corrigir a cadeia TLS.
-
-## String de conexão Supabase
-
-No painel Supabase:
-
-1. `Project Settings`
-2. `Database`
-3. `Connection string`
-4. Copie a URI (`postgresql://...`)
-
-Recomendado usar com `sslmode=require`.
+- `POSTGRES_USER` + `POSTGRES_HOST` + `POSTGRES_DATABASE` + `POSTGRES_PASSWORD` (+ `POSTGRES_PORT` opcional)
 
 ## Tabela
 
-O serviço cria automaticamente a tabela se não existir:
+No modo HTTP, a tabela deve existir. Rode no SQL Editor do Supabase:
 
 ```sql
 CREATE TABLE IF NOT EXISTS public.short_links (
@@ -62,18 +51,18 @@ CREATE TABLE IF NOT EXISTS public.short_links (
 );
 ```
 
-## Teste rápido
+## Vercel (passo a passo)
 
-Crie link:
+1. Em `Project Settings` -> `Environment Variables`, adicione:
+   - `SHORTENER_USE_SUPABASE_HTTP=true`
+   - `SUPABASE_URL`
+   - `SUPABASE_SERVICE_ROLE_KEY`
+   - `NEXT_PUBLIC_APP_URL=https://seu-dominio.com`
+2. Faça redeploy.
+3. Teste:
 
 ```bash
 curl -X POST https://seu-dominio.com/api/shorten \
   -H "content-type: application/json" \
-  -d '{"url":"https://example.com","slug":"teste-supabase"}'
-```
-
-Abra:
-
-```bash
-https://seu-dominio.com/s/teste-supabase
+  -d '{"url":"https://example.com","slug":"teste-supabase-http"}'
 ```

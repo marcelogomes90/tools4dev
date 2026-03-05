@@ -6,6 +6,39 @@ import { shortenSchema } from '@/server/validators/api';
 
 export const runtime = 'nodejs';
 
+function resolveShortenerError(error: unknown) {
+  if (!(error instanceof Error)) {
+    return {
+      status: 500,
+      message: 'Falha ao gerar link curto.',
+    };
+  }
+
+  const maybeErrno = error as NodeJS.ErrnoException;
+  if (
+    maybeErrno.code === 'ENOTFOUND' &&
+    error.message.includes('.supabase.co')
+  ) {
+    return {
+      status: 500,
+      message:
+        'Host do Postgres não resolvido. Use modo HTTP (SHORTENER_USE_SUPABASE_HTTP=true) ou POSTGRES_URL/POSTGRES_PRISMA_URL da integração Supabase+Vercel.',
+    };
+  }
+
+  if (error.message.includes('Slug já está em uso')) {
+    return {
+      status: 409,
+      message: error.message,
+    };
+  }
+
+  return {
+    status: 500,
+    message: error.message || 'Falha ao gerar link curto.',
+  };
+}
+
 function isLoopbackHost(url: string) {
   try {
     const hostname = new URL(url).hostname;
@@ -59,8 +92,7 @@ export async function POST(request: NextRequest) {
     const result = await createShortLink(parsed.data, resolveBaseUrl(request));
     return NextResponse.json({ ok: true, ...result }, { status: 201 });
   } catch (error) {
-    const message = error instanceof Error ? error.message : 'Falha ao gerar link curto.';
-    const status = message.includes('Slug já está em uso') ? 409 : 500;
+    const { status, message } = resolveShortenerError(error);
 
     return NextResponse.json(
       {

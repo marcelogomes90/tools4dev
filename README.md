@@ -122,6 +122,8 @@ Variáveis:
 - `SHORTENER_DATABASE_URL` (opcional: URL dedicada do Postgres para o shortener)
 - `SUPABASE_DB_URL` (opcional: atalho para URL do Postgres do Supabase)
 - `SHORTENER_DATABASE_TABLE` (opcional: tabela do shortener, padrão `short_links`, aceita `schema.tabela`)
+- `SHORTENER_USE_SUPABASE_HTTP` (opcional: ativa shortener via API HTTP do Supabase)
+- `SUPABASE_URL` + `SUPABASE_SERVICE_ROLE_KEY` (obrigatórios no modo HTTP)
 - `POSTGRES_URL` (auto-detectado do Vercel/Supabase Integration)
 - `POSTGRES_PRISMA_URL` (fallback auto-detectado)
 - `POSTGRES_URL_NON_POOLING` (fallback auto-detectado)
@@ -173,7 +175,8 @@ yarn lint
 - headers de segurança em `next.config.ts`
 - JWT secrets não são persistidos
 - shortener aceita apenas URL `http/https`
-- shortener usa Postgres quando encontra uma URL de DB (`SHORTENER_DATABASE_URL`, `SUPABASE_DB_URL`, `POSTGRES_URL`, `POSTGRES_PRISMA_URL`, `POSTGRES_URL_NON_POOLING` ou `DATABASE_URL`)
+- shortener usa Supabase HTTP quando `SHORTENER_USE_SUPABASE_HTTP=true`
+- sem modo HTTP, usa Postgres quando encontra uma URL de DB (`SHORTENER_DATABASE_URL`, `SUPABASE_DB_URL`, `POSTGRES_URL`, `POSTGRES_PRISMA_URL`, `POSTGRES_URL_NON_POOLING` ou `DATABASE_URL`)
 - uploads com limite:
   - imagem: 10MB (`png/jpeg/webp/gif`)
   - PDF: 20MB

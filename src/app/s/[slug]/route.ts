@@ -8,18 +8,33 @@ interface ShortRedirectParams {
 }
 
 export async function GET(_request: NextRequest, { params }: ShortRedirectParams) {
-  const { slug } = await params;
-  const found = await resolveShortLink(slug);
+  try {
+    const { slug } = await params;
+    const found = await resolveShortLink(slug);
 
-  if (!found) {
+    if (!found) {
+      return NextResponse.json(
+        {
+          ok: false,
+          message: 'Slug não encontrado.',
+        },
+        { status: 404 },
+      );
+    }
+
+    return NextResponse.redirect(found.url, { status: 307 });
+  } catch (error) {
+    const message =
+      error instanceof Error
+        ? error.message
+        : 'Falha ao resolver link curto.';
+
     return NextResponse.json(
       {
         ok: false,
-        message: 'Slug não encontrado.',
+        message,
       },
-      { status: 404 },
+      { status: 500 },
     );
   }
-
-  return NextResponse.redirect(found.url, { status: 307 });
 }

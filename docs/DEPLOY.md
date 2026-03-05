@@ -16,6 +16,8 @@
 - `SHORTENER_DATABASE_URL` (opcional, URL dedicada Postgres para shortener)
 - `SUPABASE_DB_URL` (opcional, atalho para URL Postgres do Supabase)
 - `SHORTENER_DATABASE_TABLE` (opcional, tabela do shortener; aceita `schema.tabela`)
+- `SHORTENER_USE_SUPABASE_HTTP` (opcional, ativa shortener via API HTTP do Supabase)
+- `SUPABASE_URL` + `SUPABASE_SERVICE_ROLE_KEY` (obrigatórios no modo HTTP)
 - `POSTGRES_URL` (auto-detectado do Vercel/Supabase Integration)
 - `POSTGRES_PRISMA_URL` (fallback auto-detectado)
 - `POSTGRES_URL_NON_POOLING` (fallback auto-detectado)

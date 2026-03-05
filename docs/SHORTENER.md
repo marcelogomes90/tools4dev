@@ -61,6 +61,7 @@ Ação:
 
 - validação de URL e slug ocorre no servidor
 - não há chamadas para APIs de terceiros
+- para usar API HTTP do Supabase, defina `SHORTENER_USE_SUPABASE_HTTP=true` + `SUPABASE_URL` + `SUPABASE_SERVICE_ROLE_KEY`
 - configure uma URL de DB (`SHORTENER_DATABASE_URL`, `SUPABASE_DB_URL`, `POSTGRES_URL`, `POSTGRES_PRISMA_URL`, `POSTGRES_URL_NON_POOLING` ou `DATABASE_URL`)
 - se não houver URL, o serviço também tenta montar por `POSTGRES_USER/HOST/DATABASE/PASSWORD` (+ `POSTGRES_PORT`)
 - opcional: `SHORTENER_DATABASE_TABLE` para customizar a tabela (`schema.tabela` suportado)
