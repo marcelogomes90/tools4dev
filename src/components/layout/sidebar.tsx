@@ -33,10 +33,10 @@ export function Sidebar({
       />
       <aside
         className={cn(
-          'fixed inset-y-0 left-0 z-50 w-72 shrink-0 overflow-x-hidden overflow-y-auto border-r border-surface-border/60 bg-surface shadow-card backdrop-blur-xl transition-transform duration-300 lg:sticky lg:top-0 lg:z-auto lg:h-screen lg:shadow-none lg:transition-all',
+          'fixed inset-y-0 left-0 z-50 w-[19rem] shrink-0 overflow-x-hidden overflow-y-auto border-r border-surface-border/60 bg-surface shadow-card backdrop-blur-xl transition-transform duration-300 lg:sticky lg:top-0 lg:z-auto lg:h-screen lg:shadow-none lg:transition-all',
           isMobileOpen ? 'translate-x-0' : '-translate-x-full',
           isDesktopOpen
-            ? 'lg:w-72 lg:opacity-100'
+            ? 'lg:w-[19rem] lg:opacity-100'
             : 'lg:w-0 lg:border-r-0 lg:opacity-0',
           'lg:translate-x-0',
         )}
