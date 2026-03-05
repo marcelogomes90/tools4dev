@@ -19,6 +19,7 @@ export function Sidebar({
   onNavigate,
 }: SidebarProps) {
   const pathname = usePathname();
+  const activeTool = toolDefinitions.find((tool) => pathname === tool.path);
 
   return (
     <>
@@ -32,15 +33,23 @@ export function Sidebar({
       />
       <aside
         className={cn(
-          'fixed inset-y-0 left-0 z-50 w-72 shrink-0 overflow-x-hidden overflow-y-auto border-r border-surface-border/60 bg-surface/85 px-3 py-4 shadow-card backdrop-blur-xl transition-transform duration-300 lg:sticky lg:top-0 lg:z-auto lg:h-screen lg:shadow-none lg:transition-all',
+          'fixed inset-y-0 left-0 z-50 w-72 shrink-0 overflow-x-hidden overflow-y-auto border-r border-surface-border/60 bg-surface shadow-card backdrop-blur-xl transition-transform duration-300 lg:sticky lg:top-0 lg:z-auto lg:h-screen lg:shadow-none lg:transition-all',
           isMobileOpen ? 'translate-x-0' : '-translate-x-full',
           isDesktopOpen
             ? 'lg:w-72 lg:opacity-100'
-            : 'lg:w-0 lg:border-r-0 lg:px-0 lg:py-0 lg:opacity-0',
+            : 'lg:w-0 lg:border-r-0 lg:opacity-0',
           'lg:translate-x-0',
         )}
       >
-        <nav className="space-y-6 pt-2">
+        <div className="sticky -top-px z-10 flex h-[65px] flex-col bg-surface px-3 pb-1 pt-4">
+          <p className="px-3 text-xs font-semibold uppercase tracking-[0.2em] text-slate-800 dark:text-slate-100">
+            Ferramentas
+          </p>
+          <p className="mt-1 truncate px-3 text-[11px] font-medium text-slate-500 dark:text-slate-300">
+            {activeTool?.name ?? 'Selecione uma ferramenta'}
+          </p>
+        </div>
+        <nav className="space-y-6 px-3 py-4">
           {categories.map((category) => (
             <div key={category}>
               <h3 className="mb-2 px-2 text-[10px] font-semibold uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400">
