@@ -2,7 +2,7 @@
 
 ## Visão geral
 
-`dev4tools` é um monolito Next.js com App Router.
+`tools4dev` é um monolito Next.js com App Router.
 
 Princípios:
 

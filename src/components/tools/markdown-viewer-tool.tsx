@@ -20,7 +20,7 @@ marked.setOptions({
 
 export function MarkdownViewerTool() {
   const [markdown, setMarkdown] = useState(
-    '# Hello Dev\n\n```ts\nconst msg = "dev4tools";\nconsole.log(msg);\n```',
+    '# Hello Dev\n\n```ts\nconst msg = "tools4dev";\nconsole.log(msg);\n```',
   );
   const [html, setHtml] = useState('');
   const previewRef = useRef<HTMLDivElement>(null);

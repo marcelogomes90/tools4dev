@@ -14,7 +14,7 @@ import { ToolLayout } from '@/components/ui/tool-layout';
 const meta = getToolBySlug('text-case-converter');
 
 export function TextCaseConverterTool() {
-  const [input, setInput] = useState('dev4tools, uma caixa de ferramentas útil.');
+  const [input, setInput] = useState('tools4dev, uma caixa de ferramentas útil.');
   const [mode, setMode] = useState<CaseMode>('title');
   const [output, setOutput] = useState('');
 

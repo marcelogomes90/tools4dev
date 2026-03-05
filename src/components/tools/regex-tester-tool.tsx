@@ -36,9 +36,9 @@ export function RegexTesterTool() {
   );
 
   function sample() {
-    setPattern('(dev4tools|tool)\\s+(\\w+)');
+    setPattern('(tools4dev|tool)\\s+(\\w+)');
     setFlags('gi');
-    setText('dev4tools and tool regex in this tool sandbox');
+    setText('tools4dev and tool regex in this tool sandbox');
   }
 
   function clear() {

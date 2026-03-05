@@ -47,7 +47,7 @@ export function JwtTool() {
 
   function fillExample() {
     setHeaderJson('{"alg":"HS256","typ":"JWT"}');
-    setPayloadJson('{"sub":"42","name":"dev4tools"}');
+    setPayloadJson('{"sub":"42","name":"tools4dev"}');
     setSecret('super-secret');
     setVerifyKey('super-secret');
     setExpiresIn('2h');

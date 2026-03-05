@@ -1,14 +1,14 @@
 import Link from 'next/link';
 import { categories } from '@/lib/tool-registry';
 
-const repoUrl = 'https://github.com/marcelogomes90/dev4tools';
+const repoUrl = 'https://github.com/marcelogomes90/tools4dev';
 
 export default function HomePage() {
   return (
     <section className="flex min-h-[calc(100vh-156px)] items-center justify-center px-2">
       <div className="w-full max-w-4xl rounded-[30px] border border-surface-border/75 bg-surface/85 p-8 text-center shadow-card backdrop-blur sm:p-12">
         <p className="mb-4 text-xs uppercase tracking-[0.24em] text-slate-600 dark:text-slate-400">
-          dev4tools
+          tools4dev
         </p>
         <h1 className="text-4xl font-bold tracking-tight md:text-5xl lg:text-6xl">
           Ferramentas essenciais para fluxo de desenvolvimento moderno

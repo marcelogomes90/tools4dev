@@ -14,7 +14,7 @@ import { ToolLayout } from '@/components/ui/tool-layout';
 const meta = getToolBySlug('qr-code-generator');
 
 export function QrCodeGeneratorTool() {
-  const [text, setText] = useState('https://github.com/marcelogomes90/dev4tools');
+  const [text, setText] = useState('https://github.com/marcelogomes90/tools4dev');
   const [size, setSize] = useState(280);
   const [qrDataUrl, setQrDataUrl] = useState('');
   const [error, setError] = useState('');
@@ -74,7 +74,7 @@ export function QrCodeGeneratorTool() {
             <Button onClick={generateQr} disabled={!text.trim() || loading}>
               {loading ? 'Gerando...' : 'Gerar QR Code'}
             </Button>
-            <Button variant="outline" onClick={() => setText('dev4tools')}>
+            <Button variant="outline" onClick={() => setText('tools4dev')}>
               Gerar exemplo
             </Button>
             <Button

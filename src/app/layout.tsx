@@ -5,7 +5,7 @@ import { AppShell } from '@/components/layout/app-shell';
 import { ThemeProvider } from '@/components/layout/theme-provider';
 
 export const metadata: Metadata = {
-  title: 'dev4tools',
+  title: 'tools4dev',
   description: 'Suite de ferramentas para produtividade no desenvolvimento.',
   icons: {
     icon: '/developer.png',
