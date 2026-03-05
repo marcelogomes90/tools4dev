@@ -75,7 +75,7 @@ export function UuidTool() {
         </InputPanel>
 
         <OutputPanel>
-          <div className="max-h-96 overflow-auto rounded-lg border border-surface-border bg-surface-muted p-3 font-mono text-xs">
+          <div className="max-h-96 overflow-auto whitespace-pre-wrap rounded-lg border border-surface-border bg-surface-muted p-3 font-mono text-xs">
             {result.length ? result.join('\n') : 'Nenhum identificador gerado.'}
           </div>
           <div className="flex gap-2">

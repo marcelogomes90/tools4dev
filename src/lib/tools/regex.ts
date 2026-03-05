@@ -26,7 +26,7 @@ export function runRegex(pattern: string, flags: string, text: string) {
   try {
     regex = new RegExp(pattern, flags);
   } catch {
-    throw new Error('Expressao regular invalida. Verifique pattern e flags.');
+    throw new Error('Expressao regular inválida. Verifique pattern e flags.');
   }
 
   const matches: RegexMatch[] = [];

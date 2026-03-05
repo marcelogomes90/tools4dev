@@ -22,7 +22,11 @@ interface TopbarProps {
 }
 
 function normalize(value: string) {
-  return value.toLowerCase().trim();
+  return value
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .toLowerCase()
+    .trim();
 }
 
 export function Topbar({

@@ -20,7 +20,7 @@ export function tooManyRequests(
 }
 
 export function internalError(
-  message = 'Erro interno ao processar requisicao.',
+  message = 'Erro interno ao processar requisição.',
 ) {
   return NextResponse.json({ ok: false, message }, { status: 500 });
 }

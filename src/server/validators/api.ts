@@ -23,11 +23,11 @@ export const shortenSchema = z.object({
   url: z
     .string()
     .trim()
-    .url('URL invalida.')
+    .url('URL inválida.')
     .refine(
       (value) => value.startsWith('http://') || value.startsWith('https://'),
       {
-        message: 'Apenas URLs http/https sao permitidas.',
+        message: 'Apenas URLs http/https são permitidas.',
       },
     ),
   slug: z

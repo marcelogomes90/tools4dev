@@ -2,16 +2,15 @@
 
 ## Checklist
 
-1. definir variaveis de ambiente
-2. instalar dependencias
-3. buildar a aplicacao
+1. definir variáveis de ambiente
+2. instalar dependências
+3. buildar a aplicação
 4. subir processo `next start`
-5. validar endpoints criticos
+5. validar endpoints críticos
 
-## Variaveis necessarias
+## Variáveis necessárias
 
-- `BITLY_TOKEN` (obrigatoria para encurtador)
-- `NEXT_PUBLIC_APP_URL` (recomendada)
+- `NEXT_PUBLIC_APP_URL` (recomendada, para URLs curtas absolutas)
 - `RATE_LIMIT_WINDOW_MS` (opcional)
 - `RATE_LIMIT_MAX` (opcional)
 
@@ -25,18 +24,19 @@ yarn start
 
 ## Ghostscript (opcional, recomendado)
 
-Para melhor compressao de PDF, instale `ghostscript` no host.
+Para melhor compressão de PDF, instale `ghostscript` no host.
 
-Sem `ghostscript`, a API usa fallback `pdf-lib` e pode nao reduzir alguns arquivos.
+Sem `ghostscript`, a API usa fallback `pdf-lib` e pode não reduzir alguns arquivos.
 
 ## Health checks sugeridos
 
 - `GET /` responde 200
-- `POST /api/hash` responde 200 com payload valido
-- `POST /api/shorten` responde 201 com `BITLY_TOKEN` valido
+- `GET /api/my-ip` responde 200
+- `POST /api/hash` responde 200 com payload válido
+- `POST /api/shorten` responde 201 com payload válido
 
 ## Observabilidade recomendada
 
 - logs de erro por rota
-- metrica de latencia por endpoint
+- métrica de latência por endpoint
 - alertas para aumento de `429` e erros `5xx`

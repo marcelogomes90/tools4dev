@@ -1,129 +1,89 @@
-interface BitlyCreateInput {
+interface ShortLinkCreateInput {
   url: string;
   slug?: string;
 }
 
-interface BitlySuccess {
-  link?: string;
-  id?: string;
+interface ShortLinkRecord {
+  slug: string;
+  url: string;
+  createdAt: string;
+  hits: number;
 }
 
-interface BitlyError {
-  message?: string;
-  description?: string;
+declare global {
+  var __devSwissShortLinks: Map<string, ShortLinkRecord> | undefined;
 }
 
-function extractSlugFromLink(link: string) {
-  const parts = link.split('/').filter(Boolean);
-  return parts[parts.length - 1] ?? '';
-}
-
-const BITLY_TIMEOUT_MS = 12_000;
-
-function isAbortLikeError(error: unknown) {
-  return (
-    error instanceof Error &&
-    (error.name === 'AbortError' || error.message.includes('aborted'))
-  );
-}
-
-async function requestBitly(
-  endpoint: string,
-  payload: Record<string, unknown>,
-  token: string,
-) {
-  try {
-    return await fetch(endpoint, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${token}`,
-      },
-      body: JSON.stringify(payload),
-      cache: 'no-store',
-      signal: AbortSignal.timeout(BITLY_TIMEOUT_MS),
-    });
-  } catch (error) {
-    if (isAbortLikeError(error)) {
-      throw new Error('Timeout ao chamar Bitly. Tente novamente.');
-    }
-
-    throw new Error('Falha de rede ao chamar Bitly.');
-  }
-}
-
-async function parseBitlyError(response: Response) {
-  const payload = (await response
-    .json()
-    .catch(() => null)) as BitlyError | null;
-
-  if (payload?.description) return payload.description;
-  if (payload?.message) return payload.message;
-
-  if (response.status === 401 || response.status === 403) {
-    return 'BITLY_TOKEN invalido ou sem permissao para criar links.';
+function getStore() {
+  if (!globalThis.__devSwissShortLinks) {
+    globalThis.__devSwissShortLinks = new Map<string, ShortLinkRecord>();
   }
 
-  if (response.status === 429) {
-    return 'Limite da API Bitly atingido. Tente novamente em instantes.';
-  }
-
-  return 'Bitly nao conseguiu processar esta solicitacao.';
+  return globalThis.__devSwissShortLinks;
 }
 
-async function createDefaultBitlyLink(url: string, token: string) {
-  const response = await requestBitly(
-    'https://api-ssl.bitly.com/v4/shorten',
-    { long_url: url },
-    token,
-  );
-
-  if (!response.ok) {
-    throw new Error(await parseBitlyError(response));
-  }
-
-  return (await response.json()) as BitlySuccess;
+function normalizeSlug(value: string) {
+  return value.trim().toLowerCase();
 }
 
-async function createCustomBitlyLink(url: string, slug: string, token: string) {
-  const response = await requestBitly(
-    'https://api-ssl.bitly.com/v4/bitlinks',
-    {
-      long_url: url,
-      domain: 'bit.ly',
-      keyword: slug,
-    },
-    token,
-  );
+function randomSlug(length = 5) {
+  const charset = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+  let output = '';
 
-  if (!response.ok) {
-    throw new Error(await parseBitlyError(response));
+  for (let i = 0; i < length; i += 1) {
+    output += charset[Math.floor(Math.random() * charset.length)] ?? 'x';
   }
 
-  return (await response.json()) as BitlySuccess;
+  return output.toLowerCase();
 }
 
-export async function createShortLink(input: BitlyCreateInput) {
-  const token = process.env.BITLY_TOKEN?.trim();
-
-  if (!token) {
-    throw new Error(
-      'BITLY_TOKEN nao configurado. Defina a variavel de ambiente para usar o encurtador.',
-    );
+function createAutoSlug(store: Map<string, ShortLinkRecord>) {
+  for (let tries = 0; tries < 10; tries += 1) {
+    const candidate = randomSlug(5);
+    if (!store.has(candidate)) return candidate;
   }
 
-  const bitlyData = input.slug
-    ? await createCustomBitlyLink(input.url, input.slug, token)
-    : await createDefaultBitlyLink(input.url, token);
+  throw new Error('Falha ao gerar slug único. Tente novamente.');
+}
 
-  if (!bitlyData.link) {
-    throw new Error('Bitly nao retornou URL curta valida.');
+function withBaseUrl(baseUrl: string, slug: string) {
+  const normalizedBase = baseUrl.replace(/\/$/, '');
+  return `${normalizedBase}/s/${slug}`;
+}
+
+export function createShortLink(input: ShortLinkCreateInput, baseUrl: string) {
+  const store = getStore();
+  const requestedSlug = input.slug ? normalizeSlug(input.slug) : '';
+  const slug = requestedSlug || createAutoSlug(store);
+
+  if (store.has(slug)) {
+    throw new Error('Slug já está em uso. Escolha outro.');
   }
+
+  store.set(slug, {
+    slug,
+    url: input.url,
+    createdAt: new Date().toISOString(),
+    hits: 0,
+  });
 
   return {
-    slug: extractSlugFromLink(bitlyData.link),
-    shortUrl: bitlyData.link,
+    slug,
+    shortUrl: withBaseUrl(baseUrl, slug),
     expiresAt: null,
-    provider: 'bitly' as const,
+    provider: 'local' as const,
   };
+}
+
+export function resolveShortLink(slug: string) {
+  const store = getStore();
+  const normalized = normalizeSlug(slug);
+  const item = store.get(normalized);
+
+  if (!item) return null;
+
+  item.hits += 1;
+  store.set(normalized, item);
+
+  return item;
 }

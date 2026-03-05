@@ -6,6 +6,17 @@ import { shortenSchema } from '@/server/validators/api';
 
 export const runtime = 'nodejs';
 
+function resolveBaseUrl(request: NextRequest) {
+  const envUrl = process.env.NEXT_PUBLIC_APP_URL?.trim();
+  if (envUrl) return envUrl;
+
+  const host = request.headers.get('x-forwarded-host') ?? request.headers.get('host');
+  const proto = request.headers.get('x-forwarded-proto') ?? 'http';
+
+  if (host) return `${proto}://${host}`;
+  return request.nextUrl.origin;
+}
+
 export async function POST(request: NextRequest) {
   const ip = getClientIp(request);
   const rate = checkRateLimit(`shorten:${ip}`, { max: 40, windowMs: 60_000 });
@@ -18,7 +29,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json(
       {
         ok: false,
-        message: 'Payload invalido.',
+        message: 'Payload inválido.',
         errors: parsed.error.flatten(),
       },
       { status: 400 },
@@ -26,14 +37,11 @@ export async function POST(request: NextRequest) {
   }
 
   try {
-    const result = await createShortLink(parsed.data);
+    const result = createShortLink(parsed.data, resolveBaseUrl(request));
     return NextResponse.json({ ok: true, ...result }, { status: 201 });
   } catch (error) {
-    const message =
-      error instanceof Error
-        ? error.message
-        : 'Falha ao gerar link curto com Bitly.';
-    const status = message.includes('BITLY_TOKEN nao configurado') ? 503 : 400;
+    const message = error instanceof Error ? error.message : 'Falha ao gerar link curto.';
+    const status = message.includes('Slug já está em uso') ? 409 : 400;
 
     return NextResponse.json(
       {

@@ -27,7 +27,7 @@ export function isHexColor(value: string) {
 export function hexToRgb(hex: string): RGB {
   const normalized = hex.trim().replace('#', '');
   if (!/^[\da-fA-F]{6}$/.test(normalized)) {
-    throw new Error('HEX invalido. Use formato #RRGGBB.');
+    throw new Error('HEX inválido. Use formato #RRGGBB.');
   }
 
   return {

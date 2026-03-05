@@ -28,21 +28,21 @@ export async function POST(request: NextRequest) {
 
   if (!(file instanceof File)) {
     return NextResponse.json(
-      { ok: false, message: 'Arquivo nao enviado.' },
+      { ok: false, message: 'Arquivo não enviado.' },
       { status: 400 },
     );
   }
 
   if (!options.success) {
     return NextResponse.json(
-      { ok: false, message: 'Opcoes invalidas para compressao de imagem.' },
+      { ok: false, message: 'Opções inválidas para compressão de imagem.' },
       { status: 400 },
     );
   }
 
   if (!allowedTypes.has(file.type)) {
     return NextResponse.json(
-      { ok: false, message: 'Tipo nao suportado. Use png/jpeg/webp/gif.' },
+      { ok: false, message: 'Tipo não suportado. Use png/jpeg/webp/gif.' },
       { status: 400 },
     );
   }

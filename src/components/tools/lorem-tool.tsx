@@ -87,8 +87,8 @@ export function LoremTool() {
                 setLanguage(event.target.value as 'classic' | 'pt' | 'en')
               }
             >
-              <option value="classic">Lorem classico</option>
-              <option value="pt">Portugues</option>
+              <option value="classic">Lorem clássico</option>
+              <option value="pt">Português</option>
               <option value="en">English</option>
             </Select>
           </div>

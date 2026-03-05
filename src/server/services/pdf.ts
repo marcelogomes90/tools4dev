@@ -72,7 +72,7 @@ export async function compressPdf(input: Buffer) {
       return {
         ok: false as const,
         message:
-          'Feature requires system dependency for melhor compressao (ghostscript). Fallback nao reduziu o arquivo.',
+          'Feature requires system dependency for melhor compressão (ghostscript). Fallback não reduziu o arquivo.',
       };
     }
 
@@ -85,7 +85,7 @@ export async function compressPdf(input: Buffer) {
     return {
       ok: false as const,
       message:
-        'Feature requires system dependency ou PDF nao suportado no fallback atual. Tente instalar ghostscript.',
+        'Feature requires system dependency ou PDF não suportado no fallback atual. Tente instalar ghostscript.',
     };
   } finally {
     await rm(inputPath, { force: true });

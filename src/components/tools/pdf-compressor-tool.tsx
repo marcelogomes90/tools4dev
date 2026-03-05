@@ -115,7 +115,7 @@ export function PdfCompressorTool() {
           </div>
           {error && <p className="text-sm text-rose-600">{error}</p>}
           <p className="text-xs text-slate-600 dark:text-slate-400">
-            Se ghostscript nao existir no ambiente, a rota tenta fallback com
+            Se ghostscript não existir no ambiente, a rota tenta fallback com
             pdf-lib e pode retornar aviso de dependencia.
           </p>
         </InputPanel>

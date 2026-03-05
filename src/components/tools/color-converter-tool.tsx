@@ -40,7 +40,7 @@ function parseNumbers(value: string, expected: number) {
     numbers.length !== expected ||
     numbers.some((item) => Number.isNaN(item))
   ) {
-    throw new Error('Formato invalido. Use valores separados por virgula.');
+    throw new Error('Formato inválido. Use valores separados por virgula.');
   }
 
   return numbers;
@@ -69,7 +69,7 @@ export function ColorConverterTool() {
           const [r, g, b] = parseNumbers(inputValue, 3);
           if ([r, g, b].some((value) => value < 0 || value > 255)) {
             throw new Error(
-              'RGB invalido. Cada canal deve ficar entre 0 e 255.',
+              'RGB inválido. Cada canal deve ficar entre 0 e 255.',
             );
           }
           return { r, g, b };
@@ -79,7 +79,7 @@ export function ColorConverterTool() {
           const [h, s, l] = parseNumbers(inputValue, 3);
           if (h < 0 || h > 360 || s < 0 || s > 100 || l < 0 || l > 100) {
             throw new Error(
-              'HSL invalido. Use H(0..360), S(0..100), L(0..100).',
+              'HSL inválido. Use H(0..360), S(0..100), L(0..100).',
             );
           }
           return hslToRgb({ h, s, l });
@@ -87,7 +87,7 @@ export function ColorConverterTool() {
 
         const [h, s, v] = parseNumbers(inputValue, 3);
         if (h < 0 || h > 360 || s < 0 || s > 100 || v < 0 || v > 100) {
-          throw new Error('HSV invalido. Use H(0..360), S(0..100), V(0..100).');
+          throw new Error('HSV inválido. Use H(0..360), S(0..100), V(0..100).');
         }
         return hsvToRgb({ h, s, v });
       })();
@@ -108,7 +108,7 @@ export function ColorConverterTool() {
     } catch (err) {
       return {
         computed: null,
-        error: err instanceof Error ? err.message : 'Cor invalida.',
+        error: err instanceof Error ? err.message : 'Cor inválida.',
       };
     }
   }, [inputType, inputValue]);
@@ -230,7 +230,7 @@ export function ColorConverterTool() {
             </div>
           ) : (
             <p className="text-sm text-slate-600 dark:text-slate-400">
-              Sem resultado valido.
+              Sem resultado válido.
             </p>
           )}
         </OutputPanel>

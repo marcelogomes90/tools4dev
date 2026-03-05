@@ -8,6 +8,7 @@
   --surface-muted: 212 28% 84%;
   --surface-border: 214 22% 68%;
   --surface-accent: 194 90% 45%;
+  --surface-input: 0 0% 100%;
 }
 
 .dark {
@@ -16,6 +17,7 @@
   --surface-muted: 224 22% 8%;
   --surface-border: 223 14% 38%;
   --surface-accent: 190 92% 52%;
+  --surface-input: 224 18% 13%;
 }
 
 * {

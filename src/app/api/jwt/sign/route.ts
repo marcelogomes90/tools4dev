@@ -18,7 +18,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json(
       {
         ok: false,
-        message: 'Payload invalido.',
+        message: 'Payload inválido.',
         errors: parsed.error.flatten(),
       },
       { status: 400 },
@@ -49,7 +49,7 @@ export async function POST(request: NextRequest) {
       {
         ok: false,
         message:
-          'Nao foi possivel assinar o token. Verifique payload/header e configuracoes.',
+          'Não foi possível assinar o token. Verifique payload/header e configurações.',
       },
       { status: 400 },
     );

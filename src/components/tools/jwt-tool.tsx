@@ -146,7 +146,7 @@ export function JwtTool() {
         | { ok: false; message: string };
 
       if (!response.ok || !data.ok) {
-        throw new Error(data.ok ? 'Token invalido.' : data.message);
+        throw new Error(data.ok ? 'Token inválido.' : data.message);
       }
 
       setVerifyOutput(pretty(data.decoded));

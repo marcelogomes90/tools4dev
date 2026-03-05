@@ -2,6 +2,21 @@
 
 Todas as rotas validam input com Zod e aplicam rate limit por IP.
 
+## `GET /api/my-ip`
+
+Retorna o IP visto pelo servidor.
+
+### Response 200
+
+```json
+{
+  "ok": true,
+  "ip": "203.0.113.10",
+  "forwardedFor": "203.0.113.10",
+  "realIp": null
+}
+```
+
 ## `POST /api/hash`
 
 Gera hashes `md5`, `sha1`, `sha256`, `sha512`.
@@ -75,7 +90,7 @@ Verifica assinatura do token.
 
 ## `POST /api/shorten`
 
-Bitly-only shortener.
+Encurtador local com slug opcional.
 
 ### Body
 
@@ -90,7 +105,7 @@ Bitly-only shortener.
 
 - URL apenas `http/https`
 - `slug` opcional (`3..40`, `a-zA-Z0-9_-`)
-- exige `BITLY_TOKEN`
+- slugs são únicos no processo atual
 
 ### Response 201
 
@@ -98,15 +113,15 @@ Bitly-only shortener.
 {
   "ok": true,
   "slug": "custom-slug",
-  "shortUrl": "https://bit.ly/custom-slug",
+  "shortUrl": "https://app.exemplo.com/s/custom-slug",
   "expiresAt": null,
-  "provider": "bitly"
+  "provider": "local"
 }
 ```
 
-### Response 503
+### Response 409
 
-`BITLY_TOKEN` ausente no ambiente.
+Slug já existente.
 
 ## `POST /api/sql/format`
 
@@ -129,7 +144,7 @@ Comprime/converte imagens via Sharp.
 
 ### Multipart fields
 
-- `file` (obrigatorio)
+- `file` (obrigatório)
 - `format`: `png|jpeg|webp|gif`
 - `quality`: `30..95`
 
@@ -140,7 +155,7 @@ Comprime/converte imagens via Sharp.
 
 ### Response 200
 
-Arquivo binario com headers:
+Arquivo binário com headers:
 
 - `Content-Type`
 - `Content-Disposition`
@@ -160,10 +175,10 @@ Comprime PDF via Ghostscript com fallback `pdf-lib`.
 
 ### Response 200
 
-Arquivo PDF binario com header adicional:
+Arquivo PDF binário com header adicional:
 
 - `X-Compression-Method: ghostscript | pdf-lib`
 
 ## `GET /s/:slug`
 
-No modo atual retorna `410 Gone` (redirecionamento local desabilitado).
+Redireciona (`307`) para a URL registrada no shortener local.

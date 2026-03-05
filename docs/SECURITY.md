@@ -1,13 +1,13 @@
-# Seguranca
+# Segurança
 
 ## Medidas aplicadas
 
-- validacao de entrada com Zod em todas as rotas API
+- validação de entrada com Zod em todas as rotas API
 - rate limit in-memory por IP
-- headers de seguranca via `next.config.ts`
-- validacao de protocolo no shortener (`http/https`)
-- segredos de JWT e Bitly sem persistencia
-- sanitizacao de Markdown preview com DOMPurify
+- headers de segurança via `next.config.ts`
+- validação de protocolo no shortener (`http/https`)
+- segredos de JWT sem persistência
+- sanitização de Markdown preview com DOMPurify
 - limite de tamanho em uploads (imagem/PDF)
 
 ## Headers configurados
@@ -16,7 +16,7 @@
 - `X-Frame-Options: DENY`
 - `Referrer-Policy: strict-origin-when-cross-origin`
 - `Permissions-Policy: camera=(), microphone=(), geolocation=()`
-- `Content-Security-Policy` basica
+- `Content-Security-Policy` básica
 
 ## Arquivos
 
@@ -28,25 +28,32 @@
 
 ### PDF
 
-- mime obrigatorio: `application/pdf`
+- mime obrigatório: `application/pdf`
 - limite: 20MB
 - timeout no processo do Ghostscript
 
 ## JWT
 
-- decode local sem verify (explicito)
+- decode local sem verify (explícito)
 - sign/verify no servidor
 - sem armazenamento de secret
 
+## Shortener local
+
+- não depende de provider externo
+- mapeamento em memória do processo
+- sem persistência entre reinícios
+
 ## Riscos conhecidos (aceitos)
 
-- rate limit em memoria nao e distribuido entre multiplas instancias
-- sem WAF/proxy dedicado por padrao
+- rate limit em memória não é distribuído entre múltiplas instâncias
+- shortener local em memória perde dados ao reiniciar
+- sem WAF/proxy dedicado por padrão
 - CSP usa `unsafe-inline` por compatibilidade com Next
 
-## Recomendacoes para producao
+## Recomendações para produção
 
 - usar reverse proxy com rate limit adicional
 - usar observabilidade (logs centralizados + alertas)
-- rotacionar `BITLY_TOKEN` periodicamente
-- proteger variaveis de ambiente no provedor de deploy
+- proteger variáveis de ambiente no provedor de deploy
+- adicionar persistência (Redis/DB) para o shortener, se necessário

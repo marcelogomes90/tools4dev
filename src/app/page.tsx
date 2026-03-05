@@ -1,19 +1,21 @@
 import Link from 'next/link';
 import { categories } from '@/lib/tool-registry';
 
+const repoUrl = 'https://github.com/marcelogomes90/dev-swiss-knife';
+
 export default function HomePage() {
   return (
     <section className="flex min-h-[calc(100vh-140px)] items-center justify-center px-2">
       <div className="w-full max-w-3xl rounded-2xl border border-surface-border bg-surface p-10 text-center shadow-card">
         <p className="mb-3 text-xs uppercase tracking-[0.2em] text-slate-600 dark:text-slate-400">
-          Canivete Suico Dev
+          Canivete Suíço Dev
         </p>
         <h1 className="text-4xl font-bold tracking-tight md:text-5xl">
           Toolkit fullstack para o dia a dia
         </h1>
         <p className="mx-auto mt-4 max-w-2xl text-sm leading-7 text-slate-700 dark:text-slate-300">
-          Geradores, formatadores, utilitarios de seguranca e compressores
-          reunidos em um unico painel. Selecione qualquer ferramenta na barra
+          Geradores, formatadores, utilitários de segurança e compressores
+          reunidos em um único painel. Selecione qualquer ferramenta na barra
           lateral para começar.
         </p>
         <div className="mt-6 flex flex-wrap justify-center gap-2">
@@ -26,13 +28,21 @@ export default function HomePage() {
             </span>
           ))}
         </div>
-        <div className="mt-7">
+        <div className="mt-7 flex flex-wrap justify-center gap-2">
           <Link
             href="/tools/json-formatter"
             className="inline-flex h-10 items-center justify-center rounded-xl bg-surface-accent px-5 text-sm font-semibold text-white transition hover:brightness-95"
           >
             Abrir uma ferramenta
           </Link>
+          <a
+            href={repoUrl}
+            target="_blank"
+            rel="noreferrer"
+            className="inline-flex h-10 items-center justify-center rounded-xl border border-surface-border bg-[hsl(var(--surface-input))] px-5 text-sm font-semibold text-surface-foreground transition hover:border-surface-accent/60"
+          >
+            Dar uma estrela no GitHub
+          </a>
         </div>
       </div>
     </section>

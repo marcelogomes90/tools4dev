@@ -19,7 +19,7 @@ export async function POST(request: NextRequest) {
 
   if (!(file instanceof File)) {
     return NextResponse.json(
-      { ok: false, message: 'Arquivo PDF nao enviado.' },
+      { ok: false, message: 'Arquivo PDF não enviado.' },
       { status: 400 },
     );
   }
@@ -32,7 +32,7 @@ export async function POST(request: NextRequest) {
 
   if (!metadata.success) {
     return NextResponse.json(
-      { ok: false, message: 'Arquivo invalido. Envie PDF de ate 20MB.' },
+      { ok: false, message: 'Arquivo inválido. Envie PDF de até 20MB.' },
       { status: 400 },
     );
   }

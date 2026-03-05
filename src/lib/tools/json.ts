@@ -21,7 +21,7 @@ function sortRecursively(value: unknown): unknown {
 }
 
 function extractParseHint(error: unknown): string {
-  if (!(error instanceof Error)) return 'JSON invalido.';
+  if (!(error instanceof Error)) return 'JSON inválido.';
   const match = error.message.match(/position\s(\d+)/i);
   if (!match) return error.message;
   const position = Number(match[1]);

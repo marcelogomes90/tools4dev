@@ -26,7 +26,7 @@ export function decodeJwtUnsafe(token: string): JwtParts {
   const parts = token.split('.');
   if (parts.length < 2) {
     throw new Error(
-      'Token JWT invalido: formato esperado header.payload.signature',
+      'Token JWT inválido: formato esperado header.payload.signature',
     );
   }
 
@@ -50,7 +50,7 @@ export function parseJsonInput(value: string) {
     return parsed;
   } catch {
     throw new Error(
-      'JSON invalido. Revise sintaxe de chaves, aspas e virgulas.',
+      'JSON inválido. Revise sintaxe de chaves, aspas e vírgulas.',
     );
   }
 }

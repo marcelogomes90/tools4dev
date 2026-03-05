@@ -21,7 +21,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json(
       {
         ok: false,
-        message: 'Payload invalido.',
+        message: 'Payload inválido.',
         errors: parsed.error.flatten(),
       },
       { status: 400 },
@@ -45,7 +45,7 @@ export async function POST(request: NextRequest) {
         message:
           error instanceof Error
             ? error.message
-            : 'Token invalido ou assinatura nao confere.',
+            : 'Token inválido ou assinatura não confere.',
       },
       { status: 400 },
     );

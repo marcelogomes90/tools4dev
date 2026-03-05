@@ -63,13 +63,13 @@ export function CnpjTool() {
               checked={masked}
               onChange={(event) => setMasked(event.target.checked)}
             />
-            Gerar com mascara
+            Gerar com máscara
           </label>
           <div>
             <Label htmlFor="cnpj-validate">Validar CNPJ</Label>
             <Input
               id="cnpj-validate"
-              placeholder="Digite CNPJ com ou sem mascara"
+              placeholder="Digite CNPJ com ou sem máscara"
               value={inputToValidate}
               onChange={(event) => setInputToValidate(event.target.value)}
             />
@@ -77,7 +77,7 @@ export function CnpjTool() {
               <p
                 className={`mt-1 text-xs ${validation ? 'text-emerald-600' : 'text-rose-600'}`}
               >
-                {validation ? 'CNPJ valido.' : 'CNPJ invalido.'}
+                {validation ? 'CNPJ válido.' : 'CNPJ inválido.'}
               </p>
             )}
           </div>
@@ -97,7 +97,7 @@ export function CnpjTool() {
         </InputPanel>
 
         <OutputPanel>
-          <div className="max-h-96 overflow-auto rounded-lg border border-surface-border bg-surface-muted p-3 text-sm">
+          <div className="max-h-96 overflow-auto whitespace-pre-wrap rounded-lg border border-surface-border bg-surface-muted p-3 text-sm">
             {result.length ? result.join('\n') : 'Nenhum CNPJ gerado ainda.'}
           </div>
           <div className="flex gap-2">

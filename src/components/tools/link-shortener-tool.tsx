@@ -82,7 +82,7 @@ export function LinkShortenerTool() {
       <div className="grid gap-4 lg:grid-cols-2">
         <InputPanel>
           <div>
-            <Label htmlFor="shorten-url">URL destino (http/https)</Label>
+            <Label htmlFor="shorten-url">URL de destino (http/https)</Label>
             <Input
               id="shorten-url"
               placeholder="https://example.com/path"
@@ -91,9 +91,7 @@ export function LinkShortenerTool() {
             />
           </div>
           <div>
-            <Label htmlFor="shorten-slug">
-              Slug custom no Bitly (opcional)
-            </Label>
+            <Label htmlFor="shorten-slug">Slug customizado (opcional)</Label>
             <Input
               id="shorten-slug"
               placeholder="meu-link"
@@ -102,8 +100,7 @@ export function LinkShortenerTool() {
             />
           </div>
           <p className="text-xs text-slate-600 dark:text-slate-400">
-            Esta ferramenta usa somente Bitly. Configure `BITLY_TOKEN` no
-            ambiente para habilitar.
+            Links curtos são gerados localmente e redirecionam por `/s/:slug`.
           </p>
           <div className="flex flex-wrap gap-2">
             <Button onClick={shorten} disabled={loading || !url}>
@@ -130,7 +127,19 @@ export function LinkShortenerTool() {
               <p>
                 <strong>Provider:</strong> {result.provider}
               </p>
-              <CopyButton value={result.shortUrl ?? ''} />
+              <div className="flex gap-2">
+                <CopyButton value={result.shortUrl ?? ''} />
+                {result.shortUrl && (
+                  <a
+                    href={result.shortUrl}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="inline-flex h-8 items-center justify-center rounded-xl border border-surface-border bg-surface px-3 text-xs font-medium transition hover:border-surface-accent/50 hover:bg-surface-muted"
+                  >
+                    Abrir
+                  </a>
+                )}
+              </div>
             </div>
           ) : (
             <div className="space-y-2 text-sm text-slate-700 dark:text-slate-300">

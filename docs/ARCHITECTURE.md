@@ -1,57 +1,58 @@
 # Arquitetura
 
-## Visao geral
+## Visão geral
 
-`dev-swiss-knife` e um monolito Next.js com App Router.
+`dev-swiss-knife` é um monolito Next.js com App Router.
 
-Principios:
+Princípios:
 
-- UI e experiencia em `src/components`
-- regras de negocio puras em `src/lib`
+- UI e experiência em `src/components`
+- regras de negócio puras em `src/lib`
 - concerns server-side em `src/server`
 - endpoints em `src/app/api/*`
 
-## Organizacao de pastas
+## Organização de pastas
 
 ```txt
 src/
   app/
     api/                  # route handlers
-    tools/[slug]/page.tsx # pagina dinamica de ferramenta
+    tools/[slug]/page.tsx # página dinâmica de ferramenta
     page.tsx              # home
   components/
     layout/               # shell, sidebar, topbar, tema
     tools/                # componentes por ferramenta
-    ui/                   # componentes base reutilizaveis
+    ui/                   # componentes base reutilizáveis
   lib/
     tool-registry.ts      # metadados das ferramentas
-    tools/                # funcoes puras (cpf, cnpj, regex, etc.)
+    tools/                # funções puras (cpf, cnpj, regex, etc.)
     utils/                # helpers (cn, download)
   server/
-    services/             # integracoes externas e processamento server-only
+    services/             # integrações externas e processamento server-only
     validators/           # schemas Zod da API
     rate-limit.ts         # rate limit in-memory
-    http.ts               # utilitarios de resposta e ip
+    http.ts               # utilitários de resposta e ip
   types/
 ```
 
-## Fluxo de renderizacao das ferramentas
+## Fluxo de renderização das ferramentas
 
-1. usuario abre `/tools/:slug`
+1. usuário abre `/tools/:slug`
 2. `src/app/tools/[slug]/page.tsx` valida slug
 3. `ToolRenderer` resolve componente da ferramenta
-4. componente executa logica local (ou chama API quando necessario)
+4. componente executa lógica local (ou chama API quando necessário)
 
-## Onde a logica deve ficar
+## Onde a lógica deve ficar
 
-- `src/lib/tools/*`: algoritmos e transformacoes puras (testaveis)
-- `src/app/api/*`: apenas I/O, validacao, rate limit e orquestracao
-- `src/server/services/*`: integracoes externas e codigo Node-specific
+- `src/lib/tools/*`: algoritmos e transformações puras (testáveis)
+- `src/app/api/*`: apenas I/O, validação, rate limit e orquestração
+- `src/server/services/*`: integrações externas e código Node-specific
 
 ## Rotas Node runtime
 
 As rotas abaixo usam `export const runtime = 'nodejs'`:
 
+- `/api/my-ip`
 - `/api/hash`
 - `/api/jwt/sign`
 - `/api/jwt/verify`
@@ -65,7 +66,7 @@ As rotas abaixo usam `export const runtime = 'nodejs'`:
 - shell com sidebar por categoria
 - home centralizada
 - modo claro/escuro com toggle
-- padroes reutilizaveis por ferramenta:
+- padrões reutilizáveis por ferramenta:
   - `ToolLayout`
   - `InputPanel`
   - `OutputPanel`
@@ -78,9 +79,8 @@ As rotas abaixo usam `export const runtime = 'nodejs'`:
 
 ## Escalabilidade
 
-A estrutura permite evolucao para:
+A estrutura permite evolução para:
 
-- persistencia opcional (futuro)
-- novos providers de shortener
+- persistência opcional para o shortener local
 - novos processadores de arquivo
 - novos grupos de ferramentas sem mexer no shell

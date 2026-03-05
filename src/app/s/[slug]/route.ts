@@ -1,14 +1,25 @@
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
+import { resolveShortLink } from '@/server/services/shortener';
 
 export const runtime = 'nodejs';
 
-export async function GET() {
-  return NextResponse.json(
-    {
-      ok: false,
-      message:
-        'Redirecionamento local desabilitado. Use o link curto retornado pelo Bitly.',
-    },
-    { status: 410 },
-  );
+interface ShortRedirectParams {
+  params: Promise<{ slug: string }>;
+}
+
+export async function GET(_request: NextRequest, { params }: ShortRedirectParams) {
+  const { slug } = await params;
+  const found = resolveShortLink(slug);
+
+  if (!found) {
+    return NextResponse.json(
+      {
+        ok: false,
+        message: 'Slug não encontrado.',
+      },
+      { status: 404 },
+    );
+  }
+
+  return NextResponse.redirect(found.url, { status: 307 });
 }

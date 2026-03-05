@@ -3,9 +3,9 @@ import Link from 'next/link';
 export default function NotFound() {
   return (
     <div className="mx-auto max-w-xl space-y-4 py-14 text-center">
-      <h1 className="text-2xl font-bold">Pagina nao encontrada</h1>
+      <h1 className="text-2xl font-bold">Pagina não encontrada</h1>
       <p className="text-sm text-slate-700 dark:text-slate-300">
-        A rota solicitada nao existe. Volte para o painel principal.
+        A rota solicitada não existe. Volte para o painel principal.
       </p>
       <Link
         href="/"

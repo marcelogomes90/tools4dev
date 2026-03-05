@@ -1,6 +1,7 @@
 export type ToolCategory =
   | 'Identidade'
   | 'Texto'
+  | 'Datas'
   | 'Segurança'
   | 'Encoding'
   | 'DevTools'
