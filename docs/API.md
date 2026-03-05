@@ -163,7 +163,8 @@ Arquivo binário com headers:
 
 ## `POST /api/pdf/compress`
 
-Comprime PDF via Ghostscript com fallback `pdf-lib`.
+Comprime PDF priorizando Ghostscript.
+Se Ghostscript não estiver disponível, usa fallback com `pdf-lib`.
 
 ### Multipart fields
 

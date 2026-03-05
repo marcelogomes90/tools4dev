@@ -44,6 +44,7 @@ export function DaysBetweenDatesTool() {
             <Input
               id="days-start"
               type="date"
+              className="min-w-0"
               value={start}
               onChange={(event) => setStart(event.target.value)}
             />
@@ -53,6 +54,7 @@ export function DaysBetweenDatesTool() {
             <Input
               id="days-end"
               type="date"
+              className="min-w-0"
               value={end}
               onChange={(event) => setEnd(event.target.value)}
             />

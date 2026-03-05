@@ -56,7 +56,8 @@ export async function POST(request: NextRequest) {
 
   try {
     const inputBuffer = Buffer.from(await file.arrayBuffer());
-    const transformer = sharp(inputBuffer, { animated: true });
+    // Auto-orient based on EXIF metadata to avoid sideways outputs.
+    const transformer = sharp(inputBuffer, { animated: true }).rotate();
     const { format, quality } = options.data;
     const safeQuality = Math.min(95, Math.max(30, quality));
 

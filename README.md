@@ -1,6 +1,6 @@
 # dev-swiss-knife
 
-Monolito em Next.js (App Router) com 27 ferramentas para produtividade de desenvolvimento.
+Monolito em Next.js (App Router) com 28 ferramentas para produtividade de desenvolvimento.
 
 O projeto foi estruturado para ser:
 
@@ -11,7 +11,7 @@ O projeto foi estruturado para ser:
 
 ## Destaques
 
-- 27 ferramentas em uma única aplicação
+- 28 ferramentas em uma única aplicação
 - App Router + TypeScript
 - validação com Zod em todas as rotas API
 - rate limit simples por IP (in-memory)
@@ -80,6 +80,7 @@ tests/
 25. Somar dias em data
 26. Subtrair dias em data
 27. Ordenar e desduplicar lista
+28. Conversor de unidades CSS
 
 ## Requisitos
 
@@ -165,6 +166,7 @@ yarn lint
 - uploads com limite:
   - imagem: 10MB (`png/jpeg/webp/gif`)
   - PDF: 20MB
+  - compressão de PDF prioriza ghostscript com fallback em `pdf-lib`
 
 ## Documentação completa
 

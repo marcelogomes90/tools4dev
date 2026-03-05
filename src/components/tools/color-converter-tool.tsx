@@ -24,7 +24,7 @@ const meta = getToolBySlug('color-converter');
 
 type InputType = 'hex' | 'rgb' | 'hsl' | 'hsv';
 
-function parseNumbers(value: string, expected: number) {
+  function parseNumbers(value: string, expected: number) {
   const normalized = value
     .replace(/rgba?|hsla?|hsva?/gi, '')
     .replace(/[()]/g, '')
@@ -40,7 +40,7 @@ function parseNumbers(value: string, expected: number) {
     numbers.length !== expected ||
     numbers.some((item) => Number.isNaN(item))
   ) {
-    throw new Error('Formato inválido. Use valores separados por virgula.');
+    throw new Error('Formato inválido. Use valores separados por vírgula.');
   }
 
   return numbers;
@@ -190,7 +190,7 @@ export function ColorConverterTool() {
               <input
                 id="picker"
                 type="color"
-                className="h-12 w-full cursor-pointer rounded-lg border border-surface-border bg-surface p-1"
+                className="h-12 w-full max-w-full cursor-pointer rounded-lg border border-surface-border bg-surface p-1"
                 value={computed?.hex ?? '#000000'}
                 onChange={(event) => updateFromPicker(event.target.value)}
               />
@@ -209,19 +209,19 @@ export function ColorConverterTool() {
                 className="h-20 rounded-lg border border-surface-border"
                 style={{ backgroundColor: computed.hex }}
               />
-              <p>
+              <p className="break-all">
                 <strong>HEX:</strong> {computed.hex}
               </p>
-              <p>
+              <p className="break-all">
                 <strong>RGB:</strong> {computed.rgb}
               </p>
-              <p>
+              <p className="break-all">
                 <strong>HSL:</strong> {computed.hsl}
               </p>
-              <p>
+              <p className="break-all">
                 <strong>HSV:</strong> {computed.hsv}
               </p>
-              <div className="flex gap-2">
+              <div className="flex flex-wrap gap-2">
                 <CopyButton value={computed.hex} label="Copiar HEX" />
                 <CopyButton value={computed.rgb} label="Copiar RGB" />
                 <CopyButton value={computed.hsl} label="Copiar HSL" />

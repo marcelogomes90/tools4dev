@@ -115,7 +115,7 @@ export function ImageCompressorTool() {
               <span className="text-sm font-medium">
                 Clique para selecionar imagem
               </span>
-              <span className="mt-1 text-xs text-slate-600 dark:text-slate-400">
+              <span className="mt-1 w-full break-all text-xs text-slate-600 dark:text-slate-400">
                 {file ? file.name : 'Sem arquivo selecionado'}
               </span>
             </label>

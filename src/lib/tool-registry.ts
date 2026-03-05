@@ -92,6 +92,15 @@ export const toolDefinitions: ToolDefinition[] = [
     examples: ['select * from users'],
   },
   {
+    slug: 'css-unit-converter',
+    name: 'Conversor de Unidades CSS',
+    description: 'Converte unidades CSS como px, rem, em, %, vw e vh.',
+    category: 'DevTools',
+    keywords: ['css', 'units', 'px', 'rem'],
+    path: '/tools/css-unit-converter',
+    examples: ['16px -> 1rem'],
+  },
+  {
     slug: 'regex-tester',
     name: 'Testador de Regex',
     description: 'Executa regex com grupos e destaque de matches.',

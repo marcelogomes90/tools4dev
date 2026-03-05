@@ -100,7 +100,7 @@ export function PdfCompressorTool() {
               <span className="text-sm font-medium">
                 Clique para selecionar PDF
               </span>
-              <span className="mt-1 text-xs text-slate-600 dark:text-slate-400">
+              <span className="mt-1 w-full break-all text-xs text-slate-600 dark:text-slate-400">
                 {file ? file.name : 'Sem arquivo selecionado'}
               </span>
             </label>
@@ -115,15 +115,14 @@ export function PdfCompressorTool() {
           </div>
           {error && <p className="text-sm text-rose-600">{error}</p>}
           <p className="text-xs text-slate-600 dark:text-slate-400">
-            Se ghostscript não existir no ambiente, a rota tenta fallback com
-            pdf-lib e pode retornar aviso de dependencia.
+            A compressão prioriza ghostscript e usa pdf-lib apenas como fallback.
           </p>
         </InputPanel>
 
         <OutputPanel>
           {resultUrl ? (
             <div className="space-y-3 text-sm">
-              <p className="text-center">{stats}</p>
+              <p className="break-all text-center">{stats}</p>
               <div className="flex justify-center">
                 <a
                   href={resultUrl}

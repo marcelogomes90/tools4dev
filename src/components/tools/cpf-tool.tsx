@@ -15,6 +15,7 @@ import { downloadText } from '@/lib/utils/download';
 const meta = getToolBySlug('cpf-generator');
 
 export function CpfTool() {
+  const [mode, setMode] = useState<'generator' | 'validator'>('generator');
   const [quantity, setQuantity] = useState(1);
   const [masked, setMasked] = useState(true);
   const [inputToValidate, setInputToValidate] = useState('');
@@ -27,15 +28,17 @@ export function CpfTool() {
   function generateExample() {
     setQuantity(5);
     setMasked(true);
-    setInputToValidate('529.982.247-25');
     setResult(generateCpfBatch(5, true));
   }
 
-  function clear() {
+  function clearGenerator() {
     setQuantity(1);
     setMasked(true);
-    setInputToValidate('');
     setResult([]);
+  }
+
+  function clearValidator() {
+    setInputToValidate('');
   }
 
   return (
@@ -44,74 +47,124 @@ export function CpfTool() {
       description={meta.description}
       examples={meta.examples}
     >
-      <div className="grid gap-4 lg:grid-cols-2">
-        <InputPanel>
-          <div>
-            <Label htmlFor="cpf-quantity">Quantidade (1..100)</Label>
-            <Input
-              id="cpf-quantity"
-              type="number"
-              min={1}
-              max={100}
-              value={quantity}
-              onChange={(event) => setQuantity(Number(event.target.value || 1))}
-            />
-          </div>
-          <label className="flex items-center gap-2 text-sm">
-            <input
-              type="checkbox"
-              checked={masked}
-              onChange={(event) => setMasked(event.target.checked)}
-            />
-            Gerar com máscara
-          </label>
-          <div>
-            <Label htmlFor="cpf-validate">Validar CPF</Label>
-            <Input
-              id="cpf-validate"
-              placeholder="Digite CPF com ou sem máscara"
-              value={inputToValidate}
-              onChange={(event) => setInputToValidate(event.target.value)}
-            />
-            {validation !== null && (
-              <p
-                className={`mt-1 text-xs ${validation ? 'text-emerald-600' : 'text-rose-600'}`}
-              >
-                {validation ? 'CPF válido.' : 'CPF inválido.'}
-              </p>
-            )}
-          </div>
-          <div className="flex flex-wrap gap-2">
-            <Button
-              onClick={() => setResult(generateCpfBatch(quantity, masked))}
-            >
-              Gerar
-            </Button>
-            <Button variant="outline" onClick={generateExample}>
-              Gerar exemplo
-            </Button>
-            <Button variant="ghost" onClick={clear}>
-              Limpar
-            </Button>
-          </div>
-        </InputPanel>
+      <div className="space-y-4">
+        <div className="inline-flex rounded-xl border border-surface-border bg-surface-muted p-1">
+          <button
+            type="button"
+            onClick={() => setMode('generator')}
+            className={`rounded-lg px-3 py-1.5 text-sm font-medium transition ${
+              mode === 'generator'
+                ? 'bg-surface text-surface-foreground'
+                : 'text-slate-600 dark:text-slate-300'
+            }`}
+          >
+            Gerador
+          </button>
+          <button
+            type="button"
+            onClick={() => setMode('validator')}
+            className={`rounded-lg px-3 py-1.5 text-sm font-medium transition ${
+              mode === 'validator'
+                ? 'bg-surface text-surface-foreground'
+                : 'text-slate-600 dark:text-slate-300'
+            }`}
+          >
+            Validador
+          </button>
+        </div>
 
-        <OutputPanel>
-          <div className="max-h-96 overflow-auto whitespace-pre-wrap rounded-lg border border-surface-border bg-surface-muted p-3 text-sm">
-            {result.length ? result.join('\n') : 'Nenhum CPF gerado ainda.'}
+        {mode === 'generator' ? (
+          <div className="grid gap-4 lg:grid-cols-2">
+            <InputPanel>
+              <div>
+                <Label htmlFor="cpf-quantity">Quantidade (1..100)</Label>
+                <Input
+                  id="cpf-quantity"
+                  type="number"
+                  min={1}
+                  max={100}
+                  value={quantity}
+                  onChange={(event) =>
+                    setQuantity(Number(event.target.value || 1))
+                  }
+                />
+              </div>
+              <label className="flex items-center gap-2 text-sm">
+                <input
+                  type="checkbox"
+                  checked={masked}
+                  onChange={(event) => setMasked(event.target.checked)}
+                />
+                Gerar com máscara
+              </label>
+              <div className="flex flex-wrap gap-2">
+                <Button onClick={() => setResult(generateCpfBatch(quantity, masked))}>
+                  Gerar
+                </Button>
+                <Button variant="outline" onClick={generateExample}>
+                  Gerar exemplo
+                </Button>
+                <Button variant="ghost" onClick={clearGenerator}>
+                  Limpar
+                </Button>
+              </div>
+            </InputPanel>
+
+            <OutputPanel>
+              <div className="max-h-96 overflow-auto whitespace-pre-wrap rounded-lg border border-surface-border bg-surface-muted p-3 text-sm">
+                {result.length ? result.join('\n') : 'Nenhum CPF gerado ainda.'}
+              </div>
+              <div className="flex gap-2">
+                <CopyButton value={result.join('\n')} />
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => downloadText(result.join('\n'), 'cpfs.txt')}
+                  disabled={result.length === 0}
+                >
+                  Baixar
+                </Button>
+              </div>
+            </OutputPanel>
           </div>
-          <div className="flex gap-2">
-            <CopyButton value={result.join('\n')} />
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => downloadText(result.join('\n'), 'cpfs.txt')}
-              disabled={result.length === 0}
-            >
-              Baixar
-            </Button>
+        ) : (
+          <div className="grid gap-4 lg:grid-cols-2">
+            <InputPanel>
+              <div>
+                <Label htmlFor="cpf-validate">Validar CPF</Label>
+                <Input
+                  id="cpf-validate"
+                  placeholder="Digite CPF com ou sem máscara"
+                  value={inputToValidate}
+                  onChange={(event) => setInputToValidate(event.target.value)}
+                />
+              </div>
+              <div className="flex flex-wrap gap-2">
+                <Button
+                  variant="outline"
+                  onClick={() => setInputToValidate('529.982.247-25')}
+                >
+                  Gerar exemplo
+                </Button>
+                <Button variant="ghost" onClick={clearValidator}>
+                  Limpar
+                </Button>
+              </div>
+            </InputPanel>
+
+            <OutputPanel>
+              {validation === null ? (
+                <p className="text-sm text-slate-600 dark:text-slate-400">
+                  Informe um CPF para validar.
+                </p>
+              ) : (
+                <p className={`text-sm ${validation ? 'text-emerald-600' : 'text-rose-600'}`}>
+                  {validation ? 'CPF válido.' : 'CPF inválido.'}
+                </p>
+              )}
+            </OutputPanel>
           </div>
-        </OutputPanel>
+        )}
       </div>
     </ToolLayout>
   );

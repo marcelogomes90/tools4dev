@@ -45,6 +45,7 @@ export function SubtractDatesTool() {
             <Input
               id="subtract-date"
               type="date"
+              className="min-w-0"
               value={date}
               onChange={(event) => setDate(event.target.value)}
             />

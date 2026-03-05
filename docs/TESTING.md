@@ -27,6 +27,9 @@
 - `tests/unit/name-shortener.test.ts`
   - geração de nomes por lote com limites
   - shortener local (slug custom, auto, conflito, resolução e hits)
+- `tests/unit/css-units.test.ts`
+  - conversão entre px/rem/em/%/vw/vh
+  - precisão de formatação de resultado
 
 ## E2E smoke atual
 

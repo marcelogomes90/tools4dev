@@ -6,6 +6,7 @@ import { Base64Tool } from './base64-tool';
 import { CnpjTool } from './cnpj-tool';
 import { ColorConverterTool } from './color-converter-tool';
 import { CpfTool } from './cpf-tool';
+import { CssUnitConverterTool } from './css-unit-converter-tool';
 import { DaysBetweenDatesTool } from './days-between-dates-tool';
 import { HashTool } from './hash-tool';
 import { ImageCompressorTool } from './image-compressor-tool';
@@ -44,6 +45,7 @@ const map: Record<string, ComponentType> = {
   'link-shortener': LinkShortenerTool,
   'json-formatter': JsonFormatterTool,
   'sql-formatter': SqlFormatterTool,
+  'css-unit-converter': CssUnitConverterTool,
   'regex-tester': RegexTesterTool,
   'text-diff': TextDiffTool,
   'markdown-viewer': MarkdownViewerTool,
