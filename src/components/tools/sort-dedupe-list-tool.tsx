@@ -66,6 +66,8 @@ export function SortDedupeListTool() {
               />
               Ordem decrescente
             </label>
+          </div>
+          <div className="grid gap-2 text-sm sm:grid-cols-2">
             <label className="flex items-center gap-2">
               <input
                 type="checkbox"
@@ -90,7 +92,7 @@ export function SortDedupeListTool() {
               />
               Ordenação numérica
             </label>
-            <label className="flex items-center gap-2 sm:col-span-2">
+            <label className="flex items-center gap-2">
               <input
                 type="checkbox"
                 checked={removeEmpty}
