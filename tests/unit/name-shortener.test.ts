@@ -1,4 +1,7 @@
-import { beforeEach, describe, expect, it } from 'vitest';
+import { mkdtempSync, rmSync } from 'node:fs';
+import { tmpdir } from 'node:os';
+import { join } from 'node:path';
+import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import { generateNames } from '@/lib/tools/name';
 import { createShortLink, resolveShortLink } from '@/server/services/shortener';
 
@@ -25,8 +28,20 @@ describe('name generator', () => {
 });
 
 describe('shortener service', () => {
+  let tempDir = '';
+  let storeFile = '';
+
   beforeEach(() => {
+    tempDir = mkdtempSync(join(tmpdir(), 'tools4dev-shortener-test-'));
+    storeFile = join(tempDir, 'short-links.json');
+    process.env.SHORTENER_STORAGE_FILE = storeFile;
     globalThis.__tools4devShortLinks = new Map();
+  });
+
+  afterEach(() => {
+    delete process.env.SHORTENER_STORAGE_FILE;
+    globalThis.__tools4devShortLinks = undefined;
+    rmSync(tempDir, { recursive: true, force: true });
   });
 
   it('creates short link with normalized custom slug', () => {
@@ -67,5 +82,18 @@ describe('shortener service', () => {
 
   it('returns null for unknown slugs', () => {
     expect(resolveShortLink('inexistente')).toBeNull();
+  });
+
+  it('persists links in storage file and resolves after memory reset', () => {
+    const created = createShortLink(
+      { url: 'https://example.com/persisted', slug: 'persistido' },
+      'https://dev.example.com',
+    );
+
+    globalThis.__tools4devShortLinks = undefined;
+
+    const resolved = resolveShortLink(created.slug);
+    expect(resolved?.url).toBe('https://example.com/persisted');
+    expect(resolved?.hits).toBe(1);
   });
 });

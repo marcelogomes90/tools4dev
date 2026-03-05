@@ -13,6 +13,7 @@
 - `NEXT_PUBLIC_APP_URL` (recomendada, para URLs curtas absolutas)
 - `RATE_LIMIT_WINDOW_MS` (opcional)
 - `RATE_LIMIT_MAX` (opcional)
+- `SHORTENER_STORAGE_FILE` (opcional, caminho do storage do shortener)
 
 ## Build e start
 

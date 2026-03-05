@@ -41,13 +41,12 @@
 ## Shortener local
 
 - não depende de provider externo
-- mapeamento em memória do processo
-- sem persistência entre reinícios
+- mapeamento persistido em arquivo local (fallback em memória)
 
 ## Riscos conhecidos (aceitos)
 
 - rate limit em memória não é distribuído entre múltiplas instâncias
-- shortener local em memória perde dados ao reiniciar
+- shortener local pode perder dados quando o host limpa `TMPDIR`
 - sem WAF/proxy dedicado por padrão
 - CSP usa `unsafe-inline` por compatibilidade com Next
 

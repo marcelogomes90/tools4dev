@@ -119,6 +119,7 @@ Variáveis:
 - `NEXT_PUBLIC_APP_URL` (URL pública da aplicação)
 - `RATE_LIMIT_WINDOW_MS` (padrão: `60000`)
 - `RATE_LIMIT_MAX` (padrão: `120`)
+- `SHORTENER_STORAGE_FILE` (opcional: caminho do arquivo de persistência do shortener)
 
 ## Endpoints principais
 
@@ -163,6 +164,7 @@ yarn lint
 - headers de segurança em `next.config.ts`
 - JWT secrets não são persistidos
 - shortener aceita apenas URL `http/https`
+- shortener persiste mapeamentos em arquivo local (fallback em memória)
 - uploads com limite:
   - imagem: 10MB (`png/jpeg/webp/gif`)
   - PDF: 20MB

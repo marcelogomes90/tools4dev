@@ -8,7 +8,7 @@ O encurtador desta aplicação opera em modo local:
 - aceita slug custom opcional
 - gera slug automático com 5 caracteres quando não informado
 - redireciona via `GET /s/:slug`
-- persistência em memória do processo (não persistente)
+- persistência em arquivo local (com fallback em memória)
 
 ## Payload suportado
 
@@ -59,4 +59,6 @@ Ação:
 
 - validação de URL e slug ocorre no servidor
 - não há chamadas para APIs de terceiros
-- para produção com múltiplas instâncias, use persistência compartilhada
+- por padrão, o arquivo é salvo em `${TMPDIR}/tools4dev-shortlinks.json`
+- opcional: configure `SHORTENER_STORAGE_FILE` para definir outro caminho
+- para produção com múltiplas instâncias, use persistência compartilhada (ex.: Redis/DB)
