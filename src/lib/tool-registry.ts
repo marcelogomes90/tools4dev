@@ -1,4 +1,4 @@
-import { ToolDefinition } from '@/types/tools';
+import { ToolCategory, ToolDefinition } from '@/types/tools';
 
 export const toolDefinitions: ToolDefinition[] = [
   {
@@ -266,6 +266,14 @@ export const categories = [
   'Cores',
 ] as const;
 
+export function getToolCategories(tool: ToolDefinition): ToolCategory[] {
+  if (Array.isArray(tool.category)) {
+    return Array.from(new Set(tool.category));
+  }
+
+  return [tool.category];
+}
+
 export const toolsBySlug = new Map(
   toolDefinitions.map((tool) => [tool.slug, tool] as const),
 );
@@ -276,7 +284,7 @@ export const toolsByPath = new Map(
 
 export const toolsByCategory = categories.map((category) => ({
   category,
-  tools: toolDefinitions.filter((tool) => tool.category === category),
+  tools: toolDefinitions.filter((tool) => getToolCategories(tool).includes(category)),
 }));
 
 export function getToolBySlug(slug: string) {

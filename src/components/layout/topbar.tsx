@@ -22,6 +22,7 @@ import {
 import { toolDefinitions } from '@/lib/tool-registry';
 import { cn } from '@/lib/utils/cn';
 import { ThemeToggle } from './theme-toggle';
+import { ToolIcon } from './tool-icons';
 
 interface TopbarProps {
   isDesktopSidebarOpen: boolean;
@@ -369,33 +370,36 @@ export function Topbar({
                 ref={suggestionsListRef}
                 className="max-h-72 overflow-y-auto p-1"
               >
-                {suggestions.map((tool, index) => (
-                  <li key={tool.slug}>
-                    <button
-                      ref={(node) => {
-                        suggestionRefs.current[index] = node;
-                      }}
-                      id={`tool-suggestion-${tool.slug}`}
-                      type="button"
-                      onMouseEnter={() => setActiveIndex(index)}
-                      onMouseDown={(event) => {
-                        event.preventDefault();
-                        goToTool(tool.path);
-                      }}
-                      className={cn(
-                        'w-full rounded-xl px-3 py-2 text-left transition hover:bg-surface-muted/70',
-                        index === resolvedActiveIndex && 'bg-surface-muted/70',
-                      )}
-                    >
-                      <div className="text-sm font-medium text-surface-foreground">
-                        {tool.name}
-                      </div>
-                      <div className="text-xs text-slate-500 dark:text-slate-400">
-                        {tool.path}
-                      </div>
-                    </button>
-                  </li>
-                ))}
+                {suggestions.map((tool, index) => {
+                  return (
+                    <li key={tool.slug}>
+                      <button
+                        ref={(node) => {
+                          suggestionRefs.current[index] = node;
+                        }}
+                        id={`tool-suggestion-${tool.slug}`}
+                        type="button"
+                        onMouseEnter={() => setActiveIndex(index)}
+                        onMouseDown={(event) => {
+                          event.preventDefault();
+                          goToTool(tool.path);
+                        }}
+                        className={cn(
+                          'w-full rounded-xl px-3 py-2 text-left transition hover:bg-surface-muted/70',
+                          index === resolvedActiveIndex && 'bg-surface-muted/70',
+                        )}
+                      >
+                        <div className="flex items-center gap-2 text-sm font-medium text-surface-foreground">
+                          <ToolIcon slug={tool.slug} className="h-4 w-4 shrink-0" />
+                          <span>{tool.name}</span>
+                        </div>
+                        <div className="text-xs text-slate-500 dark:text-slate-400">
+                          {tool.path}
+                        </div>
+                      </button>
+                    </li>
+                  );
+                })}
               </ul>
             </div>
           )}

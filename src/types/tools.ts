@@ -12,7 +12,7 @@ export interface ToolDefinition {
   slug: string;
   name: string;
   description: string;
-  category: ToolCategory;
+  category: ToolCategory | ToolCategory[];
   keywords: string[];
   path: string;
   examples: string[];
