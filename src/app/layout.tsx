@@ -57,6 +57,9 @@ export const metadata: Metadata = {
     description: SITE_DESCRIPTION,
     images: ['/developer.png'],
   },
+  verification: {
+    google: 'NtLsh5bfARYSPHto1GxoGVbDE0clV6yJYRI5vQHlUlI',
+  },
   icons: {
     icon: '/developer.png',
     shortcut: '/developer.png',
