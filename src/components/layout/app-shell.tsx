@@ -1,6 +1,6 @@
 'use client';
 
-import { ReactNode, useState } from 'react';
+import { ReactNode, useCallback, useState } from 'react';
 import { Sidebar } from './sidebar';
 import { Topbar } from './topbar';
 
@@ -11,23 +11,30 @@ interface AppShellProps {
 export function AppShell({ children }: AppShellProps) {
   const [isDesktopSidebarOpen, setIsDesktopSidebarOpen] = useState(true);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const closeMobileMenu = useCallback(() => setIsMobileMenuOpen(false), []);
+  const toggleDesktopSidebar = useCallback(
+    () => setIsDesktopSidebarOpen((value) => !value),
+    [],
+  );
+  const toggleMobileMenu = useCallback(
+    () => setIsMobileMenuOpen((value) => !value),
+    [],
+  );
 
   return (
     <div className="relative min-h-screen lg:flex">
       <Sidebar
         isDesktopOpen={isDesktopSidebarOpen}
         isMobileOpen={isMobileMenuOpen}
-        onCloseMobile={() => setIsMobileMenuOpen(false)}
-        onNavigate={() => setIsMobileMenuOpen(false)}
+        onCloseMobile={closeMobileMenu}
+        onNavigate={closeMobileMenu}
       />
       <div className="min-w-0 flex-1">
         <Topbar
           isDesktopSidebarOpen={isDesktopSidebarOpen}
           isMobileMenuOpen={isMobileMenuOpen}
-          onToggleDesktopSidebar={() =>
-            setIsDesktopSidebarOpen((value) => !value)
-          }
-          onToggleMobileMenu={() => setIsMobileMenuOpen((value) => !value)}
+          onToggleDesktopSidebar={toggleDesktopSidebar}
+          onToggleMobileMenu={toggleMobileMenu}
         />
         <main className="fade-in-up mx-auto max-w-[1400px] px-4 pb-8 pt-7 sm:px-6 lg:px-8">
           {children}

@@ -5,6 +5,12 @@ interface Entry {
 
 const store = new Map<string, Entry>();
 
+function parsePositiveInt(value: string | undefined, fallback: number) {
+  const parsed = Number(value);
+  if (!Number.isFinite(parsed)) return fallback;
+  return Math.max(1, Math.trunc(parsed));
+}
+
 function cleanup(now: number) {
   for (const [key, value] of store) {
     if (value.resetAt <= now) store.delete(key);
@@ -21,9 +27,10 @@ export function checkRateLimit(
   const now = Date.now();
   cleanup(now);
 
-  const max = options?.max ?? Number(process.env.RATE_LIMIT_MAX ?? 120);
+  const max =
+    options?.max ?? parsePositiveInt(process.env.RATE_LIMIT_MAX, 120);
   const windowMs =
-    options?.windowMs ?? Number(process.env.RATE_LIMIT_WINDOW_MS ?? 60_000);
+    options?.windowMs ?? parsePositiveInt(process.env.RATE_LIMIT_WINDOW_MS, 60_000);
   const current = store.get(key);
 
   if (!current || current.resetAt <= now) {

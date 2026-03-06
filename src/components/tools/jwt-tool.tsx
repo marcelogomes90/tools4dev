@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useCallback, useState } from 'react';
 import { decodeJwtUnsafe, parseJsonInput } from '@/lib/tools/jwt';
 import { getToolBySlug } from '@/lib/tool-registry';
 import { Button } from '@/components/ui/button';
@@ -14,69 +14,100 @@ import { Textarea } from '@/components/ui/textarea';
 import { ToolLayout } from '@/components/ui/tool-layout';
 
 const meta = getToolBySlug('jwt-tool');
+const defaultHeaderJson = '{"alg":"HS256","typ":"JWT"}';
+const defaultPayloadJson = '{"sub":"123","role":"admin"}';
+const defaultSecret = 'my-secret';
+const exampleSecret = 'super-secret';
+const defaultExpiresIn = '1h';
+const exampleExpiresIn = '2h';
+const defaultVerifyKey = 'my-secret';
+
+type JwtApiSuccess<T> = { ok: true } & T;
+type JwtApiError = { ok: false; message: string };
 
 function pretty(value: unknown) {
   return JSON.stringify(value, null, 2);
+}
+
+function getErrorMessage(
+  error: unknown,
+  fallback: string,
+) {
+  return error instanceof Error ? error.message : fallback;
+}
+
+async function postJwtApi<TSuccess extends Record<string, unknown>>(
+  path: '/api/jwt/sign' | '/api/jwt/verify',
+  payload: unknown,
+) {
+  const response = await fetch(path, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(payload),
+  });
+
+  const data = (await response.json()) as JwtApiSuccess<TSuccess> | JwtApiError;
+  if (!response.ok || !data.ok) {
+    throw new Error(data.ok ? 'Falha ao processar requisição JWT.' : data.message);
+  }
+
+  return data;
 }
 
 export function JwtTool() {
   const [mode, setMode] = useState<'decoder' | 'encoder'>('decoder');
 
   const [token, setToken] = useState('');
-  const [verifyKey, setVerifyKey] = useState('my-secret');
+  const [verifyKey, setVerifyKey] = useState(defaultVerifyKey);
   const [showVerifyKey, setShowVerifyKey] = useState(false);
   const [decodedOutput, setDecodedOutput] = useState('');
   const [verifyOutput, setVerifyOutput] = useState('');
   const [decoderError, setDecoderError] = useState('');
 
-  const [headerJson, setHeaderJson] = useState('{"alg":"HS256","typ":"JWT"}');
-  const [payloadJson, setPayloadJson] = useState(
-    '{"sub":"123","role":"admin"}',
-  );
-  const [secret, setSecret] = useState('my-secret');
+  const [headerJson, setHeaderJson] = useState(defaultHeaderJson);
+  const [payloadJson, setPayloadJson] = useState(defaultPayloadJson);
+  const [secret, setSecret] = useState(defaultSecret);
   const [showSecret, setShowSecret] = useState(false);
   const [algorithm, setAlgorithm] = useState<'HS256' | 'HS512'>('HS256');
-  const [expiresIn, setExpiresIn] = useState('1h');
+  const [expiresIn, setExpiresIn] = useState(defaultExpiresIn);
   const [signedToken, setSignedToken] = useState('');
   const [encoderError, setEncoderError] = useState('');
 
   const [loadingVerify, setLoadingVerify] = useState(false);
   const [loadingSign, setLoadingSign] = useState(false);
 
-  if (!meta) return null;
-
-  function fillExample() {
-    setHeaderJson('{"alg":"HS256","typ":"JWT"}');
+  const fillExample = useCallback(() => {
+    setHeaderJson(defaultHeaderJson);
     setPayloadJson('{"sub":"42","name":"tools4dev"}');
-    setSecret('super-secret');
-    setVerifyKey('super-secret');
-    setExpiresIn('2h');
+    setSecret(exampleSecret);
+    setVerifyKey(exampleSecret);
+    setExpiresIn(exampleExpiresIn);
     setToken('');
     setSignedToken('');
     setDecodedOutput('');
     setVerifyOutput('');
     setDecoderError('');
     setEncoderError('');
-  }
+  }, []);
 
-  function clearEncoder() {
-    setHeaderJson('{"alg":"HS256","typ":"JWT"}');
-    setPayloadJson('{"sub":"123","role":"admin"}');
-    setSecret('my-secret');
-    setExpiresIn('1h');
+  const clearEncoder = useCallback(() => {
+    setHeaderJson(defaultHeaderJson);
+    setPayloadJson(defaultPayloadJson);
+    setSecret(defaultSecret);
+    setExpiresIn(defaultExpiresIn);
     setSignedToken('');
     setEncoderError('');
-  }
+  }, []);
 
-  function clearDecoder() {
+  const clearDecoder = useCallback(() => {
     setToken('');
-    setVerifyKey('my-secret');
+    setVerifyKey(defaultVerifyKey);
     setDecodedOutput('');
     setVerifyOutput('');
     setDecoderError('');
-  }
+  }, []);
 
-  function decodeLocal() {
+  const decodeLocal = useCallback(() => {
     try {
       if (!token.trim()) throw new Error('Informe token para decodificar.');
       const decoded = decodeJwtUnsafe(token.trim());
@@ -84,13 +115,11 @@ export function JwtTool() {
       setDecoderError('');
     } catch (err) {
       setDecodedOutput('');
-      setDecoderError(
-        err instanceof Error ? err.message : 'Falha ao decodificar token.',
-      );
+      setDecoderError(getErrorMessage(err, 'Falha ao decodificar token.'));
     }
-  }
+  }, [token]);
 
-  async function signServer() {
+  const signServer = useCallback(async () => {
     setLoadingSign(true);
     setEncoderError('');
 
@@ -98,67 +127,47 @@ export function JwtTool() {
       const header = parseJsonInput(headerJson);
       const payload = parseJsonInput(payloadJson);
 
-      const response = await fetch('/api/jwt/sign', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ header, payload, secret, algorithm, expiresIn }),
+      const data = await postJwtApi<{ token: string }>('/api/jwt/sign', {
+        header,
+        payload,
+        secret,
+        algorithm,
+        expiresIn,
       });
-
-      const data = (await response.json()) as
-        | { ok: true; token: string }
-        | { ok: false; message: string };
-
-      if (!response.ok || !data.ok) {
-        throw new Error(data.ok ? 'Falha ao assinar token.' : data.message);
-      }
 
       setSignedToken(data.token);
       setToken(data.token);
       setDecoderError('');
     } catch (err) {
-      setEncoderError(
-        err instanceof Error ? err.message : 'Erro ao assinar token.',
-      );
+      setEncoderError(getErrorMessage(err, 'Erro ao assinar token.'));
     } finally {
       setLoadingSign(false);
     }
-  }
+  }, [algorithm, expiresIn, headerJson, payloadJson, secret]);
 
-  async function verifyServer() {
+  const verifyServer = useCallback(async () => {
     setLoadingVerify(true);
     setDecoderError('');
 
     try {
       if (!token.trim()) throw new Error('Informe um token para validar.');
 
-      const response = await fetch('/api/jwt/verify', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          token: token.trim(),
-          key: verifyKey,
-          algorithms: [algorithm],
-        }),
+      const data = await postJwtApi<{ decoded: unknown }>('/api/jwt/verify', {
+        token: token.trim(),
+        key: verifyKey,
+        algorithms: [algorithm],
       });
-
-      const data = (await response.json()) as
-        | { ok: true; decoded: unknown }
-        | { ok: false; message: string };
-
-      if (!response.ok || !data.ok) {
-        throw new Error(data.ok ? 'Token inválido.' : data.message);
-      }
 
       setVerifyOutput(pretty(data.decoded));
     } catch (err) {
       setVerifyOutput('');
-      setDecoderError(
-        err instanceof Error ? err.message : 'Falha ao validar token.',
-      );
+      setDecoderError(getErrorMessage(err, 'Falha ao validar token.'));
     } finally {
       setLoadingVerify(false);
     }
-  }
+  }, [algorithm, token, verifyKey]);
+
+  if (!meta) return null;
 
   return (
     <ToolLayout

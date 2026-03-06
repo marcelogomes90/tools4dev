@@ -1,6 +1,5 @@
 'use client';
 
-import hljs from 'highlight.js';
 import { marked } from 'marked';
 import { useEffect, useRef, useState } from 'react';
 import { getToolBySlug } from '@/lib/tool-registry';
@@ -17,6 +16,17 @@ marked.setOptions({
   gfm: true,
   breaks: false,
 });
+
+let highlightJsPromise: Promise<typeof import('highlight.js/lib/common')> | null =
+  null;
+
+function loadHighlightJs() {
+  if (!highlightJsPromise) {
+    highlightJsPromise = import('highlight.js/lib/common');
+  }
+
+  return highlightJsPromise;
+}
 
 export function MarkdownViewerTool() {
   const [markdown, setMarkdown] = useState(
@@ -42,10 +52,23 @@ export function MarkdownViewerTool() {
   }, [markdown]);
 
   useEffect(() => {
-    if (!previewRef.current) return;
-    previewRef.current.querySelectorAll('pre code').forEach((element) => {
-      hljs.highlightElement(element as HTMLElement);
-    });
+    let active = true;
+
+    async function highlightCodeBlocks() {
+      if (!previewRef.current) return;
+      const hljs = await loadHighlightJs();
+      if (!active || !previewRef.current) return;
+
+      previewRef.current.querySelectorAll('pre code').forEach((element) => {
+        hljs.default.highlightElement(element as HTMLElement);
+      });
+    }
+
+    highlightCodeBlocks();
+
+    return () => {
+      active = false;
+    };
   }, [html]);
 
   function clear() {

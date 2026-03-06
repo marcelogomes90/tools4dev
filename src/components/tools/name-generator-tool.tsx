@@ -1,7 +1,6 @@
 'use client';
 
 import { useState } from 'react';
-import { generateNames } from '@/lib/tools/name';
 import { downloadText } from '@/lib/utils/download';
 import { getToolBySlug } from '@/lib/tool-registry';
 import { Button } from '@/components/ui/button';
@@ -15,11 +14,22 @@ import { ToolLayout } from '@/components/ui/tool-layout';
 
 const meta = getToolBySlug('name-generator');
 
+let generateNamesPromise: Promise<typeof import('@/lib/tools/name')> | null = null;
+
+function loadGenerateNames() {
+  if (!generateNamesPromise) {
+    generateNamesPromise = import('@/lib/tools/name');
+  }
+
+  return generateNamesPromise;
+}
+
 export function NameGeneratorTool() {
   const [amount, setAmount] = useState(10);
   const [withMiddleName, setWithMiddleName] = useState(false);
   const [locale, setLocale] = useState<'pt-BR' | 'en'>('pt-BR');
   const [result, setResult] = useState<string[]>([]);
+  const [loading, setLoading] = useState(false);
 
   if (!meta) return null;
 
@@ -28,6 +38,22 @@ export function NameGeneratorTool() {
     setWithMiddleName(false);
     setLocale('pt-BR');
     setResult([]);
+    setLoading(false);
+  }
+
+  async function generate(
+    nextAmount: number,
+    nextWithMiddleName: boolean,
+    nextLocale: 'pt-BR' | 'en',
+  ) {
+    setLoading(true);
+
+    try {
+      const { generateNames } = await loadGenerateNames();
+      setResult(generateNames(nextAmount, nextWithMiddleName, nextLocale));
+    } finally {
+      setLoading(false);
+    }
   }
 
   return (
@@ -70,15 +96,15 @@ export function NameGeneratorTool() {
           </label>
           <div className="flex flex-wrap gap-2">
             <Button
-              onClick={() =>
-                setResult(generateNames(amount, withMiddleName, locale))
-              }
+              onClick={() => generate(amount, withMiddleName, locale)}
+              disabled={loading}
             >
-              Gerar
+              {loading ? 'Gerando...' : 'Gerar'}
             </Button>
             <Button
               variant="outline"
-              onClick={() => setResult(generateNames(20, true, 'pt-BR'))}
+              onClick={() => generate(20, true, 'pt-BR')}
+              disabled={loading}
             >
               Gerar exemplo
             </Button>

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 import { getToolBySlug } from '@/lib/tool-registry';
 import { Button } from '@/components/ui/button';
 import { CopyButton } from '@/components/ui/copy-button';
@@ -11,6 +11,8 @@ import { OutputPanel } from '@/components/ui/output-panel';
 import { ToolLayout } from '@/components/ui/tool-layout';
 
 const meta = getToolBySlug('link-shortener');
+const sampleUrl = 'https://nextjs.org/docs';
+const sampleSlug = 'docs-next';
 
 interface ShortenResponse {
   ok: boolean;
@@ -28,17 +30,24 @@ export function LinkShortenerTool() {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
-  if (!meta) return null;
+  const trimmedUrl = useMemo(() => url.trim(), [url]);
+  const trimmedSlug = useMemo(() => slug.trim(), [slug]);
 
-  async function shorten() {
+  const outputMessage = useMemo(() => {
+    if (error) return error;
+    if (result?.message) return result.message;
+    return 'Nenhum link curto gerado.';
+  }, [error, result?.message]);
+
+  const shorten = useCallback(async () => {
     setLoading(true);
     setResult(null);
     setError('');
 
     try {
       const payload = {
-        url: url.trim(),
-        slug: slug.trim() || undefined,
+        url: trimmedUrl,
+        slug: trimmedSlug || undefined,
       };
 
       const response = await fetch('/api/shorten', {
@@ -59,19 +68,21 @@ export function LinkShortenerTool() {
     } finally {
       setLoading(false);
     }
-  }
+  }, [trimmedSlug, trimmedUrl]);
 
-  function clear() {
+  const clear = useCallback(() => {
     setUrl('');
     setSlug('');
     setResult(null);
     setError('');
-  }
+  }, []);
 
-  function sample() {
-    setUrl('https://nextjs.org/docs');
-    setSlug('docs-next');
-  }
+  const sample = useCallback(() => {
+    setUrl(sampleUrl);
+    setSlug(sampleSlug);
+  }, []);
+
+  if (!meta) return null;
 
   return (
     <ToolLayout
@@ -103,7 +114,7 @@ export function LinkShortenerTool() {
             Links curtos são gerados localmente e redirecionam por `/s/:slug`.
           </p>
           <div className="flex flex-wrap gap-2">
-            <Button onClick={shorten} disabled={loading || !url}>
+            <Button onClick={shorten} disabled={loading || !trimmedUrl}>
               {loading ? 'Gerando...' : 'Encurtar'}
             </Button>
             <Button variant="outline" onClick={sample}>
@@ -143,7 +154,7 @@ export function LinkShortenerTool() {
             </div>
           ) : (
             <div className="space-y-2 text-sm text-slate-700 dark:text-slate-300">
-              <p>{error || result?.message || 'Nenhum link curto gerado.'}</p>
+              <p>{outputMessage}</p>
             </div>
           )}
         </OutputPanel>

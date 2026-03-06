@@ -1,68 +1,111 @@
 'use client';
 
+import dynamic from 'next/dynamic';
 import { ComponentType } from 'react';
-import { AddDaysToDateTool } from './add-days-to-date-tool';
-import { Base64Tool } from './base64-tool';
-import { CnpjTool } from './cnpj-tool';
-import { ColorConverterTool } from './color-converter-tool';
-import { CpfTool } from './cpf-tool';
-import { CssUnitConverterTool } from './css-unit-converter-tool';
-import { DaysBetweenDatesTool } from './days-between-dates-tool';
-import { HashTool } from './hash-tool';
-import { ImageCompressorTool } from './image-compressor-tool';
-import { JsonFormatterTool } from './json-formatter-tool';
-import { JwtTool } from './jwt-tool';
-import { LinkShortenerTool } from './link-shortener-tool';
-import { LoremTool } from './lorem-tool';
-import { MarkdownViewerTool } from './markdown-viewer-tool';
-import { MyIpTool } from './my-ip-tool';
-import { NameGeneratorTool } from './name-generator-tool';
-import { PasswordGeneratorTool } from './password-generator-tool';
-import { PdfCompressorTool } from './pdf-compressor-tool';
-import { QrCodeGeneratorTool } from './qr-code-generator-tool';
-import { RegexTesterTool } from './regex-tester-tool';
-import { RemoveAccentsTool } from './remove-accents-tool';
-import { SortDedupeListTool } from './sort-dedupe-list-tool';
-import { SqlFormatterTool } from './sql-formatter-tool';
-import { SubtractDatesTool } from './subtract-dates-tool';
-import { TextCaseConverterTool } from './text-case-converter-tool';
-import { TextCounterTool } from './text-counter-tool';
-import { TextDiffTool } from './text-diff-tool';
-import { UuidTool } from './uuid-tool';
 
 interface ToolRendererProps {
   slug: string;
 }
 
 const map: Record<string, ComponentType> = {
-  'cpf-generator': CpfTool,
-  'cnpj-generator': CnpjTool,
-  'hash-generator': HashTool,
-  'uuid-generator': UuidTool,
-  'lorem-ipsum': LoremTool,
-  'jwt-tool': JwtTool,
-  'base64-tool': Base64Tool,
-  'link-shortener': LinkShortenerTool,
-  'json-formatter': JsonFormatterTool,
-  'sql-formatter': SqlFormatterTool,
-  'css-unit-converter': CssUnitConverterTool,
-  'regex-tester': RegexTesterTool,
-  'text-diff': TextDiffTool,
-  'markdown-viewer': MarkdownViewerTool,
-  'color-converter': ColorConverterTool,
-  'image-compressor': ImageCompressorTool,
-  'pdf-compressor': PdfCompressorTool,
-  'name-generator': NameGeneratorTool,
-  'password-generator': PasswordGeneratorTool,
-  'my-ip': MyIpTool,
-  'qr-code-generator': QrCodeGeneratorTool,
-  'remove-accents': RemoveAccentsTool,
-  'text-case-converter': TextCaseConverterTool,
-  'text-counter': TextCounterTool,
-  'days-between-dates': DaysBetweenDatesTool,
-  'add-days-to-date': AddDaysToDateTool,
-  'subtract-dates': SubtractDatesTool,
-  'sort-dedupe-list': SortDedupeListTool,
+  'cpf-generator': dynamic(() =>
+    import('./cpf-tool').then((module) => module.CpfTool),
+  ),
+  'cnpj-generator': dynamic(() =>
+    import('./cnpj-tool').then((module) => module.CnpjTool),
+  ),
+  'hash-generator': dynamic(() =>
+    import('./hash-tool').then((module) => module.HashTool),
+  ),
+  'uuid-generator': dynamic(() =>
+    import('./uuid-tool').then((module) => module.UuidTool),
+  ),
+  'lorem-ipsum': dynamic(() =>
+    import('./lorem-tool').then((module) => module.LoremTool),
+  ),
+  'jwt-tool': dynamic(() =>
+    import('./jwt-tool').then((module) => module.JwtTool),
+  ),
+  'base64-tool': dynamic(() =>
+    import('./base64-tool').then((module) => module.Base64Tool),
+  ),
+  'link-shortener': dynamic(() =>
+    import('./link-shortener-tool').then((module) => module.LinkShortenerTool),
+  ),
+  'json-formatter': dynamic(() =>
+    import('./json-formatter-tool').then((module) => module.JsonFormatterTool),
+  ),
+  'sql-formatter': dynamic(() =>
+    import('./sql-formatter-tool').then((module) => module.SqlFormatterTool),
+  ),
+  'css-unit-converter': dynamic(() =>
+    import('./css-unit-converter-tool').then(
+      (module) => module.CssUnitConverterTool,
+    ),
+  ),
+  'regex-tester': dynamic(() =>
+    import('./regex-tester-tool').then((module) => module.RegexTesterTool),
+  ),
+  'text-diff': dynamic(() =>
+    import('./text-diff-tool').then((module) => module.TextDiffTool),
+  ),
+  'markdown-viewer': dynamic(() =>
+    import('./markdown-viewer-tool').then((module) => module.MarkdownViewerTool),
+  ),
+  'color-converter': dynamic(() =>
+    import('./color-converter-tool').then(
+      (module) => module.ColorConverterTool,
+    ),
+  ),
+  'image-compressor': dynamic(() =>
+    import('./image-compressor-tool').then(
+      (module) => module.ImageCompressorTool,
+    ),
+  ),
+  'pdf-compressor': dynamic(() =>
+    import('./pdf-compressor-tool').then((module) => module.PdfCompressorTool),
+  ),
+  'name-generator': dynamic(() =>
+    import('./name-generator-tool').then((module) => module.NameGeneratorTool),
+  ),
+  'password-generator': dynamic(() =>
+    import('./password-generator-tool').then(
+      (module) => module.PasswordGeneratorTool,
+    ),
+  ),
+  'my-ip': dynamic(() =>
+    import('./my-ip-tool').then((module) => module.MyIpTool),
+  ),
+  'qr-code-generator': dynamic(() =>
+    import('./qr-code-generator-tool').then(
+      (module) => module.QrCodeGeneratorTool,
+    ),
+  ),
+  'remove-accents': dynamic(() =>
+    import('./remove-accents-tool').then((module) => module.RemoveAccentsTool),
+  ),
+  'text-case-converter': dynamic(() =>
+    import('./text-case-converter-tool').then(
+      (module) => module.TextCaseConverterTool,
+    ),
+  ),
+  'text-counter': dynamic(() =>
+    import('./text-counter-tool').then((module) => module.TextCounterTool),
+  ),
+  'days-between-dates': dynamic(() =>
+    import('./days-between-dates-tool').then(
+      (module) => module.DaysBetweenDatesTool,
+    ),
+  ),
+  'add-days-to-date': dynamic(() =>
+    import('./add-days-to-date-tool').then((module) => module.AddDaysToDateTool),
+  ),
+  'subtract-dates': dynamic(() =>
+    import('./subtract-dates-tool').then((module) => module.SubtractDatesTool),
+  ),
+  'sort-dedupe-list': dynamic(() =>
+    import('./sort-dedupe-list-tool').then((module) => module.SortDedupeListTool),
+  ),
 };
 
 export function ToolRenderer({ slug }: ToolRendererProps) {

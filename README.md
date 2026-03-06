@@ -1,24 +1,6 @@
 # tools4dev
 
-Monolito em Next.js (App Router) com 28 ferramentas para produtividade de desenvolvimento.
-
-O projeto foi estruturado para ser:
-
-- modular
-- testável
-- seguro por padrão
-- pronto para deploy
-
-## Destaques
-
-- 28 ferramentas em uma única aplicação
-- App Router + TypeScript
-- validação com Zod em todas as rotas API
-- rate limit simples por IP (in-memory)
-- Node runtime nas rotas que usam libs Node
-- tema light/dark com toggle
-- testes unitários (Vitest) e smoke e2e (Playwright)
-- encurtador local com redirecionamento em `/s/:slug`
+Aplicação web em Next.js com 28 ferramentas para tarefas comuns de desenvolvimento.
 
 ## Stack
 
@@ -26,111 +8,63 @@ O projeto foi estruturado para ser:
 - React + TypeScript
 - TailwindCSS
 - Zod
-- jsonwebtoken
-- sharp
-- sql-formatter
-- pdf-lib (+ Ghostscript opcional no host)
-- @faker-js/faker
-- qrcode
-- Vitest
-- Playwright
+- Sharp / pdf-lib
+- Vitest + Playwright
 - ESLint + Prettier
-
-## Estrutura
-
-```txt
-src/
-  app/            # Rotas de página e route handlers (/api)
-  components/     # UI reutilizável e componentes das ferramentas
-  lib/            # Funções puras por domínio
-  server/         # Serviços e utilitários server-only
-  types/          # Tipos compartilhados
-
-tests/
-  unit/           # Vitest
-  e2e/            # Playwright smoke
-```
-
-## Ferramentas implementadas
-
-1. Gerador de CPF
-2. Gerador de CNPJ
-3. Hash generator (md5/sha1/sha256/sha512)
-4. UUID/ULID generator
-5. Lorem Ipsum
-6. JWT encoder/decoder (decode local + sign/verify server)
-7. Base64 encode/decode
-8. Encurtador de links (local)
-9. Formatador de JSON
-10. Formatador de SQL
-11. Testador de Regex
-12. Comparação de texto (diff)
-13. Visualizador Markdown
-14. Conversor de cor
-15. Compressão de imagens
-16. Compressão de PDFs
-17. Gerador de nomes
-18. Gerador de senhas
-19. Meu IP
-20. Gerador de QR Code
-21. Remover acentos
-22. Conversor de maiúsculas e minúsculas
-23. Contador de palavras e caracteres
-24. Contador de dias entre datas
-25. Somar dias em data
-26. Subtrair dias em data
-27. Ordenar e desduplicar lista
-28. Conversor de unidades CSS
 
 ## Requisitos
 
-- Node.js 22+ (veja `.nvmrc`)
+- Node.js 22+
 - Yarn 1.22+
-- para compressão de PDF de melhor qualidade: `ghostscript` (`gs`) no host
+- `qpdf` opcional (melhora compressão de PDF)
 
-## Como rodar (Yarn)
+## Como rodar
 
 ```bash
 yarn install
+cp .env.example .env.local
 yarn dev
 ```
 
-App em `http://localhost:3000`.
+App local: `http://localhost:3000`
 
-## Build e produção
+## Build de produção
 
 ```bash
 yarn build
 yarn start
 ```
 
-> O script de build usa `next build --webpack` para maior estabilidade no ambiente atual.
+## Scripts
 
-## Ambiente
+- `yarn dev`: ambiente local
+- `yarn build`: build de produção
+- `yarn start`: inicia build
+- `yarn lint`: lint
+- `yarn lint:fix`: lint com correção
+- `yarn typecheck`: valida tipos TS
+- `yarn format`: formata código
+- `yarn format:check`: valida formatação
+- `yarn test`: testes unitários
+- `yarn test:watch`: unitário em watch
+- `yarn test:e2e:install`: instala Chromium do Playwright
+- `yarn test:e2e:install:deps`: instala Chromium + deps de SO
+- `yarn test:e2e`: testes e2e
+- `yarn test:e2e:ui`: e2e com interface
 
-Copie `.env.example` para `.env.local`:
+## Estrutura
 
-```bash
-cp .env.example .env.local
+```txt
+src/
+  app/          rotas e APIs
+  components/   layout, UI e ferramentas
+  lib/          regras de negócio puras
+  server/       serviços server-side
+  types/        tipos compartilhados
+tests/
+  unit/         Vitest
+  e2e/          Playwright
 ```
-
-Variáveis:
-
-- `NEXT_PUBLIC_APP_URL` (URL pública da aplicação)
-- `RATE_LIMIT_WINDOW_MS` (padrão: `60000`)
-- `RATE_LIMIT_MAX` (padrão: `120`)
-- `SHORTENER_DATABASE_URL` (opcional: URL dedicada do Postgres para o shortener)
-- `SUPABASE_DB_URL` (opcional: atalho para URL do Postgres do Supabase)
-- `SHORTENER_DATABASE_TABLE` (opcional: tabela do shortener, padrão `short_links`, aceita `schema.tabela`)
-- `SHORTENER_USE_SUPABASE_HTTP` (opcional: ativa shortener via API HTTP do Supabase)
-- `SUPABASE_URL` + `SUPABASE_SERVICE_ROLE_KEY` (obrigatórios no modo HTTP)
-- `POSTGRES_URL` (auto-detectado do Vercel/Supabase Integration)
-- `POSTGRES_PRISMA_URL` (fallback auto-detectado)
-- `POSTGRES_URL_NON_POOLING` (fallback auto-detectado)
-- `DATABASE_URL` (fallback do shortener quando `SHORTENER_DATABASE_URL` não está definida)
-- `POSTGRES_USER` + `POSTGRES_HOST` + `POSTGRES_DATABASE` + `POSTGRES_PASSWORD` (+ `POSTGRES_PORT` opcional) para montar URL automaticamente
-- `SHORTENER_DATABASE_SSL_NO_VERIFY` (opcional e temporário: desabilita validação TLS do certificado do shortener)
-- `SHORTENER_STORAGE_FILE` (opcional: fallback JSON local sem Postgres)
 
 ## Endpoints principais
 
@@ -142,52 +76,4 @@ Variáveis:
 - `POST /api/sql/format`
 - `POST /api/image/compress`
 - `POST /api/pdf/compress`
-- `GET /s/:slug` (redireciona para URL curta criada localmente)
-
-## Testes
-
-```bash
-yarn test          # unit
-yarn test:e2e      # smoke e2e
-yarn typecheck
-yarn lint
-```
-
-## Scripts
-
-- `yarn dev`
-- `yarn build`
-- `yarn start`
-- `yarn lint`
-- `yarn lint:fix`
-- `yarn typecheck`
-- `yarn format`
-- `yarn format:check`
-- `yarn test`
-- `yarn test:watch`
-- `yarn test:e2e`
-- `yarn test:e2e:ui`
-
-## Segurança e limites
-
-- validação Zod em rotas API
-- rate limit in-memory por IP
-- headers de segurança em `next.config.ts`
-- JWT secrets não são persistidos
-- shortener aceita apenas URL `http/https`
-- shortener usa Supabase HTTP quando `SHORTENER_USE_SUPABASE_HTTP=true`
-- sem modo HTTP, usa Postgres quando encontra uma URL de DB (`SHORTENER_DATABASE_URL`, `SUPABASE_DB_URL`, `POSTGRES_URL`, `POSTGRES_PRISMA_URL`, `POSTGRES_URL_NON_POOLING` ou `DATABASE_URL`)
-- uploads com limite:
-  - imagem: 10MB (`png/jpeg/webp/gif`)
-  - PDF: 20MB
-  - compressão de PDF prioriza ghostscript com fallback em `pdf-lib`
-
-## Documentação completa
-
-- [Arquitetura](docs/ARCHITECTURE.md)
-- [API](docs/API.md)
-- [Shortener local](docs/SHORTENER.md)
-- [Segurança](docs/SECURITY.md)
-- [Supabase](docs/SUPABASE.md)
-- [Testes](docs/TESTING.md)
-- [Deploy](docs/DEPLOY.md)
+- `GET /s/:slug`

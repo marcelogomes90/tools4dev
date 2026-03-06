@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo, useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 import {
   hexToRgb,
   hslToRgb,
@@ -24,7 +24,21 @@ const meta = getToolBySlug('color-converter');
 
 type InputType = 'hex' | 'rgb' | 'hsl' | 'hsv';
 
-  function parseNumbers(value: string, expected: number) {
+const inputPlaceholders: Record<InputType, string> = {
+  hex: '#RRGGBB',
+  rgb: '255, 153, 0',
+  hsl: '36, 100, 50',
+  hsv: '36, 100, 100',
+};
+
+const inputSamples: Record<InputType, string> = {
+  hex: '#34d399',
+  rgb: '52, 211, 153',
+  hsl: '158, 64, 52',
+  hsv: '158, 75, 83',
+};
+
+function parseNumbers(value: string, expected: number) {
   const normalized = value
     .replace(/rgba?|hsla?|hsva?/gi, '')
     .replace(/[()]/g, '')
@@ -46,6 +60,33 @@ type InputType = 'hex' | 'rgb' | 'hsl' | 'hsv';
   return numbers;
 }
 
+function parseRgb(value: string) {
+  const [r, g, b] = parseNumbers(value, 3);
+  if ([r, g, b].some((item) => item < 0 || item > 255)) {
+    throw new Error('RGB inválido. Cada canal deve ficar entre 0 e 255.');
+  }
+
+  return { r, g, b };
+}
+
+function parseHsl(value: string) {
+  const [h, s, l] = parseNumbers(value, 3);
+  if (h < 0 || h > 360 || s < 0 || s > 100 || l < 0 || l > 100) {
+    throw new Error('HSL inválido. Use H(0..360), S(0..100), L(0..100).');
+  }
+
+  return { h, s, l };
+}
+
+function parseHsv(value: string) {
+  const [h, s, v] = parseNumbers(value, 3);
+  if (h < 0 || h > 360 || s < 0 || s > 100 || v < 0 || v > 100) {
+    throw new Error('HSV inválido. Use H(0..360), S(0..100), V(0..100).');
+  }
+
+  return { h, s, v };
+}
+
 export function ColorConverterTool() {
   const [formState, setFormState] = useState<{
     inputType: InputType;
@@ -64,32 +105,9 @@ export function ColorConverterTool() {
     try {
       const rgb = (() => {
         if (inputType === 'hex') return hexToRgb(inputValue);
-
-        if (inputType === 'rgb') {
-          const [r, g, b] = parseNumbers(inputValue, 3);
-          if ([r, g, b].some((value) => value < 0 || value > 255)) {
-            throw new Error(
-              'RGB inválido. Cada canal deve ficar entre 0 e 255.',
-            );
-          }
-          return { r, g, b };
-        }
-
-        if (inputType === 'hsl') {
-          const [h, s, l] = parseNumbers(inputValue, 3);
-          if (h < 0 || h > 360 || s < 0 || s > 100 || l < 0 || l > 100) {
-            throw new Error(
-              'HSL inválido. Use H(0..360), S(0..100), L(0..100).',
-            );
-          }
-          return hslToRgb({ h, s, l });
-        }
-
-        const [h, s, v] = parseNumbers(inputValue, 3);
-        if (h < 0 || h > 360 || s < 0 || s > 100 || v < 0 || v > 100) {
-          throw new Error('HSV inválido. Use H(0..360), S(0..100), V(0..100).');
-        }
-        return hsvToRgb({ h, s, v });
+        if (inputType === 'rgb') return parseRgb(inputValue);
+        if (inputType === 'hsl') return hslToRgb(parseHsl(inputValue));
+        return hsvToRgb(parseHsv(inputValue));
       })();
 
       const hex = rgbToHex(rgb);
@@ -113,29 +131,32 @@ export function ColorConverterTool() {
     }
   }, [inputType, inputValue]);
 
-  function sample() {
-    if (inputType === 'hex')
-      setFormState((state) => ({ ...state, inputValue: '#34d399' }));
-    if (inputType === 'rgb')
-      setFormState((state) => ({ ...state, inputValue: '52, 211, 153' }));
-    if (inputType === 'hsl')
-      setFormState((state) => ({ ...state, inputValue: '158, 64, 52' }));
-    if (inputType === 'hsv')
-      setFormState((state) => ({ ...state, inputValue: '158, 75, 83' }));
-  }
+  const sample = useCallback(() => {
+    setFormState((state) => ({
+      ...state,
+      inputValue: inputSamples[inputType],
+    }));
+  }, [inputType]);
 
-  function updateFromPicker(value: string) {
+  const updateFromPicker = useCallback((value: string) => {
     if (isHexColor(value)) {
       setFormState((state) => ({ ...state, inputValue: value }));
     }
-  }
+  }, []);
 
-  function changeInputType(type: InputType) {
+  const changeInputType = useCallback((type: InputType) => {
     setFormState({
       inputType: type,
       inputValue: '',
     });
-  }
+  }, []);
+
+  const handleInputChange = useCallback((value: string) => {
+    setFormState((state) => ({
+      ...state,
+      inputValue: value,
+    }));
+  }, []);
 
   if (!meta) return null;
 
@@ -167,21 +188,8 @@ export function ColorConverterTool() {
             <Input
               id="color-input"
               value={inputValue}
-              onChange={(event) =>
-                setFormState((state) => ({
-                  ...state,
-                  inputValue: event.target.value,
-                }))
-              }
-              placeholder={
-                inputType === 'hex'
-                  ? '#RRGGBB'
-                  : inputType === 'rgb'
-                    ? '255, 153, 0'
-                    : inputType === 'hsl'
-                      ? '36, 100, 50'
-                      : '36, 100, 100'
-              }
+              onChange={(event) => handleInputChange(event.target.value)}
+              placeholder={inputPlaceholders[inputType]}
             />
           </div>
           {inputType === 'hex' && (

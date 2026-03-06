@@ -1,7 +1,6 @@
 'use client';
 
 import { useState } from 'react';
-import QRCode from 'qrcode';
 import { getToolBySlug } from '@/lib/tool-registry';
 import { Button } from '@/components/ui/button';
 import { CopyButton } from '@/components/ui/copy-button';
@@ -12,6 +11,16 @@ import { OutputPanel } from '@/components/ui/output-panel';
 import { ToolLayout } from '@/components/ui/tool-layout';
 
 const meta = getToolBySlug('qr-code-generator');
+
+let qrCodePromise: Promise<typeof import('qrcode')> | null = null;
+
+function loadQrCode() {
+  if (!qrCodePromise) {
+    qrCodePromise = import('qrcode');
+  }
+
+  return qrCodePromise;
+}
 
 export function QrCodeGeneratorTool() {
   const [text, setText] = useState('https://github.com/marcelogomes90/tools4dev');
@@ -27,6 +36,7 @@ export function QrCodeGeneratorTool() {
     setError('');
 
     try {
+      const QRCode = await loadQrCode();
       const safeSize = Math.min(1000, Math.max(100, Math.floor(size)));
       const dataUrl = await QRCode.toDataURL(text, {
         width: safeSize,

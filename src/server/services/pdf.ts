@@ -5,21 +5,19 @@ import { randomUUID } from 'node:crypto';
 import { spawn } from 'node:child_process';
 import { PDFDocument } from 'pdf-lib';
 
-function runGhostscript(
-  inputPath: string,
-  outputPath: string,
-  timeoutMs = 30000,
-) {
+function runQpdf(inputPath: string, outputPath: string, timeoutMs = 20_000) {
   return new Promise<boolean>((resolve) => {
-    const child = spawn('gs', [
-      '-sDEVICE=pdfwrite',
-      '-dCompatibilityLevel=1.4',
-      '-dPDFSETTINGS=/ebook',
-      '-dNOPAUSE',
-      '-dBATCH',
-      '-dQUIET',
-      `-sOutputFile=${outputPath}`,
+    const child = spawn('qpdf', [
+      '--object-streams=generate',
+      '--stream-data=compress',
+      '--recompress-flate',
+      '--compression-level=9',
+      '--optimize-images',
+      '--oi-min-width=64',
+      '--oi-min-height=64',
+      '--oi-min-area=4096',
       inputPath,
+      outputPath,
     ]);
 
     const timeout = setTimeout(() => {
@@ -39,7 +37,7 @@ function runGhostscript(
   });
 }
 
-async function fallbackPdfLib(buffer: Buffer) {
+async function compressWithPdfLib(buffer: Buffer) {
   const doc = await PDFDocument.load(buffer, { ignoreEncryption: true });
   const bytes = await doc.save({
     useObjectStreams: true,
@@ -51,35 +49,44 @@ async function fallbackPdfLib(buffer: Buffer) {
 export async function compressPdf(input: Buffer) {
   const tempId = randomUUID();
   const inputPath = path.join(tmpdir(), `in-${tempId}.pdf`);
-  const outputPath = path.join(tmpdir(), `out-${tempId}.pdf`);
+  const qpdfOutputPath = path.join(tmpdir(), `out-${tempId}-qpdf.pdf`);
 
   try {
-    await writeFile(inputPath, input);
-    const gsOk = await runGhostscript(inputPath, outputPath, 40000);
+    let bestBuffer: Buffer | null = null;
+    let bestMethod: 'qpdf' | 'pdf-lib' | null = null;
+    let bestSize = input.length;
 
-    if (gsOk) {
-      const output = await readFile(outputPath);
-      return {
-        ok: true as const,
-        buffer: output,
-        method: 'ghostscript' as const,
-      };
+    await writeFile(inputPath, input);
+
+    const qpdfOk = await runQpdf(inputPath, qpdfOutputPath);
+    if (qpdfOk) {
+      const qpdfOutput = await readFile(qpdfOutputPath);
+      if (qpdfOutput.length < bestSize) {
+        bestBuffer = qpdfOutput;
+        bestMethod = 'qpdf';
+        bestSize = qpdfOutput.length;
+      }
     }
 
-    const fallback = await fallbackPdfLib(input);
+    const pdfLibOutput = await compressWithPdfLib(input);
+    if (pdfLibOutput.length < bestSize) {
+      bestBuffer = pdfLibOutput;
+      bestMethod = 'pdf-lib';
+      bestSize = pdfLibOutput.length;
+    }
 
-    if (fallback.length >= input.length) {
+    if (!bestBuffer || !bestMethod) {
       return {
         ok: false as const,
         message:
-          'Ghostscript não disponível e o fallback com pdf-lib não reduziu o arquivo.',
+          'A compressão não reduziu o tamanho do PDF. O arquivo original foi preservado.',
       };
     }
 
     return {
       ok: true as const,
-      buffer: fallback,
-      method: 'pdf-lib' as const,
+      buffer: bestBuffer,
+      method: bestMethod,
     };
   } catch {
     return {
@@ -88,6 +95,6 @@ export async function compressPdf(input: Buffer) {
     };
   } finally {
     await rm(inputPath, { force: true });
-    await rm(outputPath, { force: true });
+    await rm(qpdfOutputPath, { force: true });
   }
 }

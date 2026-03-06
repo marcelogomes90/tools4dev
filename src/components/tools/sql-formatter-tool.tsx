@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 import { downloadText } from '@/lib/utils/download';
 import { getToolBySlug } from '@/lib/tool-registry';
 import { Button } from '@/components/ui/button';
@@ -14,21 +14,23 @@ import { Textarea } from '@/components/ui/textarea';
 import { ToolLayout } from '@/components/ui/tool-layout';
 
 const meta = getToolBySlug('sql-formatter');
+const defaultLanguage = 'postgresql' as const;
+const defaultIndent = 2;
+const sampleSql =
+  'select u.id,u.name,p.title from users u join posts p on p.user_id=u.id where u.active=true order by p.created_at desc limit 20';
+type SqlLanguage = 'postgresql' | 'mysql' | 'sqlite';
 
 export function SqlFormatterTool() {
   const [sql, setSql] = useState('');
-  const [language, setLanguage] = useState<'postgresql' | 'mysql' | 'sqlite'>(
-    'postgresql',
-  );
+  const [language, setLanguage] = useState<SqlLanguage>(defaultLanguage);
   const [uppercase, setUppercase] = useState(true);
-  const [indent, setIndent] = useState(2);
+  const [indent, setIndent] = useState(defaultIndent);
   const [formatted, setFormatted] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const canRun = useMemo(() => Boolean(sql.trim()) && !loading, [loading, sql]);
 
-  if (!meta) return null;
-
-  async function run() {
+  const run = useCallback(async () => {
     setLoading(true);
     setError('');
 
@@ -56,22 +58,22 @@ export function SqlFormatterTool() {
     } finally {
       setLoading(false);
     }
-  }
+  }, [indent, language, sql, uppercase]);
 
-  function sample() {
-    const example =
-      'select u.id,u.name,p.title from users u join posts p on p.user_id=u.id where u.active=true order by p.created_at desc limit 20';
-    setSql(example);
-    setLanguage('postgresql');
+  const sample = useCallback(() => {
+    setSql(sampleSql);
+    setLanguage(defaultLanguage);
     setUppercase(true);
-    setIndent(2);
-  }
+    setIndent(defaultIndent);
+  }, []);
 
-  function clear() {
+  const clear = useCallback(() => {
     setSql('');
     setFormatted('');
     setError('');
-  }
+  }, []);
+
+  if (!meta) return null;
 
   return (
     <ToolLayout
@@ -93,9 +95,7 @@ export function SqlFormatterTool() {
               <Select
                 value={language}
                 onChange={(event) =>
-                  setLanguage(
-                    event.target.value as 'postgresql' | 'mysql' | 'sqlite',
-                  )
+                  setLanguage(event.target.value as SqlLanguage)
                 }
               >
                 <option value="postgresql">PostgreSQL</option>
@@ -110,7 +110,9 @@ export function SqlFormatterTool() {
                 min={2}
                 max={8}
                 value={indent}
-                onChange={(event) => setIndent(Number(event.target.value || 2))}
+                onChange={(event) =>
+                  setIndent(Number(event.target.value || defaultIndent))
+                }
               />
             </div>
             <div className="flex items-end pb-2">
@@ -125,7 +127,7 @@ export function SqlFormatterTool() {
             </div>
           </div>
           <div className="flex flex-wrap gap-2">
-            <Button onClick={run} disabled={!sql || loading}>
+            <Button onClick={run} disabled={!canRun}>
               {loading ? 'Formatando...' : 'Formatar'}
             </Button>
             <Button variant="outline" onClick={sample}>

@@ -115,7 +115,7 @@ export function PdfCompressorTool() {
           </div>
           {error && <p className="text-sm text-rose-600">{error}</p>}
           <p className="text-xs text-slate-600 dark:text-slate-400">
-            A compressão prioriza ghostscript e usa pdf-lib apenas como fallback.
+            A compressão tenta qpdf (rápido) e usa pdf-lib como fallback.
           </p>
         </InputPanel>
 

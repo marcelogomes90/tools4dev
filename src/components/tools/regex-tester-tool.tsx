@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo, useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 import { highlightMatches, runRegex } from '@/lib/tools/regex';
 import { getToolBySlug } from '@/lib/tool-registry';
 import { Button } from '@/components/ui/button';
@@ -12,6 +12,9 @@ import { Textarea } from '@/components/ui/textarea';
 import { ToolLayout } from '@/components/ui/tool-layout';
 
 const meta = getToolBySlug('regex-tester');
+const samplePattern = '(tools4dev|tool)\\s+(\\w+)';
+const sampleFlags = 'gi';
+const sampleText = 'tools4dev and tool regex in this tool sandbox';
 
 export function RegexTesterTool() {
   const [pattern, setPattern] = useState('');
@@ -34,18 +37,19 @@ export function RegexTesterTool() {
     () => highlightMatches(text, result),
     [text, result],
   );
+  const hasMatches = result.length > 0;
 
-  function sample() {
-    setPattern('(tools4dev|tool)\\s+(\\w+)');
-    setFlags('gi');
-    setText('tools4dev and tool regex in this tool sandbox');
-  }
+  const sample = useCallback(() => {
+    setPattern(samplePattern);
+    setFlags(sampleFlags);
+    setText(sampleText);
+  }, []);
 
-  function clear() {
+  const clear = useCallback(() => {
     setPattern('');
     setFlags('');
     setText('');
-  }
+  }, []);
 
   if (!meta) return null;
 
@@ -102,7 +106,7 @@ export function RegexTesterTool() {
             dangerouslySetInnerHTML={{ __html: highlighted }}
           />
           <div className="rounded-lg border border-surface-border bg-surface-muted p-3 text-xs">
-            {result.length === 0
+            {!hasMatches
               ? 'Sem matches.'
               : result.map((item, idx) => (
                   <div

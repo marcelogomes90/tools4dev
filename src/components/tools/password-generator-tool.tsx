@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 import {
   PasswordOptions,
   generatePasswordBatch,
@@ -17,7 +17,9 @@ import { ToolLayout } from '@/components/ui/tool-layout';
 
 const meta = getToolBySlug('password-generator');
 
-const defaultOptions: PasswordOptions = {
+const DEFAULT_AMOUNT = 5;
+
+const baseDefaultOptions: PasswordOptions = {
   length: 16,
   uppercase: true,
   lowercase: true,
@@ -26,15 +28,28 @@ const defaultOptions: PasswordOptions = {
   avoidAmbiguous: true,
 };
 
+type PasswordToggleKey = Exclude<keyof PasswordOptions, 'length'>;
+
+const optionToggles: Array<{ key: PasswordToggleKey; label: string }> = [
+  { key: 'uppercase', label: 'Maiúsculas' },
+  { key: 'lowercase', label: 'Minúsculas' },
+  { key: 'numbers', label: 'Números' },
+  { key: 'symbols', label: 'Símbolos' },
+  { key: 'avoidAmbiguous', label: 'Evitar caracteres ambíguos (0/O, 1/l)' },
+];
+
+function createDefaultOptions(): PasswordOptions {
+  return { ...baseDefaultOptions };
+}
+
 export function PasswordGeneratorTool() {
-  const [amount, setAmount] = useState(5);
-  const [options, setOptions] = useState<PasswordOptions>(defaultOptions);
+  const [amount, setAmount] = useState(DEFAULT_AMOUNT);
+  const [options, setOptions] = useState<PasswordOptions>(createDefaultOptions);
   const [result, setResult] = useState<string[]>([]);
   const [error, setError] = useState('');
+  const resultText = useMemo(() => result.join('\n'), [result]);
 
-  if (!meta) return null;
-
-  function generate() {
+  const generate = useCallback(() => {
     try {
       setResult(generatePasswordBatch(amount, options));
       setError('');
@@ -42,18 +57,29 @@ export function PasswordGeneratorTool() {
       setError(err instanceof Error ? err.message : 'Falha ao gerar senhas.');
       setResult([]);
     }
-  }
+  }, [amount, options]);
 
-  function clear() {
-    setAmount(5);
-    setOptions(defaultOptions);
+  const clear = useCallback(() => {
+    setAmount(DEFAULT_AMOUNT);
+    setOptions(createDefaultOptions());
     setResult([]);
     setError('');
-  }
+  }, []);
 
-  function toggle<K extends keyof PasswordOptions>(key: K) {
+  const toggle = useCallback((key: PasswordToggleKey) => {
     setOptions((current) => ({ ...current, [key]: !current[key] }));
-  }
+  }, []);
+
+  const applyExample = useCallback(() => {
+    setOptions({
+      ...createDefaultOptions(),
+      length: 24,
+      symbols: true,
+    });
+    setAmount(10);
+  }, []);
+
+  if (!meta) return null;
 
   return (
     <ToolLayout
@@ -93,60 +119,25 @@ export function PasswordGeneratorTool() {
             </div>
           </div>
           <div className="grid gap-2 text-sm sm:grid-cols-2">
-            <label className="flex items-center gap-2">
-              <input
-                type="checkbox"
-                checked={options.uppercase}
-                onChange={() => toggle('uppercase')}
-              />
-              Maiúsculas
-            </label>
-            <label className="flex items-center gap-2">
-              <input
-                type="checkbox"
-                checked={options.lowercase}
-                onChange={() => toggle('lowercase')}
-              />
-              Minúsculas
-            </label>
-            <label className="flex items-center gap-2">
-              <input
-                type="checkbox"
-                checked={options.numbers}
-                onChange={() => toggle('numbers')}
-              />
-              Números
-            </label>
-            <label className="flex items-center gap-2">
-              <input
-                type="checkbox"
-                checked={options.symbols}
-                onChange={() => toggle('symbols')}
-              />
-              Símbolos
-            </label>
-            <label className="flex items-center gap-2 sm:col-span-2">
-              <input
-                type="checkbox"
-                checked={options.avoidAmbiguous}
-                onChange={() => toggle('avoidAmbiguous')}
-              />
-              Evitar caracteres ambíguos (0/O, 1/l)
-            </label>
+            {optionToggles.map((item) => (
+              <label
+                key={item.key}
+                className={`flex items-center gap-2 ${
+                  item.key === 'avoidAmbiguous' ? 'sm:col-span-2' : ''
+                }`}
+              >
+                <input
+                  type="checkbox"
+                  checked={options[item.key]}
+                  onChange={() => toggle(item.key)}
+                />
+                {item.label}
+              </label>
+            ))}
           </div>
           <div className="flex flex-wrap gap-2">
             <Button onClick={generate}>Gerar</Button>
-            <Button
-              variant="outline"
-              onClick={() => {
-                setOptions({
-                  ...defaultOptions,
-                  length: 24,
-                  symbols: true,
-                });
-                setAmount(10);
-              }}
-            >
+            <Button variant="outline" onClick={applyExample}>
               Gerar exemplo
             </Button>
             <Button variant="ghost" onClick={clear}>
@@ -158,15 +149,15 @@ export function PasswordGeneratorTool() {
 
         <OutputPanel>
           <div className="max-h-96 overflow-auto whitespace-pre-wrap rounded-lg border border-surface-border bg-surface-muted p-3 font-mono text-xs">
-            {result.length ? result.join('\n') : 'Nenhuma senha gerada ainda.'}
+            {result.length ? resultText : 'Nenhuma senha gerada ainda.'}
           </div>
           <div className="flex gap-2">
-            <CopyButton value={result.join('\n')} label="Copiar lista" />
+            <CopyButton value={resultText} label="Copiar lista" />
             <Button
               variant="outline"
               size="sm"
               disabled={result.length === 0}
-              onClick={() => downloadText(result.join('\n'), 'senhas.txt')}
+              onClick={() => downloadText(resultText, 'senhas.txt')}
             >
               Baixar
             </Button>

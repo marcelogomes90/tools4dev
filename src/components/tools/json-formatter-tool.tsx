@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useCallback, useState } from 'react';
 import { formatJson } from '@/lib/tools/json';
 import { downloadText } from '@/lib/utils/download';
 import { getToolBySlug } from '@/lib/tool-registry';
@@ -13,19 +13,31 @@ import { Textarea } from '@/components/ui/textarea';
 import { ToolLayout } from '@/components/ui/tool-layout';
 
 const meta = getToolBySlug('json-formatter');
+const defaultIndent: 2 | 4 = 2;
+const sampleInput = '{"z":3,"a":{"x":1,"w":2},"arr":[{"b":2,"a":1}]}';
 
 export function JsonFormatterTool() {
   const [input, setInput] = useState('');
-  const [indent, setIndent] = useState<2 | 4>(2);
+  const [indent, setIndent] = useState<2 | 4>(defaultIndent);
   const [sortKeys, setSortKeys] = useState(false);
   const [minify, setMinify] = useState(false);
   const [output, setOutput] = useState('');
   const [error, setError] = useState('');
 
-  if (!meta) return null;
+  const applyFormat = useCallback(
+    (nextInput: string, options?: { nextIndent?: 2 | 4; nextSortKeys?: boolean; nextMinify?: boolean }) => {
+      const result = formatJson(nextInput, {
+        indent: options?.nextIndent ?? indent,
+        minify: options?.nextMinify ?? minify,
+        sortKeys: options?.nextSortKeys ?? sortKeys,
+      });
+      return result;
+    },
+    [indent, minify, sortKeys],
+  );
 
-  function run() {
-    const result = formatJson(input, { indent, minify, sortKeys });
+  const run = useCallback(() => {
+    const result = applyFormat(input);
     if (!result.ok) {
       setError(result.error);
       setOutput('');
@@ -34,31 +46,32 @@ export function JsonFormatterTool() {
 
     setOutput(result.output);
     setError('');
-  }
+  }, [applyFormat, input]);
 
-  function sample() {
-    const example = '{"z":3,"a":{"x":1,"w":2},"arr":[{"b":2,"a":1}]}';
-    setInput(example);
-    const result = formatJson(example, {
-      indent: 2,
-      sortKeys: true,
-      minify: false,
+  const sample = useCallback(() => {
+    setInput(sampleInput);
+    const result = applyFormat(sampleInput, {
+      nextIndent: defaultIndent,
+      nextSortKeys: true,
+      nextMinify: false,
     });
     if (result.ok) setOutput(result.output);
     setSortKeys(true);
     setMinify(false);
-    setIndent(2);
+    setIndent(defaultIndent);
     setError('');
-  }
+  }, [applyFormat]);
 
-  function clear() {
+  const clear = useCallback(() => {
     setInput('');
     setOutput('');
     setError('');
     setSortKeys(false);
     setMinify(false);
-    setIndent(2);
-  }
+    setIndent(defaultIndent);
+  }, []);
+
+  if (!meta) return null;
 
   return (
     <ToolLayout

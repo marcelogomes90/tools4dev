@@ -51,6 +51,9 @@ declare global {
 
 const STORE_FILE_ENV = 'SHORTENER_STORAGE_FILE';
 const STORE_FILE_DEFAULT = join(tmpdir(), 'tools4dev-shortlinks.json');
+const SLUG_CHARSET = 'abcdefghijklmnopqrstuvwxyz0123456789';
+const SLUG_LENGTH = 5;
+const MAX_SLUG_GENERATION_TRIES = 10;
 const DATABASE_URL_ENV = 'SHORTENER_DATABASE_URL';
 const SUPABASE_DATABASE_URL_ENV = 'SUPABASE_DB_URL';
 const VERCEL_POSTGRES_URL_ENV = 'POSTGRES_URL';
@@ -119,10 +122,20 @@ function buildDatabaseUrlFromParts() {
 function parseBooleanEnv(name: string): boolean | null {
   const raw = process.env[name]?.trim().toLowerCase();
   if (!raw) return null;
-
-  if (['1', 'true', 'yes', 'on'].includes(raw)) return true;
-  if (['0', 'false', 'no', 'off'].includes(raw)) return false;
-  return null;
+  switch (raw) {
+    case '1':
+    case 'true':
+    case 'yes':
+    case 'on':
+      return true;
+    case '0':
+    case 'false':
+    case 'no':
+    case 'off':
+      return false;
+    default:
+      return null;
+  }
 }
 
 function resolveSslConfig(connectionString: string): PoolConfig['ssl'] | undefined {
@@ -353,14 +366,6 @@ function getSupabaseHttpStore(): SupabaseHttpStore | null {
   return store;
 }
 
-function getMemoryStore() {
-  if (!globalThis.__tools4devShortLinks) {
-    globalThis.__tools4devShortLinks = new Map<string, ShortLinkRecord>();
-  }
-
-  return globalThis.__tools4devShortLinks;
-}
-
 function isRecord(value: unknown): value is ShortLinkRecord {
   if (!value || typeof value !== 'object') return false;
 
@@ -415,12 +420,18 @@ function persistStoreToDisk(store: Map<string, ShortLinkRecord>) {
   renameSync(tempFile, filePath);
 }
 
-function loadJsonStore() {
-  try {
-    return loadStoreFromDisk();
-  } catch {
-    return getMemoryStore();
+function getJsonStore() {
+  if (globalThis.__tools4devShortLinks) {
+    return globalThis.__tools4devShortLinks;
   }
+
+  try {
+    globalThis.__tools4devShortLinks = loadStoreFromDisk();
+  } catch {
+    globalThis.__tools4devShortLinks = new Map<string, ShortLinkRecord>();
+  }
+
+  return globalThis.__tools4devShortLinks;
 }
 
 function persistJsonStore(store: Map<string, ShortLinkRecord>) {
@@ -436,19 +447,19 @@ function normalizeSlug(value: string) {
 }
 
 function randomSlug(length = 5) {
-  const charset = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
   let output = '';
 
   for (let i = 0; i < length; i += 1) {
-    output += charset[Math.floor(Math.random() * charset.length)] ?? 'x';
+    output +=
+      SLUG_CHARSET[Math.floor(Math.random() * SLUG_CHARSET.length)] ?? 'x';
   }
 
-  return output.toLowerCase();
+  return output;
 }
 
 function createAutoSlug(store: Map<string, ShortLinkRecord>) {
-  for (let tries = 0; tries < 10; tries += 1) {
-    const candidate = randomSlug(5);
+  for (let tries = 0; tries < MAX_SLUG_GENERATION_TRIES; tries += 1) {
+    const candidate = randomSlug(SLUG_LENGTH);
     if (!store.has(candidate)) return candidate;
   }
 
@@ -458,6 +469,19 @@ function createAutoSlug(store: Map<string, ShortLinkRecord>) {
 function withBaseUrl(baseUrl: string, slug: string) {
   const normalizedBase = baseUrl.replace(/\/$/, '');
   return `${normalizedBase}/s/${slug}`;
+}
+
+function createShortLinkResponse(
+  provider: 'supabase-http' | 'postgres' | 'local',
+  slug: string,
+  baseUrl: string,
+) {
+  return {
+    slug,
+    shortUrl: withBaseUrl(baseUrl, slug),
+    expiresAt: null,
+    provider,
+  };
 }
 
 function fromPostgresRow(row: PostgresRow): ShortLinkRecord {
@@ -601,77 +625,63 @@ async function resolveSupabaseRecord(
   };
 }
 
+async function createWithExternalStore(options: {
+  requestedSlug: string;
+  inputUrl: string;
+  baseUrl: string;
+  provider: 'supabase-http' | 'postgres';
+  insert: (slug: string, url: string) => Promise<boolean>;
+}) {
+  const { requestedSlug, inputUrl, baseUrl, provider, insert } = options;
+
+  if (requestedSlug) {
+    const inserted = await insert(requestedSlug, inputUrl);
+    if (!inserted) {
+      throw new Error('Slug já está em uso. Escolha outro.');
+    }
+
+    return createShortLinkResponse(provider, requestedSlug, baseUrl);
+  }
+
+  for (let tries = 0; tries < MAX_SLUG_GENERATION_TRIES; tries += 1) {
+    const candidate = randomSlug(SLUG_LENGTH);
+    const inserted = await insert(candidate, inputUrl);
+
+    if (!inserted) continue;
+
+    return createShortLinkResponse(provider, candidate, baseUrl);
+  }
+
+  throw new Error('Falha ao gerar slug único. Tente novamente.');
+}
+
 export async function createShortLink(input: ShortLinkCreateInput, baseUrl: string) {
   const requestedSlug = input.slug ? normalizeSlug(input.slug) : '';
   const supabaseStore = getSupabaseHttpStore();
 
   if (supabaseStore) {
-    if (requestedSlug) {
-      const inserted = await insertSupabaseRecord(supabaseStore, requestedSlug, input.url);
-      if (!inserted) {
-        throw new Error('Slug já está em uso. Escolha outro.');
-      }
-
-      return {
-        slug: requestedSlug,
-        shortUrl: withBaseUrl(baseUrl, requestedSlug),
-        expiresAt: null,
-        provider: 'supabase-http' as const,
-      };
-    }
-
-    for (let tries = 0; tries < 10; tries += 1) {
-      const candidate = randomSlug(5);
-      const inserted = await insertSupabaseRecord(supabaseStore, candidate, input.url);
-
-      if (!inserted) continue;
-
-      return {
-        slug: candidate,
-        shortUrl: withBaseUrl(baseUrl, candidate),
-        expiresAt: null,
-        provider: 'supabase-http' as const,
-      };
-    }
-
-    throw new Error('Falha ao gerar slug único. Tente novamente.');
+    return createWithExternalStore({
+      requestedSlug,
+      inputUrl: input.url,
+      baseUrl,
+      provider: 'supabase-http',
+      insert: (slug, url) => insertSupabaseRecord(supabaseStore, slug, url),
+    });
   }
 
   const postgresStore = await getPostgresStore();
 
   if (postgresStore) {
-    if (requestedSlug) {
-      const inserted = await insertPostgresRecord(postgresStore, requestedSlug, input.url);
-      if (!inserted) {
-        throw new Error('Slug já está em uso. Escolha outro.');
-      }
-
-      return {
-        slug: requestedSlug,
-        shortUrl: withBaseUrl(baseUrl, requestedSlug),
-        expiresAt: null,
-        provider: 'postgres' as const,
-      };
-    }
-
-    for (let tries = 0; tries < 10; tries += 1) {
-      const candidate = randomSlug(5);
-      const inserted = await insertPostgresRecord(postgresStore, candidate, input.url);
-
-      if (!inserted) continue;
-
-      return {
-        slug: candidate,
-        shortUrl: withBaseUrl(baseUrl, candidate),
-        expiresAt: null,
-        provider: 'postgres' as const,
-      };
-    }
-
-    throw new Error('Falha ao gerar slug único. Tente novamente.');
+    return createWithExternalStore({
+      requestedSlug,
+      inputUrl: input.url,
+      baseUrl,
+      provider: 'postgres',
+      insert: (slug, url) => insertPostgresRecord(postgresStore, slug, url),
+    });
   }
 
-  const store = loadJsonStore();
+  const store = getJsonStore();
   const slug = requestedSlug || createAutoSlug(store);
 
   if (store.has(slug)) {
@@ -686,12 +696,7 @@ export async function createShortLink(input: ShortLinkCreateInput, baseUrl: stri
   });
   persistJsonStore(store);
 
-  return {
-    slug,
-    shortUrl: withBaseUrl(baseUrl, slug),
-    expiresAt: null,
-    provider: 'local' as const,
-  };
+  return createShortLinkResponse('local', slug, baseUrl);
 }
 
 export async function resolveShortLink(slug: string) {
@@ -708,7 +713,7 @@ export async function resolveShortLink(slug: string) {
     return resolvePostgresRecord(postgresStore, normalizedSlug);
   }
 
-  const store = loadJsonStore();
+  const store = getJsonStore();
   const item = store.get(normalizedSlug);
 
   if (!item) return null;

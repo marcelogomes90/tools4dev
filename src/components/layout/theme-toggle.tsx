@@ -37,10 +37,10 @@ export function ThemeToggle() {
         }`}
       />
       <span
-        className={`absolute left-1.5 top-1/2 flex h-7 w-7 -translate-y-1/2 items-center justify-center rounded-full border shadow transition-transform ${
+        className={`absolute top-1.5 flex h-7 w-7 items-center justify-center rounded-full border shadow transition-all duration-200 ${
           isDark
-            ? 'translate-x-8 border-cyan-300/60 bg-cyan-100 text-cyan-900'
-            : 'translate-x-0 border-amber-200/85 bg-white text-amber-700'
+            ? 'right-1.5 border-cyan-300/60 bg-cyan-100 text-cyan-900'
+            : 'left-1.5 border-amber-200/85 bg-white text-amber-700'
         }`}
       >
         {isDark ? (

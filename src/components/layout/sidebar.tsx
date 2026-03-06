@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { categories, toolDefinitions } from '@/lib/tool-registry';
+import { toolsByCategory, toolsByPath } from '@/lib/tool-registry';
 import { cn } from '@/lib/utils/cn';
 
 interface SidebarProps {
@@ -19,7 +19,7 @@ export function Sidebar({
   onNavigate,
 }: SidebarProps) {
   const pathname = usePathname();
-  const activeTool = toolDefinitions.find((tool) => pathname === tool.path);
+  const activeTool = toolsByPath.get(pathname);
 
   return (
     <>
@@ -50,32 +50,30 @@ export function Sidebar({
           </p>
         </div>
         <nav className="space-y-6 px-3 py-4">
-          {categories.map((category) => (
+          {toolsByCategory.map(({ category, tools }) => (
             <div key={category}>
               <h3 className="mb-2 px-2 text-[10px] font-semibold uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400">
                 {category}
               </h3>
               <ul className="space-y-1">
-                {toolDefinitions
-                  .filter((tool) => tool.category === category)
-                  .map((tool) => {
-                    const active = pathname === tool.path;
-                    return (
-                      <li key={tool.slug}>
-                        <Link
-                          href={tool.path}
-                          onClick={onNavigate}
-                          className={cn(
-                            'block rounded-xl px-3 py-2.5 text-sm text-slate-700 transition hover:bg-surface-muted/85 hover:text-surface-foreground dark:text-slate-200',
-                            active &&
-                              'bg-surface font-semibold text-surface-foreground shadow-sm ring-1 ring-surface-border/70',
-                          )}
-                        >
-                          {tool.name}
-                        </Link>
-                      </li>
-                    );
-                  })}
+                {tools.map((tool) => {
+                  const active = pathname === tool.path;
+                  return (
+                    <li key={tool.slug}>
+                      <Link
+                        href={tool.path}
+                        onClick={onNavigate}
+                        className={cn(
+                          'block rounded-xl px-3 py-2.5 text-sm text-slate-700 transition hover:bg-surface-muted/85 hover:text-surface-foreground dark:text-slate-200',
+                          active &&
+                            'bg-surface font-semibold text-surface-foreground shadow-sm ring-1 ring-surface-border/70',
+                        )}
+                      >
+                        {tool.name}
+                      </Link>
+                    </li>
+                  );
+                })}
               </ul>
             </div>
           ))}

@@ -148,9 +148,9 @@ export const toolDefinitions: ToolDefinition[] = [
   {
     slug: 'pdf-compressor',
     name: 'Compressão de PDFs',
-    description: 'Comprime PDFs com fallback seguro.',
+    description: 'Comprime PDFs com qpdf e fallback em pdf-lib.',
     category: 'Arquivos',
-    keywords: ['pdf', 'compress', 'ghostscript'],
+    keywords: ['pdf', 'compress', 'qpdf', 'pdf-lib'],
     path: '/tools/pdf-compressor',
     examples: ['Arquivo de 10MB'],
   },
@@ -266,6 +266,19 @@ export const categories = [
   'Cores',
 ] as const;
 
+export const toolsBySlug = new Map(
+  toolDefinitions.map((tool) => [tool.slug, tool] as const),
+);
+
+export const toolsByPath = new Map(
+  toolDefinitions.map((tool) => [tool.path, tool] as const),
+);
+
+export const toolsByCategory = categories.map((category) => ({
+  category,
+  tools: toolDefinitions.filter((tool) => tool.category === category),
+}));
+
 export function getToolBySlug(slug: string) {
-  return toolDefinitions.find((tool) => tool.slug === slug);
+  return toolsBySlug.get(slug);
 }

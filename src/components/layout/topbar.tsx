@@ -13,6 +13,7 @@ import { useRouter } from 'next/navigation';
 import {
   FormEvent,
   KeyboardEvent,
+  useCallback,
   useEffect,
   useMemo,
   useRef,
@@ -39,6 +40,8 @@ interface SearchableTool {
   normalizedKeywords: string[];
   normalizedHaystack: string;
 }
+
+const ptBrCollator = new Intl.Collator('pt-BR');
 
 function normalize(value: string) {
   return value
@@ -78,11 +81,7 @@ function scoreField(field: string, token: string) {
   return 0;
 }
 
-function scoreTool(tool: SearchableTool, query: string) {
-  const normalizedQuery = normalize(query);
-  if (!normalizedQuery) return 0;
-
-  const tokens = tokenize(normalizedQuery);
+function scoreTool(tool: SearchableTool, normalizedQuery: string, tokens: string[]) {
   const fields = [
     tool.normalizedName,
     tool.normalizedSlug,
@@ -110,6 +109,44 @@ function scoreTool(tool: SearchableTool, query: string) {
   return score;
 }
 
+const searchableTools: SearchableTool[] = toolDefinitions.map((tool) => {
+  const normalizedName = normalize(tool.name);
+  const normalizedSlug = normalize(tool.slug);
+  const normalizedPath = normalize(tool.path);
+  const normalizedKeywords = tool.keywords.map((keyword) => normalize(keyword));
+
+  return {
+    slug: tool.slug,
+    name: tool.name,
+    path: tool.path,
+    normalizedName,
+    normalizedSlug,
+    normalizedPath,
+    normalizedKeywords,
+    normalizedHaystack: [
+      normalizedName,
+      normalizedSlug,
+      normalizedPath,
+      ...normalizedKeywords,
+    ].join(' '),
+  };
+});
+
+const directPathByQuery = new Map<string, string>();
+for (const tool of searchableTools) {
+  if (!directPathByQuery.has(tool.normalizedSlug)) {
+    directPathByQuery.set(tool.normalizedSlug, tool.path);
+  }
+
+  if (!directPathByQuery.has(tool.normalizedPath)) {
+    directPathByQuery.set(tool.normalizedPath, tool.path);
+  }
+
+  if (!directPathByQuery.has(tool.normalizedName)) {
+    directPathByQuery.set(tool.normalizedName, tool.path);
+  }
+}
+
 export function Topbar({
   isDesktopSidebarOpen,
   isMobileMenuOpen,
@@ -123,43 +160,14 @@ export function Topbar({
   const suggestionsListRef = useRef<HTMLUListElement | null>(null);
   const suggestionRefs = useRef<Array<HTMLButtonElement | null>>([]);
 
-  const searchable = useMemo(
-    () =>
-      toolDefinitions.map((tool) => {
-        const normalizedName = normalize(tool.name);
-        const normalizedSlug = normalize(tool.slug);
-        const normalizedPath = normalize(tool.path);
-        const normalizedKeywords = tool.keywords.map((keyword) =>
-          normalize(keyword),
-        );
-
-        return {
-          slug: tool.slug,
-          name: tool.name,
-          path: tool.path,
-          normalizedName,
-          normalizedSlug,
-          normalizedPath,
-          normalizedKeywords,
-          normalizedHaystack: [
-            normalizedName,
-            normalizedSlug,
-            normalizedPath,
-            ...normalizedKeywords,
-          ].join(' '),
-        };
-      }),
-    [],
-  );
-
   const suggestions = useMemo(() => {
     const normalizedQuery = normalize(query);
+    if (!normalizedQuery) return searchableTools.slice(0, 8);
+    const tokens = tokenize(normalizedQuery);
 
-    if (!normalizedQuery) return searchable.slice(0, 8);
-
-    return searchable
+    return searchableTools
       .map((tool) => {
-        const score = scoreTool(tool, normalizedQuery);
+        const score = scoreTool(tool, normalizedQuery, tokens);
         if (score === null) return null;
         return { tool, score };
       })
@@ -168,15 +176,19 @@ export function Topbar({
       )
       .sort((a, b) => {
         if (b.score !== a.score) return b.score - a.score;
-        return a.tool.name.localeCompare(b.tool.name, 'pt-BR');
+        return ptBrCollator.compare(a.tool.name, b.tool.name);
       })
       .slice(0, 8)
       .map((item) => item.tool);
-  }, [query, searchable]);
+  }, [query]);
   const resolvedActiveIndex =
     suggestions.length === 0
       ? -1
       : Math.min(Math.max(activeIndex, 0), suggestions.length - 1);
+
+  useEffect(() => {
+    suggestionRefs.current = suggestionRefs.current.slice(0, suggestions.length);
+  }, [suggestions.length]);
 
   useEffect(() => {
     if (!isSearchFocused || resolvedActiveIndex < 0) return;
@@ -202,12 +214,15 @@ export function Topbar({
     }
   }, [isSearchFocused, resolvedActiveIndex, suggestions.length]);
 
-  function goToTool(path: string) {
-    router.push(path);
-    setQuery('');
-    setIsSearchFocused(false);
-    setActiveIndex(-1);
-  }
+  const goToTool = useCallback(
+    (path: string) => {
+      router.push(path);
+      setQuery('');
+      setIsSearchFocused(false);
+      setActiveIndex(-1);
+    },
+    [router],
+  );
 
   function onSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -218,15 +233,9 @@ export function Topbar({
       return;
     }
 
-    const directMatch = searchable.find(
-      (tool) =>
-        tool.normalizedSlug === normalizedQuery ||
-        tool.normalizedPath === normalizedQuery ||
-        tool.normalizedName === normalizedQuery,
-    );
-
-    if (directMatch) {
-      goToTool(directMatch.path);
+    const directMatchPath = directPathByQuery.get(normalizedQuery);
+    if (directMatchPath) {
+      goToTool(directMatchPath);
       return;
     }
 
@@ -236,6 +245,25 @@ export function Topbar({
         : suggestions[0];
     if (selectedSuggestion) goToTool(selectedSuggestion.path);
   }
+
+  const onSearchChange = useCallback(
+    (value: string) => {
+      setIsSearchFocused(true);
+      setQuery(value);
+      setActiveIndex(0);
+    },
+    [setQuery],
+  );
+
+  const onSearchFocus = useCallback(() => {
+    setIsSearchFocused(true);
+    if (suggestions.length > 0 && activeIndex < 0) setActiveIndex(0);
+  }, [activeIndex, suggestions.length]);
+
+  const onSearchBlur = useCallback(() => {
+    setIsSearchFocused(false);
+    setActiveIndex(-1);
+  }, []);
 
   function onSearchKeyDown(event: KeyboardEvent<HTMLInputElement>) {
     if (event.key === 'Escape') {
@@ -316,19 +344,9 @@ export function Topbar({
           <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-500 dark:text-slate-300" />
           <input
             value={query}
-            onChange={(event) => {
-              setIsSearchFocused(true);
-              setQuery(event.target.value);
-              setActiveIndex(0);
-            }}
-            onFocus={() => {
-              setIsSearchFocused(true);
-              if (suggestions.length > 0 && activeIndex < 0) setActiveIndex(0);
-            }}
-            onBlur={() => {
-              setIsSearchFocused(false);
-              setActiveIndex(-1);
-            }}
+            onChange={(event) => onSearchChange(event.target.value)}
+            onFocus={onSearchFocus}
+            onBlur={onSearchBlur}
             onKeyDown={onSearchKeyDown}
             placeholder="Buscar ferramenta por nome, slug ou keyword"
             aria-label="Buscar ferramentas"

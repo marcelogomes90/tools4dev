@@ -3,7 +3,11 @@ import { NextRequest, NextResponse } from 'next/server';
 export function getClientIp(request: NextRequest) {
   const forwarded = request.headers.get('x-forwarded-for');
   if (forwarded) {
-    return forwarded.split(',')[0].trim();
+    const first = forwarded
+      .split(',')
+      .map((part) => part.trim())
+      .find(Boolean);
+    if (first) return first;
   }
 
   return request.headers.get('x-real-ip') ?? '0.0.0.0';
