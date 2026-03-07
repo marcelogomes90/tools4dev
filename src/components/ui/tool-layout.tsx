@@ -41,7 +41,7 @@ export function ToolLayout({
             <CategoryBadge
               key={category}
               category={category}
-              className="px-2 py-0.5` text-[9px] font-medium"
+              className="px-2 py-0.5 text-[9px] font-medium"
             />
           ))}
         </div>

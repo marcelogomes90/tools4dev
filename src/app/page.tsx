@@ -5,33 +5,67 @@ import {
   SITE_DESCRIPTION,
   SITE_NAME,
   getHomeSeoKeywords,
-  getSiteUrl,
+  getPublicSiteUrl,
 } from '@/lib/seo';
 import { CategoryBadge } from '@/components/ui/category-badge';
 
 const repoUrl = 'https://github.com/marcelogomes90/tools4dev';
-const siteUrl = getSiteUrl();
+const siteUrl = getPublicSiteUrl();
 const jsonLd = {
   '@context': 'https://schema.org',
   '@type': 'WebSite',
   name: SITE_NAME,
   description: SITE_DESCRIPTION,
-  url: siteUrl,
-  potentialAction: {
-    '@type': 'SearchAction',
-    target: `${siteUrl}/tools/{slug}`,
-    'query-input': 'required name=slug',
-  },
+  ...(siteUrl ? { url: siteUrl } : {}),
 };
 const featuredTools = toolDefinitions.slice(0, 8);
+const itemListJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'ItemList',
+  itemListElement: featuredTools.map((tool, index) => ({
+    '@type': 'ListItem',
+    position: index + 1,
+    name: tool.name,
+    description: tool.description,
+    url: siteUrl ? `${siteUrl}${tool.path}` : tool.path,
+  })),
+};
 
 export const metadata: Metadata = {
   title: 'Ferramentas Online para Desenvolvedores',
   description:
-    'Use ferramentas online para desenvolvimento: JSON, SQL, JWT, Regex, Base64, PDF, imagem e muito mais, sem instalação.',
+    'Ferramentas online grátis para devs: formatador JSON/SQL, JWT, Regex, Base64, geradores, compressores e utilitários no navegador.',
   keywords: getHomeSeoKeywords(),
-  alternates: {
-    canonical: '/',
+  alternates: siteUrl
+    ? {
+        canonical: '/',
+      }
+    : undefined,
+  openGraph: {
+    title: 'Ferramentas Online para Desenvolvedores',
+    description:
+      'Ferramentas online grátis para devs: formatador JSON/SQL, JWT, Regex, Base64, geradores, compressores e utilitários no navegador.',
+    type: 'website',
+    ...(siteUrl ? { url: siteUrl } : {}),
+    ...(siteUrl
+      ? {
+          images: [
+            {
+              url: `${siteUrl}/developer.png`,
+              width: 1200,
+              height: 630,
+              alt: 'tools4dev',
+            },
+          ],
+        }
+      : {}),
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Ferramentas Online para Desenvolvedores',
+    description:
+      'Ferramentas online grátis para devs: formatador JSON/SQL, JWT, Regex, Base64, geradores, compressores e utilitários no navegador.',
+    ...(siteUrl ? { images: [`${siteUrl}/developer.png`] } : {}),
   },
 };
 
@@ -41,6 +75,10 @@ export default function HomePage() {
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(itemListJsonLd) }}
       />
       <section className="flex min-h-[calc(100vh-156px)] items-center justify-center px-2">
         <div className="w-full max-w-4xl rounded-[30px] border border-surface-border/75 bg-surface/85 p-8 text-center shadow-card backdrop-blur sm:p-12">

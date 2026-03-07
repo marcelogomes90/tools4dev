@@ -7,13 +7,13 @@ import {
   SITE_DESCRIPTION,
   SITE_NAME,
   getHomeSeoKeywords,
-  getSiteUrl,
+  getPublicSiteUrl,
 } from '@/lib/seo';
 
-const siteUrl = getSiteUrl();
+const siteUrl = getPublicSiteUrl();
 
 export const metadata: Metadata = {
-  metadataBase: new URL(siteUrl),
+  metadataBase: siteUrl ? new URL(siteUrl) : undefined,
   title: {
     default: SITE_NAME,
     template: `%s | ${SITE_NAME}`,
@@ -21,9 +21,11 @@ export const metadata: Metadata = {
   description: SITE_DESCRIPTION,
   applicationName: SITE_NAME,
   keywords: getHomeSeoKeywords(),
-  alternates: {
-    canonical: '/',
-  },
+  alternates: siteUrl
+    ? {
+        canonical: '/',
+      }
+    : undefined,
   robots: {
     index: true,
     follow: true,
@@ -38,24 +40,28 @@ export const metadata: Metadata = {
   openGraph: {
     type: 'website',
     locale: 'pt_BR',
-    url: siteUrl,
+    ...(siteUrl ? { url: siteUrl } : {}),
     siteName: SITE_NAME,
     title: SITE_NAME,
     description: SITE_DESCRIPTION,
-    images: [
-      {
-        url: '/developer.png',
-        width: 1200,
-        height: 630,
-        alt: `${SITE_NAME} logo`,
-      },
-    ],
+    ...(siteUrl
+      ? {
+          images: [
+            {
+              url: `${siteUrl}/developer.png`,
+              width: 1200,
+              height: 630,
+              alt: `${SITE_NAME} logo`,
+            },
+          ],
+        }
+      : {}),
   },
   twitter: {
     card: 'summary_large_image',
     title: SITE_NAME,
     description: SITE_DESCRIPTION,
-    images: ['/developer.png'],
+    ...(siteUrl ? { images: [`${siteUrl}/developer.png`] } : {}),
   },
   verification: {
     google: 'NtLsh5bfARYSPHto1GxoGVbDE0clV6yJYRI5vQHlUlI',

@@ -1,10 +1,14 @@
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import { ToolRenderer } from '@/components/tools/tool-renderer';
-import { getToolBySlug, getToolCategories } from '@/lib/tool-registry';
+import {
+  getToolBySlug,
+  getToolCategories,
+  toolDefinitions,
+} from '@/lib/tool-registry';
 import {
   SITE_NAME,
-  getSiteUrl,
+  getPublicSiteUrl,
   getToolSeoDescription,
   getToolSeoKeywords,
   getToolSeoTitle,
@@ -12,6 +16,12 @@ import {
 
 interface ToolPageProps {
   params: Promise<{ slug: string }>;
+}
+
+export const dynamicParams = false;
+
+export function generateStaticParams() {
+  return toolDefinitions.map((tool) => ({ slug: tool.slug }));
 }
 
 export async function generateMetadata({
@@ -33,35 +43,45 @@ export async function generateMetadata({
   const title = getToolSeoTitle(tool);
   const description = getToolSeoDescription(tool);
   const canonicalPath = `/tools/${tool.slug}`;
-  const siteUrl = getSiteUrl();
+  const siteUrl = getPublicSiteUrl();
 
   return {
     title,
     description,
     keywords: getToolSeoKeywords(tool),
-    alternates: {
-      canonical: canonicalPath,
+    robots: {
+      index: true,
+      follow: true,
     },
+    alternates: siteUrl
+      ? {
+          canonical: canonicalPath,
+        }
+      : undefined,
     openGraph: {
       title,
       description,
-      url: `${siteUrl}${canonicalPath}`,
+      ...(siteUrl ? { url: `${siteUrl}${canonicalPath}` } : {}),
       siteName: SITE_NAME,
       type: 'website',
-      images: [
-        {
-          url: '/developer.png',
-          width: 1200,
-          height: 630,
-          alt: tool.name,
-        },
-      ],
+      ...(siteUrl
+        ? {
+            images: [
+              {
+                url: `${siteUrl}/developer.png`,
+                width: 1200,
+                height: 630,
+                alt: tool.name,
+              },
+            ],
+          }
+        : {}),
     },
     twitter: {
       card: 'summary_large_image',
       title,
       description,
-      images: ['/developer.png'],
+      ...(siteUrl ? { images: [`${siteUrl}/developer.png`] } : {}),
     },
   };
 }
@@ -74,7 +94,7 @@ export default async function ToolPage({ params }: ToolPageProps) {
     notFound();
   }
 
-  const siteUrl = getSiteUrl();
+  const siteUrl = getPublicSiteUrl();
   const canonicalPath = `/tools/${tool.slug}`;
   const toolCategories = getToolCategories(tool);
   const toolJsonLd = {
@@ -85,7 +105,7 @@ export default async function ToolPage({ params }: ToolPageProps) {
     applicationCategory: toolCategories.join(', '),
     operatingSystem: 'Web',
     isAccessibleForFree: true,
-    url: `${siteUrl}${canonicalPath}`,
+    ...(siteUrl ? { url: `${siteUrl}${canonicalPath}` } : {}),
     keywords: getToolSeoKeywords(tool).join(', '),
     offers: {
       '@type': 'Offer',
@@ -101,13 +121,13 @@ export default async function ToolPage({ params }: ToolPageProps) {
         '@type': 'ListItem',
         position: 1,
         name: SITE_NAME,
-        item: siteUrl,
+        ...(siteUrl ? { item: siteUrl } : {}),
       },
       {
         '@type': 'ListItem',
         position: 2,
         name: tool.name,
-        item: `${siteUrl}${canonicalPath}`,
+        ...(siteUrl ? { item: `${siteUrl}${canonicalPath}` } : {}),
       },
     ],
   };
