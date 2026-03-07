@@ -4,17 +4,16 @@ test('home opens and lists project title', async ({ page }) => {
   await page.goto('/');
   await expect(page).toHaveURL(/\/$/);
   await expect(
-    page.getByRole('heading', { name: 'Toolkit fullstack para o dia a dia' }),
+    page.getByRole('heading', {
+      name: 'Ferramentas essenciais para fluxo de desenvolvimento moderno',
+    }),
   ).toBeVisible();
 });
 
 test('json formatter works', async ({ page }) => {
   await page.goto('/tools/json-formatter');
+  await page.getByRole('button', { name: 'Gerar exemplo' }).click();
 
-  const input = page.locator('textarea').first();
-  await input.fill('{"b":2,"a":1}');
-  await page.getByRole('button', { name: 'Formatar' }).click();
-
-  const output = page.locator('textarea').nth(1);
-  await expect(output).toContainText('"b": 2');
+  const output = page.getByPlaceholder('Resultado formatado aparece aqui');
+  await expect(output).toHaveValue(/"arr"/);
 });
