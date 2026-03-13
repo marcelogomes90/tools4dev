@@ -13,91 +13,97 @@ import { ToolLayout } from '@/components/ui/tool-layout';
 const meta = getToolBySlug('base64-tool');
 
 export function Base64Tool() {
-  const [input, setInput] = useState('');
-  const [output, setOutput] = useState('');
-  const [urlSafe, setUrlSafe] = useState(false);
-  const [error, setError] = useState('');
+    const [input, setInput] = useState('');
+    const [output, setOutput] = useState('');
+    const [urlSafe, setUrlSafe] = useState(false);
+    const [error, setError] = useState('');
 
-  if (!meta) return null;
+    if (!meta) return null;
 
-  function clear() {
-    setInput('');
-    setOutput('');
-    setError('');
-  }
-
-  function example() {
-    setInput('Olá, dev!');
-    setOutput(encodeBase64('Olá, dev!', false));
-    setUrlSafe(false);
-    setError('');
-  }
-
-  function onEncode() {
-    try {
-      setOutput(encodeBase64(input, urlSafe));
-      setError('');
-    } catch {
-      setError('Falha ao codificar texto para base64.');
+    function clear() {
+        setInput('');
+        setOutput('');
+        setError('');
     }
-  }
 
-  function onDecode() {
-    try {
-      setOutput(decodeBase64(input, urlSafe));
-      setError('');
-    } catch {
-      setError(
-        'Falha ao decodificar base64. Verifique o conteudo e modo URL-safe.',
-      );
+    function example() {
+        setInput('Olá, dev!');
+        setOutput(encodeBase64('Olá, dev!', false));
+        setUrlSafe(false);
+        setError('');
     }
-  }
 
-  return (
-    <ToolLayout
-      title={meta.name}
-      description={meta.description}
-      examples={meta.examples}
-    >
-      <div className="grid gap-4 lg:grid-cols-2">
-        <InputPanel>
-          <Textarea
-            value={input}
-            onChange={(event) => setInput(event.target.value)}
-            placeholder="Digite texto ou base64"
-          />
-          <label className="flex items-center gap-2 text-sm">
-            <input
-              type="checkbox"
-              checked={urlSafe}
-              onChange={(event) => setUrlSafe(event.target.checked)}
-            />
-            Modo URL-safe
-          </label>
-          <div className="flex flex-wrap gap-2">
-            <Button onClick={onEncode} disabled={!input}>
-              Encode
-            </Button>
-            <Button variant="outline" onClick={onDecode} disabled={!input}>
-              Decode
-            </Button>
-            <Button variant="outline" onClick={example}>
-              Gerar exemplo
-            </Button>
-            <Button variant="ghost" onClick={clear}>
-              Limpar
-            </Button>
-          </div>
-          {error && <p className="text-sm text-rose-600">{error}</p>}
-        </InputPanel>
+    function onEncode() {
+        try {
+            setOutput(encodeBase64(input, urlSafe));
+            setError('');
+        } catch {
+            setError('Falha ao codificar texto para base64.');
+        }
+    }
 
-        <OutputPanel>
-          <pre className="min-h-[140px] whitespace-pre-wrap break-words rounded-lg border border-surface-border bg-surface-muted p-3 text-sm">
-            {output || 'Sem resultado ainda.'}
-          </pre>
-          <CopyButton value={output} />
-        </OutputPanel>
-      </div>
-    </ToolLayout>
-  );
+    function onDecode() {
+        try {
+            setOutput(decodeBase64(input, urlSafe));
+            setError('');
+        } catch {
+            setError(
+                'Falha ao decodificar base64. Verifique o conteudo e modo URL-safe.',
+            );
+        }
+    }
+
+    return (
+        <ToolLayout
+            title={meta.name}
+            description={meta.description}
+            examples={meta.examples}
+        >
+            <div className="grid gap-4 lg:grid-cols-2">
+                <InputPanel>
+                    <Textarea
+                        value={input}
+                        onChange={(event) => setInput(event.target.value)}
+                        placeholder="Digite texto ou base64"
+                    />
+                    <label className="flex items-center gap-2 text-sm">
+                        <input
+                            type="checkbox"
+                            checked={urlSafe}
+                            onChange={(event) =>
+                                setUrlSafe(event.target.checked)
+                            }
+                        />
+                        Modo URL-safe
+                    </label>
+                    <div className="flex flex-wrap gap-2">
+                        <Button onClick={onEncode} disabled={!input}>
+                            Encode
+                        </Button>
+                        <Button
+                            variant="outline"
+                            onClick={onDecode}
+                            disabled={!input}
+                        >
+                            Decode
+                        </Button>
+                        <Button variant="outline" onClick={example}>
+                            Gerar exemplo
+                        </Button>
+                        <Button variant="ghost" onClick={clear}>
+                            Limpar
+                        </Button>
+                    </div>
+                    {error && <p className="text-sm text-rose-600">{error}</p>}
+                </InputPanel>
+
+                <OutputPanel>
+                    <pre className="min-h-[140px] whitespace-pre-wrap break-words rounded-lg border border-surface-border bg-surface-muted p-3 text-sm">
+                        {output || 'Sem resultado ainda.'}
+                    </pre>
+                    <CopyButton value={output} />
+                </OutputPanel>
+            </div>
+        </ToolLayout>
+    );
 }
