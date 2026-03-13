@@ -3,186 +3,241 @@
 @tailwind utilities;
 
 :root {
-  --surface: 210 46% 98%;
-  --surface-foreground: 218 32% 16%;
-  --surface-muted: 205 45% 93%;
-  --surface-border: 212 34% 82%;
-  --surface-accent: 196 88% 42%;
-  --surface-input: 0 0% 100%;
+    --surface: 220 33% 98%;
+    --surface-foreground: 222 47% 11%;
+    --surface-muted: 220 30% 94%;
+    --surface-border: 218 27% 84%;
+    --surface-accent: 235 89% 62%;
+    --surface-accent-hover: 235 89% 55%;
+    --surface-input: 0 0% 100%;
+    --surface-card: 220 33% 99%;
 }
 
 .dark {
-  --surface: 222 34% 11%;
-  --surface-foreground: 210 36% 94%;
-  --surface-muted: 219 28% 16%;
-  --surface-border: 217 19% 31%;
-  --surface-accent: 192 92% 57%;
-  --surface-input: 220 27% 14%;
+    --surface: 224 39% 9%;
+    --surface-foreground: 213 31% 93%;
+    --surface-muted: 222 32% 13%;
+    --surface-border: 220 20% 22%;
+    --surface-accent: 235 89% 68%;
+    --surface-accent-hover: 235 89% 75%;
+    --surface-input: 222 32% 12%;
+    --surface-card: 222 36% 11%;
 }
 
 * {
-  @apply border-surface-border;
+    @apply border-surface-border;
 }
 
 body {
-  @apply text-surface-foreground antialiased selection:bg-surface-accent/25 selection:text-surface-foreground;
-  background:
-    radial-gradient(circle at 2% -20%, rgba(14, 165, 233, 0.2), transparent 44%),
-    radial-gradient(circle at 94% 4%, rgba(56, 189, 248, 0.14), transparent 30%),
-    radial-gradient(circle at 12% 100%, rgba(37, 99, 235, 0.08), transparent 34%),
-    radial-gradient(rgba(100, 116, 139, 0.24) 0.85px, transparent 0.95px),
-    radial-gradient(rgba(255, 255, 255, 0.3) 0.85px, transparent 0.95px),
-    linear-gradient(180deg, rgba(255, 255, 255, 0.86), rgba(255, 255, 255, 0.72)),
-    hsl(var(--surface-muted));
-  background-size:
-    auto,
-    auto,
-    auto,
-    15px 15px,
-    15px 15px,
-    auto,
-    auto;
-  background-position:
-    center,
-    center,
-    center,
-    0 0,
-    7.5px 7.5px,
-    center,
-    center;
-  background-attachment: fixed;
-  font-family: 'Manrope', 'Segoe UI', 'Inter', system-ui, sans-serif;
+    @apply text-surface-foreground antialiased selection:bg-surface-accent/20 selection:text-surface-foreground;
+    background:
+        radial-gradient(
+            circle at 2% -20%,
+            rgba(99, 102, 241, 0.15),
+            transparent 44%
+        ),
+        radial-gradient(
+            circle at 94% 4%,
+            rgba(139, 92, 246, 0.1),
+            transparent 30%
+        ),
+        radial-gradient(
+            circle at 12% 100%,
+            rgba(37, 99, 235, 0.06),
+            transparent 34%
+        ),
+        radial-gradient(rgba(100, 116, 139, 0.18) 0.85px, transparent 0.95px),
+        radial-gradient(rgba(255, 255, 255, 0.25) 0.85px, transparent 0.95px),
+        linear-gradient(
+            180deg,
+            rgba(255, 255, 255, 0.9),
+            rgba(255, 255, 255, 0.78)
+        ),
+        hsl(var(--surface-muted));
+    background-size:
+        auto,
+        auto,
+        auto,
+        15px 15px,
+        15px 15px,
+        auto,
+        auto;
+    background-position:
+        center,
+        center,
+        center,
+        0 0,
+        7.5px 7.5px,
+        center,
+        center;
+    background-attachment: fixed;
+    font-family: 'Manrope', 'Inter', 'Segoe UI', system-ui, sans-serif;
 }
 
 .dark body {
-  background:
-    radial-gradient(circle at -8% -24%, rgba(6, 182, 212, 0.24), transparent 48%),
-    radial-gradient(circle at 96% -10%, rgba(56, 189, 248, 0.16), transparent 36%),
-    radial-gradient(circle at 10% 110%, rgba(37, 99, 235, 0.11), transparent 40%),
-    radial-gradient(rgba(148, 163, 184, 0.2) 0.85px, transparent 0.95px),
-    radial-gradient(rgba(8, 47, 73, 0.46) 0.85px, transparent 0.95px),
-    linear-gradient(180deg, rgba(6, 10, 18, 0.82), rgba(7, 12, 21, 0.76)),
-    hsl(var(--surface-muted));
-  background-size:
-    auto,
-    auto,
-    auto,
-    15px 15px,
-    15px 15px,
-    auto,
-    auto;
-  background-position:
-    center,
-    center,
-    center,
-    0 0,
-    7.5px 7.5px,
-    center,
-    center;
-  background-attachment: fixed;
+    background:
+        radial-gradient(
+            circle at -8% -24%,
+            rgba(99, 102, 241, 0.18),
+            transparent 48%
+        ),
+        radial-gradient(
+            circle at 96% -10%,
+            rgba(139, 92, 246, 0.12),
+            transparent 36%
+        ),
+        radial-gradient(
+            circle at 10% 110%,
+            rgba(37, 99, 235, 0.09),
+            transparent 40%
+        ),
+        radial-gradient(rgba(148, 163, 184, 0.1) 0.85px, transparent 0.95px),
+        radial-gradient(rgba(8, 14, 36, 0.5) 0.85px, transparent 0.95px),
+        linear-gradient(180deg, rgba(6, 8, 18, 0.88), rgba(7, 10, 22, 0.82)),
+        hsl(var(--surface-muted));
+    background-size:
+        auto,
+        auto,
+        auto,
+        15px 15px,
+        15px 15px,
+        auto,
+        auto;
+    background-position:
+        center,
+        center,
+        center,
+        0 0,
+        7.5px 7.5px,
+        center,
+        center;
+    background-attachment: fixed;
 }
 
 pre,
 code {
-  font-family:
-    'IBM Plex Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas,
-    'Liberation Mono', 'Courier New', monospace;
+    font-family:
+        'IBM Plex Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas,
+        'Liberation Mono', 'Courier New', monospace;
+}
+
+/* Custom scrollbar for sidebar */
+.sidebar-scroll {
+    scrollbar-width: thin;
+    scrollbar-color: hsl(var(--surface-border)) transparent;
+}
+
+.sidebar-scroll::-webkit-scrollbar {
+    width: 4px;
+}
+
+.sidebar-scroll::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.sidebar-scroll::-webkit-scrollbar-thumb {
+    background-color: hsl(var(--surface-border));
+    border-radius: 4px;
+}
+
+.sidebar-scroll::-webkit-scrollbar-thumb:hover {
+    background-color: hsl(var(--surface-accent) / 0.5);
 }
 
 .markdown-preview {
-  @apply text-[15px] leading-7;
+    @apply text-[15px] leading-7;
 }
 
 .markdown-preview h1 {
-  @apply mb-2 mt-6 text-3xl font-bold tracking-tight;
+    @apply mb-2 mt-6 text-3xl font-bold tracking-tight;
 }
 
 .markdown-preview h2 {
-  @apply mb-2 mt-5 text-2xl font-semibold tracking-tight;
+    @apply mb-2 mt-5 text-2xl font-semibold tracking-tight;
 }
 
 .markdown-preview h3 {
-  @apply mb-2 mt-5 text-xl font-semibold;
+    @apply mb-2 mt-5 text-xl font-semibold;
 }
 
 .markdown-preview h4 {
-  @apply mb-2 mt-4 text-lg font-semibold;
+    @apply mb-2 mt-4 text-lg font-semibold;
 }
 
 .markdown-preview h5 {
-  @apply mb-2 mt-4 text-base font-semibold;
+    @apply mb-2 mt-4 text-base font-semibold;
 }
 
 .markdown-preview h6 {
-  @apply mb-2 mt-4 text-sm font-semibold uppercase tracking-wide;
+    @apply mb-2 mt-4 text-sm font-semibold uppercase tracking-wide;
 }
 
 .markdown-preview p {
-  @apply my-3 leading-7;
+    @apply my-3 leading-7;
 }
 
 .markdown-preview ul {
-  @apply my-3 list-disc space-y-1 pl-6;
+    @apply my-3 list-disc space-y-1 pl-6;
 }
 
 .markdown-preview ol {
-  @apply my-3 list-decimal space-y-1 pl-6;
+    @apply my-3 list-decimal space-y-1 pl-6;
 }
 
 .markdown-preview li {
-  @apply pl-1;
+    @apply pl-1;
 }
 
 .markdown-preview blockquote {
-  @apply my-3 border-l-4 border-surface-accent/70 bg-surface-muted/70 py-2 pl-3 italic;
+    @apply my-3 border-l-4 border-surface-accent/70 bg-surface-muted/70 py-2 pl-3 italic;
 }
 
 .markdown-preview a {
-  @apply font-medium text-sky-700 underline decoration-surface-accent/45 underline-offset-4 dark:text-sky-300;
+    @apply font-medium text-indigo-600 underline decoration-surface-accent/45 underline-offset-4 dark:text-indigo-400;
 }
 
 .markdown-preview pre {
-  @apply my-4 overflow-x-auto rounded-xl bg-slate-950/90 p-4 text-zinc-100;
+    @apply my-4 overflow-x-auto rounded-xl bg-slate-950/90 p-4 text-zinc-100;
 }
 
 .markdown-preview table {
-  @apply my-4 w-full border-collapse overflow-hidden rounded-lg;
+    @apply my-4 w-full border-collapse overflow-hidden rounded-lg;
 }
 
 .markdown-preview th,
 .markdown-preview td {
-  @apply border border-surface-border px-3 py-2 text-left;
+    @apply border border-surface-border px-3 py-2 text-left;
 }
 
 .hljs-keyword,
 .hljs-selector-tag,
 .hljs-literal,
 .hljs-title {
-  color: #f59e0b;
+    color: #f59e0b;
 }
 
 .hljs-string,
 .hljs-attr,
 .hljs-template-tag {
-  color: #34d399;
+    color: #34d399;
 }
 
 .hljs-number,
 .hljs-symbol {
-  color: #22d3ee;
+    color: #818cf8;
 }
 
 @keyframes fade-in-up {
-  from {
-    opacity: 0;
-    transform: translateY(8px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+    from {
+        opacity: 0;
+        transform: translateY(8px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
 .fade-in-up {
-  animation: fade-in-up 0.3s ease-out;
+    animation: fade-in-up 0.3s ease-out;
 }

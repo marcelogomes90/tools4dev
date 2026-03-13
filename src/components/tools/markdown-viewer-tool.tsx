@@ -13,107 +13,110 @@ import { ToolLayout } from '@/components/ui/tool-layout';
 const meta = getToolBySlug('markdown-viewer');
 
 marked.setOptions({
-  gfm: true,
-  breaks: false,
+    gfm: true,
+    breaks: false,
 });
 
-let highlightJsPromise: Promise<typeof import('highlight.js/lib/common')> | null =
-  null;
+let highlightJsPromise: Promise<
+    typeof import('highlight.js/lib/common')
+> | null = null;
 
 function loadHighlightJs() {
-  if (!highlightJsPromise) {
-    highlightJsPromise = import('highlight.js/lib/common');
-  }
+    if (!highlightJsPromise) {
+        highlightJsPromise = import('highlight.js/lib/common');
+    }
 
-  return highlightJsPromise;
+    return highlightJsPromise;
 }
 
 export function MarkdownViewerTool() {
-  const [markdown, setMarkdown] = useState(
-    '# Hello Dev\n\n```ts\nconst msg = "tools4dev";\nconsole.log(msg);\n```',
-  );
-  const [html, setHtml] = useState('');
-  const previewRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    let active = true;
-
-    async function render() {
-      const raw = marked.parse(markdown) as string;
-      const domPurifyModule = await import('dompurify');
-      if (!active) return;
-      setHtml(domPurifyModule.default.sanitize(raw));
-    }
-
-    render();
-    return () => {
-      active = false;
-    };
-  }, [markdown]);
-
-  useEffect(() => {
-    let active = true;
-
-    async function highlightCodeBlocks() {
-      if (!previewRef.current) return;
-      const hljs = await loadHighlightJs();
-      if (!active || !previewRef.current) return;
-
-      previewRef.current.querySelectorAll('pre code').forEach((element) => {
-        hljs.default.highlightElement(element as HTMLElement);
-      });
-    }
-
-    highlightCodeBlocks();
-
-    return () => {
-      active = false;
-    };
-  }, [html]);
-
-  function clear() {
-    setMarkdown('');
-  }
-
-  function sample() {
-    setMarkdown(
-      '# Titulo H1\n## Titulo H2\n### Titulo H3\n\n- Topico 1\n- Topico 2\n\n1. Item numerado\n2. Segundo item\n\n```sql\nselect * from users;\n```',
+    const [markdown, setMarkdown] = useState(
+        '# Hello Dev\n\n```ts\nconst msg = "tools4dev";\nconsole.log(msg);\n```',
     );
-  }
+    const [html, setHtml] = useState('');
+    const previewRef = useRef<HTMLDivElement>(null);
 
-  if (!meta) return null;
+    useEffect(() => {
+        let active = true;
 
-  return (
-    <ToolLayout
-      title={meta.name}
-      description={meta.description}
-      examples={meta.examples}
-    >
-      <div className="grid gap-4 lg:grid-cols-2">
-        <InputPanel>
-          <Textarea
-            className="min-h-[360px] font-mono"
-            value={markdown}
-            onChange={(event) => setMarkdown(event.target.value)}
-            placeholder="Digite markdown"
-          />
-          <div className="flex gap-2">
-            <Button onClick={sample}>Gerar exemplo</Button>
-            <Button variant="ghost" onClick={clear}>
-              Limpar
-            </Button>
-          </div>
-        </InputPanel>
+        async function render() {
+            const raw = marked.parse(markdown) as string;
+            const domPurifyModule = await import('dompurify');
+            if (!active) return;
+            setHtml(domPurifyModule.default.sanitize(raw));
+        }
 
-        <OutputPanel>
-          <div
-            ref={previewRef}
-            className="markdown-preview min-h-[360px] overflow-auto rounded-lg border border-surface-border bg-surface-muted p-4"
-            dangerouslySetInnerHTML={{ __html: html }}
-          />
-          <CopyButton value={markdown} label="Copiar markdown" />
-        </OutputPanel>
-      </div>
-    </ToolLayout>
-  );
+        render();
+        return () => {
+            active = false;
+        };
+    }, [markdown]);
+
+    useEffect(() => {
+        let active = true;
+
+        async function highlightCodeBlocks() {
+            if (!previewRef.current) return;
+            const hljs = await loadHighlightJs();
+            if (!active || !previewRef.current) return;
+
+            previewRef.current
+                .querySelectorAll('pre code')
+                .forEach((element) => {
+                    hljs.default.highlightElement(element as HTMLElement);
+                });
+        }
+
+        highlightCodeBlocks();
+
+        return () => {
+            active = false;
+        };
+    }, [html]);
+
+    function clear() {
+        setMarkdown('');
+    }
+
+    function sample() {
+        setMarkdown(
+            '# Titulo H1\n## Titulo H2\n### Titulo H3\n\n- Topico 1\n- Topico 2\n\n1. Item numerado\n2. Segundo item\n\n```sql\nselect * from users;\n```',
+        );
+    }
+
+    if (!meta) return null;
+
+    return (
+        <ToolLayout
+            title={meta.name}
+            description={meta.description}
+            examples={meta.examples}
+        >
+            <div className="grid gap-4 lg:grid-cols-2">
+                <InputPanel>
+                    <Textarea
+                        className="min-h-[360px] font-mono"
+                        value={markdown}
+                        onChange={(event) => setMarkdown(event.target.value)}
+                        placeholder="Digite markdown"
+                    />
+                    <div className="flex gap-2">
+                        <Button onClick={sample}>Gerar exemplo</Button>
+                        <Button variant="ghost" onClick={clear}>
+                            Limpar
+                        </Button>
+                    </div>
+                </InputPanel>
+
+                <OutputPanel>
+                    <div
+                        ref={previewRef}
+                        className="markdown-preview min-h-[360px] overflow-auto rounded-lg border border-surface-border bg-surface-muted p-4"
+                        dangerouslySetInnerHTML={{ __html: html }}
+                    />
+                    <CopyButton value={markdown} label="Copiar markdown" />
+                </OutputPanel>
+            </div>
+        </ToolLayout>
+    );
 }

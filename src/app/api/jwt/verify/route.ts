@@ -7,47 +7,47 @@ import { jwtVerifySchema } from '@/server/validators/api';
 export const runtime = 'nodejs';
 
 export async function POST(request: NextRequest) {
-  const ip = getClientIp(request);
-  const rate = checkRateLimit(`jwt-verify:${ip}`, {
-    max: 60,
-    windowMs: 60_000,
-  });
-  if (!rate.allowed) return tooManyRequests();
+    const ip = getClientIp(request);
+    const rate = checkRateLimit(`jwt-verify:${ip}`, {
+        max: 60,
+        windowMs: 60_000,
+    });
+    if (!rate.allowed) return tooManyRequests();
 
-  const body = await request.json().catch(() => null);
-  const parsed = jwtVerifySchema.safeParse(body);
+    const body = await request.json().catch(() => null);
+    const parsed = jwtVerifySchema.safeParse(body);
 
-  if (!parsed.success) {
-    return NextResponse.json(
-      {
-        ok: false,
-        message: 'Payload inválido.',
-        errors: parsed.error.flatten(),
-      },
-      { status: 400 },
-    );
-  }
+    if (!parsed.success) {
+        return NextResponse.json(
+            {
+                ok: false,
+                message: 'Payload inválido.',
+                errors: parsed.error.flatten(),
+            },
+            { status: 400 },
+        );
+    }
 
-  try {
-    const { token, key, algorithms } = parsed.data;
-    const decoded = jwt.verify(
-      token,
-      key,
-      algorithms?.length
-        ? { algorithms: algorithms as jwt.Algorithm[] }
-        : undefined,
-    );
-    return NextResponse.json({ ok: true, decoded });
-  } catch (error) {
-    return NextResponse.json(
-      {
-        ok: false,
-        message:
-          error instanceof Error
-            ? error.message
-            : 'Token inválido ou assinatura não confere.',
-      },
-      { status: 400 },
-    );
-  }
+    try {
+        const { token, key, algorithms } = parsed.data;
+        const decoded = jwt.verify(
+            token,
+            key,
+            algorithms?.length
+                ? { algorithms: algorithms as jwt.Algorithm[] }
+                : undefined,
+        );
+        return NextResponse.json({ ok: true, decoded });
+    } catch (error) {
+        return NextResponse.json(
+            {
+                ok: false,
+                message:
+                    error instanceof Error
+                        ? error.message
+                        : 'Token inválido ou assinatura não confere.',
+            },
+            { status: 400 },
+        );
+    }
 }
