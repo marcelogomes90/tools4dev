@@ -405,7 +405,7 @@ export function Topbar({
                                                     'w-full rounded-lg px-3 py-2 text-left transition-all hover:bg-surface-muted/70',
                                                     index ===
                                                         resolvedActiveIndex &&
-                                                        'bg-surface-accent/8 text-surface-accent',
+                                                        'bg-surface-muted/70',
                                                 )}
                                             >
                                                 <div className="flex items-center gap-2 text-sm font-medium text-surface-foreground">

@@ -172,7 +172,7 @@ export default function HomePage() {
                                         <span className="text-sm font-semibold text-surface-foreground group-hover:text-surface-accent">
                                             {tool.name}
                                         </span>
-                                        <p className="mt-1 text-xs leading-relaxed text-slate-500 dark:text-slate-400">
+                                        <p className="mt-1 line-clamp-1 text-xs leading-relaxed text-slate-500 dark:text-slate-400">
                                             {tool.description}
                                         </p>
                                     </Link>
