@@ -1,18 +1,37 @@
 import { NextRequest, NextResponse } from 'next/server';
-import sharp from 'sharp';
 import { checkRateLimit } from '@/server/rate-limit';
+import {
+    compressImage,
+    convertImageFormat,
+    detectImageFormat,
+    getMimeTypeForImageFormat,
+    resizeImage,
+} from '@/server/services/image';
 import { getClientIp, tooManyRequests } from '@/server/http';
-import { imageCompressSchema } from '@/server/validators/api';
+import { imageProcessSchema } from '@/server/validators/api';
 
 export const runtime = 'nodejs';
 
 const MAX_FILE_SIZE = 10 * 1024 * 1024;
-const allowedTypes = new Set([
-    'image/png',
-    'image/jpeg',
-    'image/webp',
-    'image/gif',
-]);
+const IMAGE_PROCESS_TIMEOUT_MS = 30_000;
+
+function withTimeout<T>(promise: Promise<T>, timeoutMs: number) {
+    return new Promise<T>((resolve, reject) => {
+        const timeout = setTimeout(() => {
+            reject(new Error('IMAGE_PROCESS_TIMEOUT'));
+        }, timeoutMs);
+
+        promise
+            .then((value) => {
+                clearTimeout(timeout);
+                resolve(value);
+            })
+            .catch((error) => {
+                clearTimeout(timeout);
+                reject(error);
+            });
+    });
+}
 
 export async function POST(request: NextRequest) {
     const ip = getClientIp(request);
@@ -21,9 +40,22 @@ export async function POST(request: NextRequest) {
 
     const formData = await request.formData();
     const file = formData.get('file');
-    const options = imageCompressSchema.safeParse({
-        format: String(formData.get('format') ?? 'webp'),
-        quality: Number(formData.get('quality') ?? 80),
+    const options = imageProcessSchema.safeParse({
+        operation: String(formData.get('operation') ?? 'compress'),
+        format: formData.get('format')
+            ? String(formData.get('format'))
+            : undefined,
+        quality: formData.get('quality')
+            ? Number(formData.get('quality'))
+            : undefined,
+        width: formData.get('width')
+            ? Number(formData.get('width'))
+            : undefined,
+        height: formData.get('height')
+            ? Number(formData.get('height'))
+            : undefined,
+        keepAspectRatio:
+            String(formData.get('keepAspectRatio') ?? 'true') === 'true',
     });
 
     if (!(file instanceof File)) {
@@ -43,7 +75,15 @@ export async function POST(request: NextRequest) {
         );
     }
 
-    if (!allowedTypes.has(file.type)) {
+    if (file.size > MAX_FILE_SIZE) {
+        return NextResponse.json(
+            { ok: false, message: 'Arquivo excede 10MB.' },
+            { status: 400 },
+        );
+    }
+
+    const sourceFormat = detectImageFormat(file.name, file.type);
+    if (!sourceFormat) {
         return NextResponse.json(
             {
                 ok: false,
@@ -53,62 +93,73 @@ export async function POST(request: NextRequest) {
         );
     }
 
-    if (file.size > MAX_FILE_SIZE) {
-        return NextResponse.json(
-            { ok: false, message: 'Arquivo excede 10MB.' },
-            { status: 400 },
-        );
-    }
-
     try {
         const inputBuffer = Buffer.from(await file.arrayBuffer());
-        // Auto-orient based on EXIF metadata to avoid sideways outputs.
-        const transformer = sharp(inputBuffer, { animated: true }).rotate();
-        const { format, quality } = options.data;
-        const safeQuality = Math.min(95, Math.max(30, quality));
+        const { operation, quality, format, width, height, keepAspectRatio } =
+            options.data;
+        const result = await withTimeout(
+            operation === 'resize'
+                ? resizeImage(inputBuffer, {
+                      fileName: file.name,
+                      mimeType: file.type,
+                      width,
+                      height,
+                      keepAspectRatio,
+                  })
+                : operation === 'convert'
+                  ? convertImageFormat(inputBuffer, {
+                        fileName: file.name,
+                        mimeType: file.type,
+                        targetFormat: format ?? sourceFormat,
+                    })
+                  : compressImage(inputBuffer, {
+                        fileName: file.name,
+                        mimeType: file.type,
+                        quality: quality ?? 80,
+                    }),
+            IMAGE_PROCESS_TIMEOUT_MS,
+        );
 
-        const outputBuffer =
-            format === 'webp'
-                ? await transformer
-                      .clone()
-                      .webp({ quality: safeQuality })
-                      .toBuffer()
-                : format === 'jpeg'
-                  ? await transformer
-                        .clone()
-                        .jpeg({ quality: safeQuality, mozjpeg: true })
-                        .toBuffer()
-                  : format === 'png'
-                    ? await transformer
-                          .clone()
-                          .png({
-                              compressionLevel: 9,
-                              quality: safeQuality,
-                              palette: true,
-                          })
-                          .toBuffer()
-                    : await transformer
-                          .clone()
-                          .gif({ effort: 7, colours: 256 })
-                          .toBuffer();
+        if (!result.success) {
+            return NextResponse.json(
+                {
+                    ok: false,
+                    message: result.message ?? 'Falha ao processar imagem.',
+                },
+                { status: 400 },
+            );
+        }
 
-        const contentTypeMap: Record<string, string> = {
-            png: 'image/png',
-            jpeg: 'image/jpeg',
-            webp: 'image/webp',
-            gif: 'image/gif',
-        };
-        const extension = format;
-
-        return new NextResponse(new Uint8Array(outputBuffer), {
+        return new NextResponse(new Uint8Array(result.file), {
             status: 200,
             headers: {
-                'Content-Type': contentTypeMap[format],
-                'Content-Disposition': `attachment; filename="compressed.${extension}"`,
+                'Content-Type': getMimeTypeForImageFormat(result.format),
+                'Content-Disposition': `attachment; filename="compressed.${result.format}"`,
+                'X-Original-Size': String(result.originalSize),
+                'X-Compressed-Size': String(result.compressedSize),
+                'X-Image-Operation': result.operation,
+                'X-Image-Format': result.format,
+                'X-Image-Note': result.message ?? '',
+                'X-Image-Width': String(result.width ?? ''),
+                'X-Image-Height': String(result.height ?? ''),
                 'Cache-Control': 'no-store',
             },
         });
-    } catch {
+    } catch (error) {
+        if (
+            error instanceof Error &&
+            error.message === 'IMAGE_PROCESS_TIMEOUT'
+        ) {
+            return NextResponse.json(
+                {
+                    ok: false,
+                    message:
+                        'Processamento excedeu 30 segundos. Tente reduzir a resolução, usar qualidade menor ou converter para WEBP/JPEG.',
+                },
+                { status: 408 },
+            );
+        }
+
         return NextResponse.json(
             {
                 ok: false,

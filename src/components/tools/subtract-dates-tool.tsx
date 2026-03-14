@@ -5,6 +5,7 @@ import { formatDatePtBr, subtractDaysFromDate } from '@/lib/tools/date';
 import { getToolBySlug } from '@/lib/tool-registry';
 import { Button } from '@/components/ui/button';
 import { CopyButton } from '@/components/ui/copy-button';
+import { DateInput } from '@/components/ui/date-input';
 import { Input } from '@/components/ui/input';
 import { InputPanel } from '@/components/ui/input-panel';
 import { Label } from '@/components/ui/label';
@@ -44,10 +45,8 @@ export function SubtractDatesTool() {
                 <InputPanel>
                     <div>
                         <Label htmlFor="subtract-date">Data base</Label>
-                        <Input
+                        <DateInput
                             id="subtract-date"
-                            type="date"
-                            className="min-w-0"
                             value={date}
                             onChange={(event) => setDate(event.target.value)}
                         />

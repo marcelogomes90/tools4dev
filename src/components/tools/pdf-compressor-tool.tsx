@@ -4,6 +4,7 @@ import { FileUp } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { getToolBySlug } from '@/lib/tool-registry';
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 import { InputPanel } from '@/components/ui/input-panel';
 import { Label } from '@/components/ui/label';
 import { OutputPanel } from '@/components/ui/output-panel';
@@ -18,6 +19,7 @@ export function PdfCompressorTool() {
     const [stats, setStats] = useState('');
     const [error, setError] = useState('');
     const [loading, setLoading] = useState(false);
+    const [quality, setQuality] = useState(80);
 
     useEffect(() => {
         return () => {
@@ -36,6 +38,7 @@ export function PdfCompressorTool() {
 
         const formData = new FormData();
         formData.append('file', file);
+        formData.append('quality', String(quality));
 
         try {
             const response = await fetch('/api/pdf/compress', {
@@ -58,8 +61,18 @@ export function PdfCompressorTool() {
             if (resultUrl) URL.revokeObjectURL(resultUrl);
 
             setResultUrl(url);
+            const originalSize = Number(
+                response.headers.get('X-Original-Size') ?? file.size,
+            );
+            const compressedSize = Number(
+                response.headers.get('X-Compressed-Size') ?? blob.size,
+            );
+            const reduction =
+                originalSize > 0
+                    ? ((originalSize - compressedSize) / originalSize) * 100
+                    : 0;
             setStats(
-                `Metodo: ${method} | Original: ${(file.size / 1024).toFixed(1)}KB | Comprimido: ${(blob.size / 1024).toFixed(1)}KB`,
+                `Metodo: ${method} | Original: ${(originalSize / 1024).toFixed(1)}KB | Comprimido: ${(compressedSize / 1024).toFixed(1)}KB | Reducao: ${Math.max(0, reduction).toFixed(1)}%`,
             );
         } catch {
             setError('Falha de rede ao comprimir PDF.');
@@ -110,6 +123,24 @@ export function PdfCompressorTool() {
                             </span>
                         </label>
                     </div>
+                    <div>
+                        <Label htmlFor="pdf-quality">Qualidade (1..100)</Label>
+                        <Input
+                            id="pdf-quality"
+                            type="number"
+                            min={1}
+                            max={100}
+                            value={quality}
+                            onChange={(event) => {
+                                const parsed = Number(event.target.value);
+                                if (Number.isNaN(parsed)) {
+                                    setQuality(80);
+                                    return;
+                                }
+                                setQuality(Math.max(1, Math.min(100, parsed)));
+                            }}
+                        />
+                    </div>
                     <div className="flex flex-wrap items-center justify-center gap-2">
                         <Button onClick={compress} disabled={!file || loading}>
                             {loading ? 'Processando...' : 'Comprimir'}
@@ -120,8 +151,8 @@ export function PdfCompressorTool() {
                     </div>
                     {error && <p className="text-sm text-rose-600">{error}</p>}
                     <p className="text-xs text-slate-600 dark:text-slate-400">
-                        A compressão tenta qpdf (rápido) e usa pdf-lib como
-                        fallback.
+                        Compressão feita com pdf-lib (Node.js puro, sem
+                        dependências nativas).
                     </p>
                 </InputPanel>
 

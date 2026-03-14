@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { checkRateLimit } from '@/server/rate-limit';
 import { getClientIp, tooManyRequests } from '@/server/http';
-import { compressPdf } from '@/server/services/pdf';
+import { compressPDF } from '@/server/services/pdf';
 import { pdfCompressSchema } from '@/server/validators/api';
 
 export const runtime = 'nodejs';
@@ -16,6 +16,7 @@ export async function POST(request: NextRequest) {
 
     const formData = await request.formData();
     const file = formData.get('file');
+    const quality = Number(formData.get('quality') ?? 80);
 
     if (!(file instanceof File)) {
         return NextResponse.json(
@@ -28,6 +29,7 @@ export async function POST(request: NextRequest) {
         fileName: file.name,
         mimeType: file.type,
         size: file.size,
+        quality,
     });
 
     if (!metadata.success) {
@@ -38,21 +40,23 @@ export async function POST(request: NextRequest) {
     }
 
     const input = Buffer.from(await file.arrayBuffer());
-    const compressed = await compressPdf(input);
+    const compressed = await compressPDF(input, { quality: metadata.data.quality });
 
-    if (!compressed.ok) {
+    if (!compressed.success) {
         return NextResponse.json(
-            { ok: false, message: compressed.message },
+            { ok: false, message: compressed.message ?? 'Falha ao comprimir PDF.' },
             { status: 400 },
         );
     }
 
-    return new NextResponse(new Uint8Array(compressed.buffer), {
+    return new NextResponse(new Uint8Array(compressed.file), {
         status: 200,
         headers: {
             'Content-Type': 'application/pdf',
             'Content-Disposition': 'attachment; filename="compressed.pdf"',
             'X-Compression-Method': compressed.method,
+            'X-Original-Size': String(compressed.originalSize),
+            'X-Compressed-Size': String(compressed.compressedSize),
             'Cache-Control': 'no-store',
         },
     });

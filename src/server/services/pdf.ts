@@ -1,100 +1,84 @@
-import { writeFile, readFile, rm } from 'node:fs/promises';
-import { tmpdir } from 'node:os';
-import path from 'node:path';
-import { randomUUID } from 'node:crypto';
-import { spawn } from 'node:child_process';
 import { PDFDocument } from 'pdf-lib';
+import { PdfCompressionResult } from '@/types/compression';
 
-function runQpdf(inputPath: string, outputPath: string, timeoutMs = 20_000) {
-    return new Promise<boolean>((resolve) => {
-        const child = spawn('qpdf', [
-            '--object-streams=generate',
-            '--stream-data=compress',
-            '--recompress-flate',
-            '--compression-level=9',
-            '--optimize-images',
-            '--oi-min-width=64',
-            '--oi-min-height=64',
-            '--oi-min-area=4096',
-            inputPath,
-            outputPath,
-        ]);
-
-        const timeout = setTimeout(() => {
-            child.kill('SIGTERM');
-            resolve(false);
-        }, timeoutMs);
-
-        child.on('error', () => {
-            clearTimeout(timeout);
-            resolve(false);
-        });
-
-        child.on('close', (code) => {
-            clearTimeout(timeout);
-            resolve(code === 0);
-        });
-    });
+export interface CompressPDFOptions {
+    quality?: number;
 }
 
-async function compressWithPdfLib(buffer: Buffer) {
-    const doc = await PDFDocument.load(buffer, { ignoreEncryption: true });
-    const bytes = await doc.save({
-        useObjectStreams: true,
-        addDefaultPage: false,
-    });
-    return Buffer.from(bytes);
+function clampQuality(quality = 80) {
+    return Math.min(100, Math.max(1, Math.trunc(quality)));
 }
 
-export async function compressPdf(input: Buffer) {
-    const tempId = randomUUID();
-    const inputPath = path.join(tmpdir(), `in-${tempId}.pdf`);
-    const qpdfOutputPath = path.join(tmpdir(), `out-${tempId}-qpdf.pdf`);
+export async function compressPDF(
+    input: Buffer,
+    options: CompressPDFOptions = {},
+): Promise<PdfCompressionResult> {
+    const originalSize = input.length;
+    const quality = clampQuality(options.quality);
+
+    if (originalSize === 0) {
+        return {
+            success: false,
+            originalSize: 0,
+            compressedSize: 0,
+            file: input,
+            method: 'pdf-lib',
+            message: 'Arquivo PDF vazio.',
+        };
+    }
 
     try {
-        let bestBuffer: Buffer | null = null;
-        let bestMethod: 'qpdf' | 'pdf-lib' | null = null;
-        let bestSize = input.length;
-
-        await writeFile(inputPath, input);
-
-        const qpdfOk = await runQpdf(inputPath, qpdfOutputPath);
-        if (qpdfOk) {
-            const qpdfOutput = await readFile(qpdfOutputPath);
-            if (qpdfOutput.length < bestSize) {
-                bestBuffer = qpdfOutput;
-                bestMethod = 'qpdf';
-                bestSize = qpdfOutput.length;
-            }
+        const source = await PDFDocument.load(input, {
+            ignoreEncryption: true,
+            updateMetadata: false,
+        });
+        const target = await PDFDocument.create({ updateMetadata: false });
+        const pageIndexes = source.getPageIndices();
+        const pages = await target.copyPages(source, pageIndexes);
+        for (const page of pages) {
+            target.addPage(page);
         }
 
-        const pdfLibOutput = await compressWithPdfLib(input);
-        if (pdfLibOutput.length < bestSize) {
-            bestBuffer = pdfLibOutput;
-            bestMethod = 'pdf-lib';
-            bestSize = pdfLibOutput.length;
-        }
+        target.setProducer('tools4dev');
+        target.setCreator('tools4dev');
 
-        if (!bestBuffer || !bestMethod) {
+        const compressedBytes = await target.save({
+            useObjectStreams: true,
+            addDefaultPage: false,
+            updateFieldAppearances: quality >= 70,
+            objectsPerTick: quality >= 70 ? 64 : 24,
+        });
+        const file = Buffer.from(compressedBytes);
+        const compressedSize = file.length;
+
+        if (compressedSize >= originalSize) {
             return {
-                ok: false as const,
+                success: false,
+                originalSize,
+                compressedSize: originalSize,
+                file: input,
+                method: 'pdf-lib',
                 message:
                     'A compressão não reduziu o tamanho do PDF. O arquivo original foi preservado.',
             };
         }
 
         return {
-            ok: true as const,
-            buffer: bestBuffer,
-            method: bestMethod,
+            success: true,
+            originalSize,
+            compressedSize,
+            file,
+            method: 'pdf-lib',
         };
     } catch {
         return {
-            ok: false as const,
+            success: false,
+            originalSize,
+            compressedSize: originalSize,
+            file: input,
+            method: 'pdf-lib',
             message: 'Falha ao processar PDF no ambiente atual.',
         };
-    } finally {
-        await rm(inputPath, { force: true });
-        await rm(qpdfOutputPath, { force: true });
     }
 }
+

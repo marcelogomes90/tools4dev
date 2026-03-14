@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { daysBetweenDates } from '@/lib/tools/date';
 import { getToolBySlug } from '@/lib/tool-registry';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
+import { DateInput } from '@/components/ui/date-input';
 import { InputPanel } from '@/components/ui/input-panel';
 import { Label } from '@/components/ui/label';
 import { OutputPanel } from '@/components/ui/output-panel';
@@ -45,20 +45,16 @@ export function DaysBetweenDatesTool() {
                 <InputPanel>
                     <div>
                         <Label htmlFor="days-start">Data inicial</Label>
-                        <Input
+                        <DateInput
                             id="days-start"
-                            type="date"
-                            className="min-w-0"
                             value={start}
                             onChange={(event) => setStart(event.target.value)}
                         />
                     </div>
                     <div>
                         <Label htmlFor="days-end">Data final</Label>
-                        <Input
+                        <DateInput
                             id="days-end"
-                            type="date"
-                            className="min-w-0"
                             value={end}
                             onChange={(event) => setEnd(event.target.value)}
                         />

@@ -80,26 +80,66 @@ export const sqlFormatterSchema = z.object({
     indent: z.number().int().min(2).max(8).default(2),
 });
 
-export const imageCompressSchema = z.object({
-    format: z
-        .enum(['png', 'jpeg', 'webp', 'gif'], {
-            errorMap: () => ({
-                message: 'Formato inválido. Use png, jpeg, webp ou gif.',
-            }),
-        })
-        .default('webp'),
+const imageFormatSchema = z.enum(['png', 'jpeg', 'webp', 'gif'], {
+    errorMap: () => ({
+        message: 'Formato inválido. Use png, jpeg, webp ou gif.',
+    }),
+});
+
+const imageBaseSchema = z.object({
+    operation: z.enum(['compress', 'convert', 'resize']).default('compress'),
+    format: imageFormatSchema.optional(),
     quality: z
         .number()
         .int()
-        .min(30, { message: 'A qualidade mínima é 30.' })
-        .max(95, { message: 'A qualidade máxima é 95.' })
-        .default(80),
+        .min(1, { message: 'A qualidade mínima é 1.' })
+        .max(100, { message: 'A qualidade máxima é 100.' })
+        .optional(),
+    width: z.number().int().positive().optional(),
+    height: z.number().int().positive().optional(),
+    keepAspectRatio: z
+        .preprocess(
+            (value) => {
+                if (typeof value === 'boolean') return value;
+                if (typeof value === 'string') return value === 'true';
+                return true;
+            },
+            z.boolean(),
+        )
+        .default(true),
+});
+
+export const imageProcessSchema = imageBaseSchema.superRefine((value, ctx) => {
+    if (value.operation === 'convert' && !value.format) {
+        ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            message: 'Formato de saída é obrigatório para conversão.',
+            path: ['format'],
+        });
+    }
+
+    if (
+        value.operation === 'resize' &&
+        !value.width &&
+        !value.height
+    ) {
+        ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            message:
+                'Informe pelo menos largura ou altura para redimensionar.',
+            path: ['width'],
+        });
+    }
+
 });
 
 export const pdfCompressSchema = z.object({
     fileName: z
         .string({ required_error: 'O nome do arquivo é obrigatório.' })
-        .min(1, { message: 'O nome do arquivo é obrigatório.' }),
+        .min(1, { message: 'O nome do arquivo é obrigatório.' })
+        .refine((value) => /\.pdf$/i.test(value), {
+            message: 'A extensão do arquivo deve ser .pdf.',
+        }),
     mimeType: z.literal('application/pdf', {
         errorMap: () => ({ message: 'O arquivo deve ser um PDF válido.' }),
     }),
@@ -110,4 +150,10 @@ export const pdfCompressSchema = z.object({
         .max(20 * 1024 * 1024, {
             message: 'O arquivo excede o limite de 20MB.',
         }),
+    quality: z
+        .number()
+        .int()
+        .min(1, { message: 'A qualidade mínima é 1.' })
+        .max(100, { message: 'A qualidade máxima é 100.' })
+        .default(80),
 });

@@ -144,13 +144,13 @@ export const toolDefinitions: ToolDefinition[] = [
     },
     {
         slug: 'image-compressor',
-        name: 'Compressão de Imagens',
+        name: 'Editor de Imagens',
         description:
-            'Comprime imagens PNG, JPEG, WebP e GIF sem perda de qualidade perceptível.',
+            'Redimensione, converta e comprima imagens PNG, JPEG, WebP e GIF.',
         category: 'Arquivos',
-        keywords: ['image', 'compress', 'sharp', 'webp'],
+        keywords: ['image', 'compress', 'jimp', 'webp'],
         path: '/tools/image-compressor',
-        examples: ['PNG para WEBP'],
+        examples: ['Redimensionar 1920x1080', 'PNG para WEBP'],
     },
     {
         slug: 'pdf-compressor',
@@ -158,7 +158,7 @@ export const toolDefinitions: ToolDefinition[] = [
         description:
             'Reduz o tamanho de arquivos PDF mantendo a qualidade visual.',
         category: 'Arquivos',
-        keywords: ['pdf', 'compress', 'qpdf', 'pdf-lib'],
+        keywords: ['pdf', 'compress', 'pdf-lib', 'optimize'],
         path: '/tools/pdf-compressor',
         examples: ['Arquivo de 10MB'],
     },

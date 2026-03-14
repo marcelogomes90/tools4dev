@@ -241,3 +241,8 @@ code {
 .fade-in-up {
     animation: fade-in-up 0.3s ease-out;
 }
+
+input[type='date'] {
+    min-inline-size: 0;
+    width: 100%;
+}
