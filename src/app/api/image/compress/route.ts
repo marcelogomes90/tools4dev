@@ -12,7 +12,7 @@ import { imageProcessSchema } from '@/server/validators/api';
 
 export const runtime = 'nodejs';
 
-const MAX_FILE_SIZE = 10 * 1024 * 1024;
+const MAX_FILE_SIZE = 5 * 1024 * 1024;
 const IMAGE_PROCESS_TIMEOUT_MS = 30_000;
 
 function withTimeout<T>(promise: Promise<T>, timeoutMs: number) {
@@ -77,8 +77,8 @@ export async function POST(request: NextRequest) {
 
     if (file.size > MAX_FILE_SIZE) {
         return NextResponse.json(
-            { ok: false, message: 'Arquivo excede 10MB.' },
-            { status: 400 },
+            { ok: false, message: 'Arquivo excede o limite de 5MB.' },
+            { status: 413 },
         );
     }
 

@@ -160,7 +160,7 @@ export const toolDefinitions: ToolDefinition[] = [
         category: 'Arquivos',
         keywords: ['pdf', 'compress', 'pdf-lib', 'optimize'],
         path: '/tools/pdf-compressor',
-        examples: ['Arquivo de 10MB'],
+        examples: ['Arquivo de 5MB'],
     },
     {
         slug: 'name-generator',

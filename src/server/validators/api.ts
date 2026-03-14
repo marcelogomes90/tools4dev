@@ -147,8 +147,8 @@ export const pdfCompressSchema = z.object({
         .number()
         .int()
         .positive()
-        .max(20 * 1024 * 1024, {
-            message: 'O arquivo excede o limite de 20MB.',
+        .max(5 * 1024 * 1024, {
+            message: 'O arquivo excede o limite de 5MB.',
         }),
     quality: z
         .number()

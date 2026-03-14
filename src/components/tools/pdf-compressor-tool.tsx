@@ -12,6 +12,8 @@ import { ToolLayout } from '@/components/ui/tool-layout';
 
 const meta = getToolBySlug('pdf-compressor');
 const FILE_INPUT_ID = 'pdf-file-upload';
+const MAX_PDF_FILE_SIZE_BYTES = 5 * 1024 * 1024;
+const MAX_PDF_FILE_SIZE_LABEL = '5MB';
 
 export function PdfCompressorTool() {
     const [file, setFile] = useState<File | null>(null);
@@ -32,6 +34,11 @@ export function PdfCompressorTool() {
     async function compress() {
         if (!file) return;
 
+        if (file.size > MAX_PDF_FILE_SIZE_BYTES) {
+            setError(`O PDF excede o limite de ${MAX_PDF_FILE_SIZE_LABEL}.`);
+            return;
+        }
+
         setLoading(true);
         setError('');
         setStats('');
@@ -47,6 +54,11 @@ export function PdfCompressorTool() {
             });
 
             if (!response.ok) {
+                if (response.status === 413) {
+                    setError(`O PDF excede o limite de ${MAX_PDF_FILE_SIZE_LABEL}.`);
+                    return;
+                }
+
                 const data = (await response.json().catch(() => null)) as {
                     message?: string;
                 } | null;
@@ -89,6 +101,24 @@ export function PdfCompressorTool() {
         setError('');
     }
 
+    function handlePdfFileChange(nextFile: File | null) {
+        setError('');
+        setStats('');
+
+        if (!nextFile) {
+            setFile(null);
+            return;
+        }
+
+        if (nextFile.size > MAX_PDF_FILE_SIZE_BYTES) {
+            setFile(null);
+            setError(`O PDF excede o limite de ${MAX_PDF_FILE_SIZE_LABEL}.`);
+            return;
+        }
+
+        setFile(nextFile);
+    }
+
     return (
         <ToolLayout
             title={meta.name}
@@ -99,7 +129,7 @@ export function PdfCompressorTool() {
                 <InputPanel>
                     <div>
                         <Label htmlFor={FILE_INPUT_ID}>
-                            Arquivo PDF (max 20MB)
+                            Arquivo PDF (máx {MAX_PDF_FILE_SIZE_LABEL})
                         </Label>
                         <input
                             id={FILE_INPUT_ID}
@@ -107,7 +137,9 @@ export function PdfCompressorTool() {
                             className="sr-only"
                             accept="application/pdf"
                             onChange={(event) =>
-                                setFile(event.target.files?.[0] ?? null)
+                                handlePdfFileChange(
+                                    event.target.files?.[0] ?? null,
+                                )
                             }
                         />
                         <label
@@ -119,9 +151,14 @@ export function PdfCompressorTool() {
                                 Clique para selecionar PDF
                             </span>
                             <span className="mt-1 w-full break-all text-xs text-slate-600 dark:text-slate-400">
-                                {file ? file.name : 'Sem arquivo selecionado'}
+                                {file
+                                    ? `${file.name} (${(file.size / 1024).toFixed(1)}KB)`
+                                    : 'Sem arquivo selecionado'}
                             </span>
                         </label>
+                        <p className="mt-1 text-xs text-slate-600 dark:text-slate-400">
+                            Limite de upload: {MAX_PDF_FILE_SIZE_LABEL}.
+                        </p>
                     </div>
                     <div>
                         <Label htmlFor="pdf-quality">Qualidade (1..100)</Label>

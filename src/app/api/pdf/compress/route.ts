@@ -5,6 +5,7 @@ import { compressPDF } from '@/server/services/pdf';
 import { pdfCompressSchema } from '@/server/validators/api';
 
 export const runtime = 'nodejs';
+const MAX_PDF_FILE_SIZE = 5 * 1024 * 1024;
 
 export async function POST(request: NextRequest) {
     const ip = getClientIp(request);
@@ -25,6 +26,13 @@ export async function POST(request: NextRequest) {
         );
     }
 
+    if (file.size > MAX_PDF_FILE_SIZE) {
+        return NextResponse.json(
+            { ok: false, message: 'Arquivo PDF excede o limite de 5MB.' },
+            { status: 413 },
+        );
+    }
+
     const metadata = pdfCompressSchema.safeParse({
         fileName: file.name,
         mimeType: file.type,
@@ -34,7 +42,7 @@ export async function POST(request: NextRequest) {
 
     if (!metadata.success) {
         return NextResponse.json(
-            { ok: false, message: 'Arquivo inválido. Envie PDF de até 20MB.' },
+            { ok: false, message: 'Arquivo inválido. Envie PDF de até 5MB.' },
             { status: 400 },
         );
     }

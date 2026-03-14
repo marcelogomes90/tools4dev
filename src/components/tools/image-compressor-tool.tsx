@@ -13,6 +13,8 @@ import { ToolLayout } from '@/components/ui/tool-layout';
 
 const meta = getToolBySlug('image-compressor');
 const FILE_INPUT_ID = 'img-file-upload';
+const MAX_IMAGE_FILE_SIZE_BYTES = 5 * 1024 * 1024;
+const MAX_IMAGE_FILE_SIZE_LABEL = '5MB';
 
 type ImageFormat = 'png' | 'jpeg' | 'webp' | 'gif';
 type ImageMode = 'resize' | 'convert' | 'compress';
@@ -150,6 +152,26 @@ export function ImageCompressorTool() {
         setConvertFormat('webp');
         setCompressQuality(78);
         clearOutput();
+    }
+
+    function handleImageFileChange(nextFile: File | null) {
+        clearOutput();
+        setSourceDimensions(null);
+
+        if (!nextFile) {
+            setFile(null);
+            return;
+        }
+
+        if (nextFile.size > MAX_IMAGE_FILE_SIZE_BYTES) {
+            setFile(null);
+            setError(
+                `A imagem excede o limite de ${MAX_IMAGE_FILE_SIZE_LABEL}.`,
+            );
+            return;
+        }
+
+        setFile(nextFile);
     }
 
     function changeMode(nextMode: ImageMode) {
@@ -292,6 +314,10 @@ export function ImageCompressorTool() {
         if (!file) return;
 
         clearOutput();
+        if (file.size > MAX_IMAGE_FILE_SIZE_BYTES) {
+            setError(`A imagem excede o limite de ${MAX_IMAGE_FILE_SIZE_LABEL}.`);
+            return;
+        }
         setLoading(true);
         let timeoutId: number | undefined;
 
@@ -333,6 +359,13 @@ export function ImageCompressorTool() {
             });
 
             if (!response.ok) {
+                if (response.status === 413) {
+                    setError(
+                        `A imagem excede o limite de ${MAX_IMAGE_FILE_SIZE_LABEL}.`,
+                    );
+                    return;
+                }
+
                 const data = (await response.json().catch(() => null)) as {
                     message?: string;
                 } | null;
@@ -455,7 +488,7 @@ export function ImageCompressorTool() {
                     <InputPanel title={`Entrada - ${modeLabel(mode)}`}>
                         <div>
                             <Label htmlFor={FILE_INPUT_ID}>
-                                Arquivo (png/jpeg/webp/gif, máx 10MB)
+                                Arquivo (png/jpeg/webp/gif, máx {MAX_IMAGE_FILE_SIZE_LABEL})
                             </Label>
                             <input
                                 id={FILE_INPUT_ID}
@@ -463,7 +496,9 @@ export function ImageCompressorTool() {
                                 className="sr-only"
                                 accept="image/png,image/jpeg,image/webp,image/gif"
                                 onChange={(event) =>
-                                    setFile(event.target.files?.[0] ?? null)
+                                    handleImageFileChange(
+                                        event.target.files?.[0] ?? null,
+                                    )
                                 }
                             />
                             <label
@@ -487,6 +522,9 @@ export function ImageCompressorTool() {
                                     </span>
                                 )}
                             </label>
+                            <p className="mt-1 text-xs text-slate-600 dark:text-slate-400">
+                                Limite de upload: {MAX_IMAGE_FILE_SIZE_LABEL}.
+                            </p>
                         </div>
 
                         {mode === 'resize' && (
