@@ -1,23 +1,5 @@
 import type { NextConfig } from 'next';
 
-const scriptSrc = ["'self'", "'unsafe-inline'"];
-
-if (process.env.NODE_ENV !== 'production') {
-    scriptSrc.push("'unsafe-eval'");
-}
-
-const csp = [
-    "default-src 'self'",
-    "img-src 'self' data: blob:",
-    "style-src 'self' 'unsafe-inline'",
-    `script-src ${scriptSrc.join(' ')}`,
-    "connect-src 'self'",
-    "font-src 'self' data:",
-    "base-uri 'self'",
-    "form-action 'self'",
-    "frame-ancestors 'none'",
-].join('; ');
-
 const nextConfig: NextConfig = {
     async headers() {
         return [
@@ -35,7 +17,6 @@ const nextConfig: NextConfig = {
                         key: 'Permissions-Policy',
                         value: 'camera=(), microphone=(), geolocation=()',
                     },
-                    { key: 'Content-Security-Policy', value: csp },
                 ],
             },
         ];

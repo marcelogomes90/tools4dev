@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import { headers } from 'next/headers';
 import { ReactNode } from 'react';
 import './globals.css';
 import { AppShell } from '@/components/layout/app-shell';
@@ -11,6 +12,8 @@ import {
 } from '@/lib/seo';
 
 const siteUrl = getPublicSiteUrl();
+const adsenseClientId = 'ca-pub-9818253381977522';
+const adsenseScriptSrc = `https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${adsenseClientId}`;
 
 export const metadata: Metadata = {
     metadataBase: siteUrl ? new URL(siteUrl) : undefined,
@@ -73,11 +76,21 @@ export const metadata: Metadata = {
     },
 };
 
-export default function RootLayout({
+export default async function RootLayout({
     children,
 }: Readonly<{ children: ReactNode }>) {
+    const nonce = (await headers()).get('x-nonce') ?? undefined;
+
     return (
         <html lang="pt-BR" suppressHydrationWarning>
+            <head>
+                <script
+                    nonce={nonce}
+                    async
+                    src={adsenseScriptSrc}
+                    crossOrigin="anonymous"
+                />
+            </head>
             <body className="font-sans">
                 <ThemeProvider>
                     <AppShell>{children}</AppShell>
