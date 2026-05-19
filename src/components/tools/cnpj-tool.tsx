@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import type { CnpjGenerationMode } from '@/lib/tools/cnpj';
 import { generateCnpjBatch, isValidCnpj } from '@/lib/tools/cnpj';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -9,6 +10,7 @@ import { InputPanel } from '@/components/ui/input-panel';
 import { OutputPanel } from '@/components/ui/output-panel';
 import { CopyButton } from '@/components/ui/copy-button';
 import { ToolLayout } from '@/components/ui/tool-layout';
+import { Select } from '@/components/ui/select';
 import { getToolBySlug } from '@/lib/tool-registry';
 import { downloadText } from '@/lib/utils/download';
 
@@ -18,6 +20,8 @@ export function CnpjTool() {
     const [mode, setMode] = useState<'generator' | 'validator'>('generator');
     const [quantity, setQuantity] = useState(1);
     const [masked, setMasked] = useState(true);
+    const [generationMode, setGenerationMode] =
+        useState<CnpjGenerationMode>('numeric');
     const [inputToValidate, setInputToValidate] = useState('');
     const [result, setResult] = useState<string[]>([]);
 
@@ -28,12 +32,14 @@ export function CnpjTool() {
     function generateExample() {
         setQuantity(5);
         setMasked(true);
-        setResult(generateCnpjBatch(5, true));
+        setGenerationMode('alphanumeric');
+        setResult(generateCnpjBatch(5, true, 'alphanumeric'));
     }
 
     function clearGenerator() {
         setQuantity(1);
         setMasked(true);
+        setGenerationMode('numeric');
         setResult([]);
     }
 
@@ -103,11 +109,36 @@ export function CnpjTool() {
                                 />
                                 Gerar com máscara
                             </label>
+                            <div>
+                                <Label htmlFor="cnpj-generation-mode">
+                                    Tipo de CNPJ
+                                </Label>
+                                <Select
+                                    id="cnpj-generation-mode"
+                                    className="mt-1"
+                                    value={generationMode}
+                                    onChange={(event) =>
+                                        setGenerationMode(
+                                            event.target
+                                                .value as CnpjGenerationMode,
+                                        )
+                                    }
+                                >
+                                    <option value="numeric">Numérico</option>
+                                    <option value="alphanumeric">
+                                        Alfanumérico
+                                    </option>
+                                </Select>
+                            </div>
                             <div className="flex flex-wrap gap-2">
                                 <Button
                                     onClick={() =>
                                         setResult(
-                                            generateCnpjBatch(quantity, masked),
+                                            generateCnpjBatch(
+                                                quantity,
+                                                masked,
+                                                generationMode,
+                                            ),
                                         )
                                     }
                                 >
@@ -172,7 +203,7 @@ export function CnpjTool() {
                                 <Button
                                     variant="outline"
                                     onClick={() =>
-                                        setInputToValidate('04.252.011/0001-10')
+                                        setInputToValidate('12.ABC.345/01DE-35')
                                     }
                                 >
                                     Gerar exemplo

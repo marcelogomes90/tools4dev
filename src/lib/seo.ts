@@ -3,12 +3,11 @@ import type { ToolDefinition } from '@/types/tools';
 export const SITE_NAME = 'tools4dev';
 export const SITE_DESCRIPTION =
     'Suite de ferramentas para desenvolvimento: formatadores, geradores, segurança, utilitários de texto e arquivos.';
+export const CANONICAL_SITE_URL = 'https://tools4dev.com.br';
 const SITE_URL_ENV_KEYS = [
     'NEXT_PUBLIC_APP_URL',
     'SITE_URL',
     'APP_URL',
-    'VERCEL_PROJECT_PRODUCTION_URL',
-    'VERCEL_URL',
 ] as const;
 const BASE_KEYWORDS = [
     'ferramentas para desenvolvedores',
@@ -45,8 +44,11 @@ const TOOL_LONG_TAIL_KEYWORDS: Record<string, string[]> = {
     ],
     'cnpj-generator': [
         'gerador de cnpj válido online',
+        'gerador de cnpj alfanumérico online',
         'validar cnpj online grátis',
+        'validar cnpj alfanumérico',
         'gerar cnpj com máscara',
+        'cnpj alfanumérico receita federal',
     ],
     'hash-generator': [
         'gerar hash sha256 online',
@@ -113,7 +115,7 @@ const TOOL_SEO_DESCRIPTION_OVERRIDES: Record<string, string> = {
     'cpf-generator':
         'Gere e valide CPF válido online com ou sem máscara para testes de cadastro, QA e homologação.',
     'cnpj-generator':
-        'Gere e valide CNPJ válido online com ou sem máscara para fluxos de cadastro de empresas.',
+        'Gere e valide CNPJ numérico ou alfanumérico online com ou sem máscara para testes de cadastro.',
     'hash-generator':
         'Gere hash MD5, SHA1, SHA256 e SHA512 online para checksum, integridade de arquivos e validação rápida.',
     'uuid-generator':
@@ -183,6 +185,19 @@ function normalizeUrl(url: string) {
     return `https://${trimmed}`.replace(/\/+$/, '');
 }
 
+function isLoopbackUrl(url: string) {
+    try {
+        const hostname = new URL(url).hostname;
+        return (
+            hostname === 'localhost' ||
+            hostname === '127.0.0.1' ||
+            hostname === '::1'
+        );
+    } catch {
+        return false;
+    }
+}
+
 function readSiteUrlFromEnv() {
     for (const key of SITE_URL_ENV_KEYS) {
         const value = process.env[key];
@@ -194,18 +209,22 @@ function readSiteUrlFromEnv() {
 
 export function getConfiguredSiteUrl() {
     const normalized = normalizeUrl(readSiteUrlFromEnv());
+    if (process.env.NODE_ENV === 'production' && isLoopbackUrl(normalized)) {
+        return undefined;
+    }
+
     return normalized || undefined;
 }
 
 export function getPublicSiteUrl() {
     const configured = getConfiguredSiteUrl();
-    if (configured) return configured;
-
-    if (process.env.NODE_ENV !== 'production') {
-        return 'http://localhost:3000';
+    if (process.env.NODE_ENV === 'production') {
+        return CANONICAL_SITE_URL;
     }
 
-    return undefined;
+    if (configured) return configured;
+
+    return 'http://localhost:3000';
 }
 
 export function getSiteUrl() {
@@ -213,10 +232,7 @@ export function getSiteUrl() {
 }
 
 export function toAbsoluteSiteUrl(path: string) {
-    const siteUrl = getPublicSiteUrl();
-    if (!siteUrl) return undefined;
-
-    return new URL(path, `${siteUrl}/`).toString();
+    return new URL(path, `${getSiteUrl()}/`).toString();
 }
 
 function dedupeKeywords(values: string[]) {

@@ -13,11 +13,12 @@ export const toolDefinitions: ToolDefinition[] = [
     {
         slug: 'cnpj-generator',
         name: 'Gerador de CNPJ',
-        description: 'Gera e valida CNPJs com ou sem formatação.',
+        description:
+            'Gera e valida CNPJs numéricos e alfanuméricos com ou sem formatação.',
         category: 'Identidade',
-        keywords: ['cnpj', 'empresa', 'validar', 'gerar'],
+        keywords: ['cnpj', 'empresa', 'validar', 'gerar', 'alfanumérico'],
         path: '/tools/cnpj-generator',
-        examples: ['12.345.678/0001-90', '11222333000181'],
+        examples: ['12.345.678/0001-90', '12.ABC.345/01DE-35'],
     },
     {
         slug: 'hash-generator',

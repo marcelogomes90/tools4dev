@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 
+const canonicalUrl = new URL('https://tools4dev.com.br');
+
 function createNonce() {
     const bytes = new Uint8Array(16);
     crypto.getRandomValues(bytes);
@@ -12,7 +14,44 @@ function createNonce() {
     return btoa(binary);
 }
 
+function getForwardedProtocol(request: NextRequest) {
+    return (
+        request.headers.get('x-forwarded-proto') ??
+        request.nextUrl.protocol.replace(':', '')
+    );
+}
+
+function getForwardedHost(request: NextRequest) {
+    return (
+        request.headers.get('x-forwarded-host') ??
+        request.headers.get('host') ??
+        request.nextUrl.host
+    );
+}
+
+function getCanonicalRedirect(request: NextRequest) {
+    if (process.env.NODE_ENV !== 'production') return null;
+
+    const protocol = getForwardedProtocol(request);
+    const host = getForwardedHost(request);
+    const isCanonicalHost = host.toLowerCase() === canonicalUrl.host;
+    const isHttps = protocol === 'https';
+
+    if (isCanonicalHost && isHttps) return null;
+
+    const redirectUrl = request.nextUrl.clone();
+    redirectUrl.protocol = canonicalUrl.protocol;
+    redirectUrl.host = canonicalUrl.host;
+
+    return redirectUrl;
+}
+
 export function middleware(request: NextRequest) {
+    const canonicalRedirect = getCanonicalRedirect(request);
+    if (canonicalRedirect) {
+        return NextResponse.redirect(canonicalRedirect, 308);
+    }
+
     const nonce = createNonce();
 
     const requestHeaders = new Headers(request.headers);
@@ -56,5 +95,5 @@ export function middleware(request: NextRequest) {
 }
 
 export const config = {
-    matcher: ['/((?!_next/static|_next/image|favicon.ico|robots.txt|sitemap.xml).*)'],
+    matcher: ['/((?!_next/static|_next/image|favicon.ico).*)'],
 };
