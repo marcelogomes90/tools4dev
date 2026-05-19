@@ -3,25 +3,28 @@
 @tailwind utilities;
 
 :root {
-    --surface: 220 33% 98%;
-    --surface-foreground: 222 47% 11%;
-    --surface-muted: 220 30% 94%;
-    --surface-border: 218 27% 84%;
-    --surface-accent: 235 89% 62%;
-    --surface-accent-hover: 235 89% 55%;
+    --surface: 210 30% 96%;
+    --surface-foreground: 220 33% 10%;
+    --surface-muted: 210 25% 90%;
+    --surface-border: 214 19% 82%;
+    --surface-accent: 174 79% 33%;
+    --surface-accent-hover: 174 83% 27%;
     --surface-input: 0 0% 100%;
-    --surface-card: 220 33% 99%;
+    --surface-card: 210 36% 99%;
+    --surface-shadow: 214 32% 26%;
 }
 
 .dark {
-    --surface: 224 39% 9%;
-    --surface-foreground: 213 31% 93%;
-    --surface-muted: 222 32% 13%;
-    --surface-border: 220 20% 22%;
-    --surface-accent: 235 89% 68%;
-    --surface-accent-hover: 235 89% 75%;
-    --surface-input: 222 32% 12%;
-    --surface-card: 222 36% 11%;
+    --surface: 220 31% 7%;
+    --surface-foreground: 210 28% 94%;
+    --surface-muted: 218 27% 12%;
+    --surface-border: 216 18% 24%;
+    --surface-accent: 173 72% 46%;
+    --surface-accent-hover: 173 80% 54%;
+    --surface-input: 218 30% 9%;
+    --surface-card: 218 30% 10%;
+    --surface-shadow: 220 60% 2%;
+    color-scheme: dark;
 }
 
 * {
@@ -32,93 +35,90 @@ body {
     @apply text-surface-foreground antialiased selection:bg-surface-accent/20 selection:text-surface-foreground;
     background:
         radial-gradient(
-            circle at 2% -20%,
-            rgba(99, 102, 241, 0.15),
-            transparent 44%
+            circle at 1px 1px,
+            hsl(214 24% 52% / 0.12) 0.8px,
+            transparent 1px
         ),
         radial-gradient(
-            circle at 94% 4%,
-            rgba(139, 92, 246, 0.1),
-            transparent 30%
+            circle at 10px 10px,
+            hsl(174 43% 39% / 0.08) 0.7px,
+            transparent 1px
         ),
-        radial-gradient(
-            circle at 12% 100%,
-            rgba(37, 99, 235, 0.06),
-            transparent 34%
-        ),
-        radial-gradient(rgba(100, 116, 139, 0.18) 0.85px, transparent 0.95px),
-        radial-gradient(rgba(255, 255, 255, 0.25) 0.85px, transparent 0.95px),
         linear-gradient(
             180deg,
-            rgba(255, 255, 255, 0.9),
-            rgba(255, 255, 255, 0.78)
+            hsl(196 48% 98% / 0.86),
+            hsl(168 30% 95% / 0.78) 42%,
+            hsl(216 31% 94% / 0.9)
         ),
+        linear-gradient(
+            90deg,
+            hsl(174 61% 42% / 0.08),
+            transparent 34%,
+            hsl(214 46% 36% / 0.06)
+        ),
+        linear-gradient(135deg, hsl(214 21% 64% / 0.11) 1px, transparent 1px),
         hsl(var(--surface-muted));
     background-size:
+        20px 20px,
+        20px 20px,
         auto,
         auto,
-        auto,
-        15px 15px,
-        15px 15px,
-        auto,
+        18px 18px,
         auto;
     background-position:
-        center,
+        0 0,
+        0 0,
         center,
         center,
         0 0,
-        7.5px 7.5px,
-        center,
         center;
     background-attachment: fixed;
-    font-family: 'Manrope', 'Inter', 'Segoe UI', system-ui, sans-serif;
+    font-family: var(--font-sans), ui-sans-serif, system-ui, sans-serif;
+    text-rendering: optimizeLegibility;
 }
 
 .dark body {
     background:
         radial-gradient(
-            circle at -8% -24%,
-            rgba(99, 102, 241, 0.18),
-            transparent 48%
+            circle at 1px 1px,
+            hsl(210 31% 78% / 0.07) 0.8px,
+            transparent 1px
         ),
         radial-gradient(
-            circle at 96% -10%,
-            rgba(139, 92, 246, 0.12),
-            transparent 36%
+            circle at 10px 10px,
+            hsl(174 74% 46% / 0.05) 0.7px,
+            transparent 1px
         ),
-        radial-gradient(
-            circle at 10% 110%,
-            rgba(37, 99, 235, 0.09),
-            transparent 40%
+        linear-gradient(180deg, hsl(218 38% 7% / 0.97), hsl(216 37% 5%)),
+        linear-gradient(
+            90deg,
+            hsl(174 78% 44% / 0.07),
+            transparent 38%,
+            hsl(205 56% 43% / 0.05)
         ),
-        radial-gradient(rgba(148, 163, 184, 0.1) 0.85px, transparent 0.95px),
-        radial-gradient(rgba(8, 14, 36, 0.5) 0.85px, transparent 0.95px),
-        linear-gradient(180deg, rgba(6, 8, 18, 0.88), rgba(7, 10, 22, 0.82)),
+        linear-gradient(135deg, hsl(215 26% 42% / 0.06) 1px, transparent 1px),
         hsl(var(--surface-muted));
     background-size:
+        20px 20px,
+        20px 20px,
         auto,
         auto,
-        auto,
-        15px 15px,
-        15px 15px,
-        auto,
+        24px 24px,
         auto;
     background-position:
-        center,
+        0 0,
+        0 0,
         center,
         center,
         0 0,
-        7.5px 7.5px,
-        center,
         center;
     background-attachment: fixed;
 }
 
 pre,
 code {
-    font-family:
-        'IBM Plex Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas,
-        'Liberation Mono', 'Courier New', monospace;
+    font-family: var(--font-mono), ui-monospace, SFMono-Regular, Menlo, Monaco,
+        Consolas, 'Liberation Mono', 'Courier New', monospace;
 }
 
 /* Custom scrollbar for sidebar */

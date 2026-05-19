@@ -10,8 +10,8 @@ export function OutputPanel({
     children,
 }: OutputPanelProps) {
     return (
-        <div className="rounded-2xl border border-surface-border/70 bg-surface-card p-5 shadow-card">
-            <h2 className="mb-3 text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-500 dark:text-slate-400">
+        <div className="rounded-2xl border border-surface-border/65 bg-surface-card/92 p-5 shadow-card backdrop-blur">
+            <h2 className="mb-3 text-[11px] font-bold uppercase tracking-[0.14em] text-slate-500 dark:text-slate-300">
                 {title}
             </h2>
             <div aria-live="polite" className="space-y-3">

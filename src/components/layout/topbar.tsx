@@ -311,12 +311,12 @@ export function Topbar({
     }
 
     return (
-        <header className="sticky top-0 z-40 border-b border-surface-border/50 bg-surface-card/80 backdrop-blur-xl supports-[backdrop-filter]:bg-surface-card/70">
-            <div className="mx-auto flex max-w-[1400px] items-center gap-2.5 px-4 py-3 sm:px-6 lg:px-8">
+        <header className="sticky top-0 z-40 border-b border-surface-border/60 bg-surface-card/92 shadow-[0_1px_0_hsl(var(--surface-border)/0.25)] backdrop-blur-xl supports-[backdrop-filter]:bg-surface-card/86">
+            <div className="mx-auto flex min-h-16 max-w-[1400px] items-center gap-2.5 px-4 py-2.5 sm:px-6 lg:px-8">
                 <button
                     type="button"
                     onClick={onToggleMobileMenu}
-                    className="inline-flex h-9 w-9 items-center justify-center rounded-lg border border-surface-border/70 bg-surface-card text-slate-600 shadow-sm transition-all hover:border-surface-accent/40 hover:bg-surface-muted/75 hover:text-surface-foreground dark:text-slate-300 lg:hidden"
+                    className="inline-flex h-9 w-9 items-center justify-center rounded-lg border border-surface-border/70 bg-surface-input text-slate-600 shadow-sm shadow-surface-border/10 transition-all hover:border-surface-accent/45 hover:bg-surface-input hover:text-surface-foreground dark:bg-slate-950/80 dark:text-slate-300 lg:hidden"
                     aria-label={
                         isMobileMenuOpen
                             ? 'Fechar menu de ferramentas'
@@ -332,7 +332,7 @@ export function Topbar({
                 <button
                     type="button"
                     onClick={onToggleDesktopSidebar}
-                    className="hidden h-9 w-9 items-center justify-center rounded-lg border border-surface-border/70 bg-surface-card text-slate-600 shadow-sm transition-all hover:border-surface-accent/40 hover:bg-surface-muted/75 hover:text-surface-foreground dark:text-slate-300 lg:inline-flex"
+                    className="hidden h-9 w-9 items-center justify-center rounded-lg border border-surface-border/70 bg-surface-input text-slate-600 shadow-sm shadow-surface-border/10 transition-all hover:border-surface-accent/45 hover:bg-surface-input hover:text-surface-foreground dark:bg-slate-950/80 dark:text-slate-300 lg:inline-flex"
                     aria-label={
                         isDesktopSidebarOpen
                             ? 'Ocultar sidebar'
@@ -348,12 +348,12 @@ export function Topbar({
                 <Link
                     href="/"
                     aria-label="Ir para Home"
-                    className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-lg border border-surface-border/70 bg-surface-card text-slate-600 shadow-sm transition-all hover:border-surface-accent/40 hover:bg-surface-muted/75 hover:text-surface-foreground dark:text-slate-300"
+                    className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-lg border border-surface-border/70 bg-surface-input text-slate-600 shadow-sm shadow-surface-border/10 transition-all hover:border-surface-accent/45 hover:bg-surface-input hover:text-surface-foreground dark:bg-slate-950/80 dark:text-slate-300"
                 >
                     <House className="h-4 w-4" />
                 </Link>
                 <form onSubmit={onSubmit} className="relative min-w-0 flex-1">
-                    <Search className="pointer-events-none absolute left-3.5 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-slate-400 dark:text-slate-500" />
+                    <Search className="pointer-events-none absolute left-3.5 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-slate-400 dark:text-slate-400" />
                     <input
                         value={query}
                         onChange={(event) => onSearchChange(event.target.value)}
@@ -374,10 +374,10 @@ export function Topbar({
                                 : undefined
                         }
                         autoComplete="off"
-                        className="h-9 w-full rounded-full border border-surface-border/70 bg-surface-card pl-9 pr-4 text-sm text-surface-foreground shadow-sm outline-none ring-surface-accent/35 transition-all placeholder:text-slate-400 focus:border-surface-accent/55 focus:ring-1 dark:placeholder:text-slate-500"
+                        className="h-9 w-full rounded-full border border-surface-border/70 bg-surface-input pl-9 pr-4 text-sm text-surface-foreground shadow-sm shadow-surface-border/10 outline-none ring-surface-accent/35 transition-all placeholder:text-slate-400 hover:border-surface-border focus:border-surface-accent/60 focus:bg-surface-input focus:ring-2 dark:border-slate-700/80 dark:bg-slate-950/80 dark:text-slate-100 dark:placeholder:text-slate-400 dark:focus:bg-slate-950"
                     />
                     {isSearchFocused && suggestions.length > 0 && (
-                        <div className="absolute top-full z-50 mt-2 w-full rounded-2xl border border-surface-border/70 bg-surface-card shadow-card backdrop-blur-xl">
+                        <div className="absolute top-full z-50 mt-2 w-full rounded-2xl border border-surface-border/70 bg-surface-card shadow-lift backdrop-blur-xl dark:border-slate-700/80 dark:bg-[hsl(218_24%_13%)]">
                             <ul
                                 id="tools-search-suggestions"
                                 ref={suggestionsListRef}
@@ -402,10 +402,10 @@ export function Topbar({
                                                     goToTool(tool.path);
                                                 }}
                                                 className={cn(
-                                                    'w-full rounded-lg px-3 py-2 text-left transition-all hover:bg-surface-muted/70',
+                                                    'w-full rounded-lg px-3 py-2 text-left transition-all hover:bg-surface-accent/10 dark:hover:bg-surface-accent/12',
                                                     index ===
                                                         resolvedActiveIndex &&
-                                                        'bg-surface-muted/70',
+                                                        'bg-surface-accent/10 dark:bg-surface-accent/12',
                                                 )}
                                             >
                                                 <div className="flex items-center gap-2 text-sm font-medium text-surface-foreground">
@@ -421,7 +421,7 @@ export function Topbar({
                                                     />
                                                     <span>{tool.name}</span>
                                                 </div>
-                                                <div className="mt-0.5 text-xs text-slate-400 dark:text-slate-500">
+                                                <div className="mt-0.5 font-mono text-[11px] text-slate-400 dark:text-slate-500">
                                                     {tool.path}
                                                 </div>
                                             </button>

@@ -83,11 +83,11 @@ export default function HomePage() {
                 }}
             />
             <section className="flex min-h-[calc(100vh-156px)] items-center justify-center px-2 py-8">
-                <div className="w-full max-w-5xl rounded-[28px] border border-surface-border/70 bg-surface-card p-8 text-center shadow-card backdrop-blur sm:p-12">
-                    <p className="mb-4 text-[11px] font-semibold uppercase tracking-[0.28em] text-slate-400 dark:text-slate-500">
+                <div className="w-full max-w-5xl rounded-[28px] border border-surface-border/65 bg-surface-card/90 p-8 text-center shadow-lift backdrop-blur sm:p-12">
+                    <p className="mb-4 text-[11px] font-bold uppercase tracking-[0.22em] text-surface-accent">
                         tools4dev
                     </p>
-                    <h1 className="text-4xl font-bold tracking-tight md:text-5xl lg:text-6xl">
+                    <h1 className="text-4xl font-extrabold leading-[1.05] tracking-normal md:text-5xl lg:text-6xl">
                         <span className="bg-gradient-to-br from-surface-foreground via-surface-foreground to-surface-accent bg-clip-text text-transparent">
                             Ferramentas essenciais
                         </span>
@@ -97,7 +97,7 @@ export default function HomePage() {
                             para desenvolvedores modernos
                         </span>
                     </h1>
-                    <p className="mx-auto mt-5 max-w-2xl text-sm leading-relaxed text-slate-600 dark:text-slate-300">
+                    <p className="mx-auto mt-5 max-w-2xl text-[15px] leading-7 text-slate-600 dark:text-slate-300">
                         Geradores, formatadores, utilitários de segurança e
                         compressores reunidos em um painel elegante. Selecione
                         qualquer ferramenta na barra lateral para começar.
@@ -115,7 +115,7 @@ export default function HomePage() {
                     <div className="mt-8 flex flex-wrap justify-center gap-3">
                         <Link
                             href="/tools/json-formatter"
-                            className="inline-flex h-10 items-center justify-center rounded-lg bg-surface-accent px-6 text-sm font-semibold text-white shadow-sm transition-all duration-150 hover:-translate-y-0.5 hover:bg-surface-accent-hover"
+                            className="inline-flex h-10 items-center justify-center rounded-lg bg-surface-accent px-6 text-sm font-semibold text-white shadow-sm shadow-surface-accent/15 transition-all duration-150 hover:-translate-y-0.5 hover:bg-surface-accent-hover hover:shadow-md hover:shadow-surface-accent/18"
                         >
                             Abrir uma ferramenta
                         </Link>
@@ -123,7 +123,7 @@ export default function HomePage() {
                             href={repoUrl}
                             target="_blank"
                             rel="noreferrer"
-                            className="inline-flex h-10 items-center justify-center rounded-lg border border-surface-border/70 bg-surface-input px-6 text-sm font-semibold text-surface-foreground transition-all hover:border-surface-accent/50 hover:bg-surface-muted/60"
+                            className="inline-flex h-10 items-center justify-center rounded-lg border border-surface-border/70 bg-surface-input/85 px-6 text-sm font-semibold text-surface-foreground shadow-sm shadow-surface-border/10 transition-all hover:border-surface-accent/45 hover:bg-surface-input"
                         >
                             Dar uma estrela no GitHub
                         </a>
@@ -155,10 +155,10 @@ export default function HomePage() {
                         </div>
                     </div>
                     <div className="mt-8 border-t border-surface-border/50 pt-6 text-left">
-                        <h2 className="text-lg font-semibold tracking-tight text-surface-foreground">
+                        <h2 className="text-lg font-bold tracking-normal text-surface-foreground">
                             Ferramentas em Destaque
                         </h2>
-                        <p className="mt-1.5 text-sm text-slate-500 dark:text-slate-400">
+                        <p className="mt-1.5 text-sm leading-6 text-slate-500 dark:text-slate-400">
                             Utilitários gratuitos para o dia a dia do
                             desenvolvimento.
                         </p>
@@ -167,9 +167,9 @@ export default function HomePage() {
                                 <li key={tool.slug}>
                                     <Link
                                         href={tool.path}
-                                        className="group flex flex-col rounded-xl border border-surface-border/60 bg-surface-muted/20 p-3.5 transition-all hover:border-surface-accent/40 hover:bg-surface-muted/40"
+                                        className="group flex flex-col rounded-xl border border-surface-border/60 bg-surface-input/42 p-3.5 shadow-sm shadow-surface-border/5 transition-all hover:-translate-y-0.5 hover:border-surface-accent/35 hover:bg-surface-input/75 hover:shadow-card"
                                     >
-                                        <span className="text-sm font-semibold text-surface-foreground group-hover:text-surface-accent">
+                                        <span className="text-sm font-bold text-surface-foreground group-hover:text-surface-accent">
                                             {tool.name}
                                         </span>
                                         <p className="mt-1 line-clamp-1 text-xs leading-relaxed text-slate-500 dark:text-slate-400">

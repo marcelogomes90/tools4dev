@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import { IBM_Plex_Mono, Manrope } from 'next/font/google';
 import { headers } from 'next/headers';
 import { ReactNode } from 'react';
 import './globals.css';
@@ -14,6 +15,17 @@ import {
 const siteUrl = getPublicSiteUrl();
 const adsenseClientId = 'ca-pub-9818253381977522';
 const adsenseScriptSrc = `https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${adsenseClientId}`;
+const manrope = Manrope({
+    subsets: ['latin'],
+    variable: '--font-sans',
+    display: 'swap',
+});
+const ibmPlexMono = IBM_Plex_Mono({
+    subsets: ['latin'],
+    weight: ['400', '500', '600'],
+    variable: '--font-mono',
+    display: 'swap',
+});
 
 export const metadata: Metadata = {
     metadataBase: siteUrl ? new URL(siteUrl) : undefined,
@@ -91,7 +103,9 @@ export default async function RootLayout({
                     crossOrigin="anonymous"
                 />
             </head>
-            <body className="font-sans">
+            <body
+                className={`${manrope.variable} ${ibmPlexMono.variable} font-sans`}
+            >
                 <ThemeProvider>
                     <AppShell>{children}</AppShell>
                 </ThemeProvider>

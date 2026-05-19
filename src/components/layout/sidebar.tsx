@@ -36,7 +36,7 @@ export function Sidebar({
             />
             <aside
                 className={cn(
-                    'sidebar-scroll fixed inset-y-0 left-0 z-50 w-[19.75rem] shrink-0 overflow-y-auto overflow-x-hidden border-r border-surface-border/50 bg-surface-card shadow-card backdrop-blur-xl transition-transform duration-300 lg:sticky lg:top-0 lg:z-auto lg:h-screen lg:shadow-none lg:transition-all',
+                    'sidebar-scroll fixed inset-y-0 left-0 z-50 w-[19.75rem] shrink-0 overflow-y-auto overflow-x-hidden border-r border-surface-border/60 bg-surface-card shadow-lift backdrop-blur-xl transition-transform duration-300 lg:sticky lg:top-0 lg:z-auto lg:h-screen lg:shadow-none lg:transition-all',
                     isMobileOpen ? 'translate-x-0' : '-translate-x-full',
                     isDesktopOpen
                         ? 'lg:w-[19.75rem] lg:opacity-100'
@@ -44,8 +44,8 @@ export function Sidebar({
                     'lg:translate-x-0',
                 )}
             >
-                <div className="sticky -top-px z-10 flex min-h-[76px] flex-col border-b border-surface-border/40 bg-surface-card px-3 pb-3 pt-4">
-                    <p className="px-3 text-xs font-semibold uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400">
+                <div className="sticky -top-px z-10 flex min-h-16 flex-col justify-center bg-surface-card px-3 py-2.5">
+                    <p className="px-3 text-[11px] font-bold uppercase tracking-[0.16em] text-slate-500 dark:text-slate-300">
                         Ferramentas
                     </p>
                     <p className="mt-1.5 flex items-center gap-2 truncate px-3 text-[13px] font-semibold text-surface-foreground">
@@ -64,7 +64,7 @@ export function Sidebar({
                     {toolsByCategory.map(({ category, tools }) => {
                         return (
                             <div key={category}>
-                                <h3 className="mb-1.5 flex items-center gap-2 px-2 text-[10px] font-semibold uppercase tracking-[0.16em] text-slate-400 dark:text-slate-500">
+                                <h3 className="mb-1.5 flex items-center gap-2 px-2 text-[10px] font-bold uppercase tracking-[0.14em] text-slate-500/80 dark:text-slate-400">
                                     <CategoryIcon
                                         category={category}
                                         className="h-3 w-3 shrink-0"
@@ -80,9 +80,9 @@ export function Sidebar({
                                                     href={tool.path}
                                                     onClick={onNavigate}
                                                     className={cn(
-                                                        'flex items-center gap-2.5 rounded-lg px-3 py-2 text-[12px] font-medium text-slate-600 transition-all duration-100 hover:bg-surface-muted/80 hover:text-surface-foreground dark:text-slate-300',
+                                                        'flex items-center gap-2.5 rounded-lg px-3 py-2 text-[12px] font-semibold text-slate-600 transition-all duration-100 hover:bg-surface-muted/80 hover:text-surface-foreground dark:text-slate-300',
                                                         active &&
-                                                            'bg-surface-accent/10 font-semibold text-surface-accent hover:bg-surface-accent/15 hover:text-surface-accent',
+                                                            'bg-surface-accent/10 text-surface-accent shadow-[inset_2px_0_0_hsl(var(--surface-accent))] hover:bg-surface-accent/14 hover:text-surface-accent',
                                                     )}
                                                 >
                                                     <ToolIcon

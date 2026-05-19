@@ -1,10 +1,14 @@
 import type { Config } from 'tailwindcss';
 
 const config: Config = {
-    darkMode: ['class'],
+    darkMode: 'class',
     content: ['./src/**/*.{js,ts,jsx,tsx,mdx}'],
     theme: {
         extend: {
+            fontFamily: {
+                sans: ['var(--font-sans)', 'ui-sans-serif', 'system-ui'],
+                mono: ['var(--font-mono)', 'ui-monospace', 'SFMono-Regular'],
+            },
             colors: {
                 surface: {
                     DEFAULT: 'hsl(var(--surface))',
@@ -18,7 +22,9 @@ const config: Config = {
                 },
             },
             boxShadow: {
-                card: '0 4px 24px hsl(var(--surface-border) / 0.18), 0 1px 6px hsl(var(--surface-border) / 0.12)',
+                card: '0 18px 50px hsl(var(--surface-shadow) / 0.10), 0 1px 0 hsl(var(--surface-border) / 0.42)',
+                lift: '0 24px 70px hsl(var(--surface-shadow) / 0.14), 0 8px 20px hsl(var(--surface-shadow) / 0.08)',
+                inset: 'inset 0 1px 0 hsl(0 0% 100% / 0.55)',
             },
         },
     },
