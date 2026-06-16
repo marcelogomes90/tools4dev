@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 
-const canonicalUrl = new URL('https://tools4dev.com.br');
+const canonicalUrl = new URL('https://www.tools4dev.com.br');
 
 function createNonce() {
     const bytes = new Uint8Array(16);

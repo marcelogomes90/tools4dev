@@ -3,7 +3,7 @@ import type { ToolDefinition } from '@/types/tools';
 export const SITE_NAME = 'tools4dev';
 export const SITE_DESCRIPTION =
     'Suite de ferramentas para desenvolvimento: formatadores, geradores, segurança, utilitários de texto e arquivos.';
-export const CANONICAL_SITE_URL = 'https://tools4dev.com.br';
+export const CANONICAL_SITE_URL = 'https://www.tools4dev.com.br';
 const SITE_URL_ENV_KEYS = [
     'NEXT_PUBLIC_APP_URL',
     'SITE_URL',
@@ -178,11 +178,23 @@ const TOOL_SEO_DESCRIPTION_MIN_WORD_CUT = 140;
 function normalizeUrl(url: string) {
     const trimmed = url.trim();
     if (!trimmed) return '';
-    if (trimmed.startsWith('http://') || trimmed.startsWith('https://')) {
-        return trimmed.replace(/\/+$/, '');
+    const normalized =
+        trimmed.startsWith('http://') || trimmed.startsWith('https://')
+            ? trimmed.replace(/\/+$/, '')
+            : `https://${trimmed}`.replace(/\/+$/, '');
+
+    try {
+        const parsedUrl = new URL(normalized);
+        if (parsedUrl.hostname === 'tools4dev.com.br') {
+            parsedUrl.protocol = 'https:';
+            parsedUrl.hostname = 'www.tools4dev.com.br';
+            return parsedUrl.toString().replace(/\/+$/, '');
+        }
+    } catch {
+        return normalized;
     }
 
-    return `https://${trimmed}`.replace(/\/+$/, '');
+    return normalized;
 }
 
 function isLoopbackUrl(url: string) {

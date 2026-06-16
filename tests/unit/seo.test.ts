@@ -34,10 +34,11 @@ describe('seo helpers', () => {
         );
     });
 
-    it('normalizes configured public URLs', () => {
+    it('canonicalizes configured apex public URLs', () => {
         vi.stubEnv('NODE_ENV', 'development');
         vi.stubEnv('NEXT_PUBLIC_APP_URL', 'tools4dev.com.br/');
 
+        expect(CANONICAL_SITE_URL).toBe('https://www.tools4dev.com.br');
         expect(getPublicSiteUrl()).toBe(CANONICAL_SITE_URL);
     });
 
